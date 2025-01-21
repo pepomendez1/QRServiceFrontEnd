@@ -1,0 +1,102 @@
+.start-page {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align items to the start (left) by default */
+
+  .image-container {
+    flex: 0 0 auto;
+    margin-right: 20px; /* Space between image and content */
+    padding: 0;
+    border: none;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover; /* Ensure the image covers the container */
+      margin: 0;
+      padding: 0;
+    }
+  }
+  .content {
+    flex: 1;
+
+    h1 {
+      font-size: 28px;
+      color: #000000;
+    }
+    p {
+      font-size: 16px;
+      color: #000000;
+      font-weight: 500;
+    }
+  }
+  .buttons {
+    flex: 1;
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    /* Flex direction is row by default, so buttons are horizontal on web */
+    flex-direction: row;
+
+       /* Styling for unfilled mat-button */
+      .default-link-button {
+        width: 90%;
+        color: #EA044E; /* Use your primary color */
+        background-color: transparent;
+        border: none; /* Optional border for unfilled button */
+        box-shadow: none;
+        font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    height: 48px;
+      }
+
+      /* Styling for filled mat-flat-button */
+      .default-filled-button {
+        width: 90%;
+        background-color: #EA044E; /* Use your primary color */
+        border-radius: 8px;
+        color: white; /* Text color for contrast */
+
+        border-color: #EA044E;
+        font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    height: 48px;
+      }
+
+    button {
+      padding: 8px 16px; /* Add padding for better appearance */
+    }
+
+
+  }
+}
+
+/* Media query for mobile */
+@media (max-width: 768px) {
+  .start-page {
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center content horizontally */
+
+    .image-container {
+      margin: 0 0 20px 0; /* Margin below image */
+      width: 100%; /* Ensure image container takes full width on mobile */
+
+      img {
+        width: 100%; /* Ensure image fills container width */
+        height: auto;
+      }
+    }
+
+    .content {
+      text-align: center; /* Center content text */
+    }
+
+    .buttons {
+      flex-direction: column; /* Stack buttons vertically on mobile */
+      align-items: center; /* Center buttons horizontally */
+      width: 100%; /* Ensure buttons take full width if needed */
+    }
+  }
+}

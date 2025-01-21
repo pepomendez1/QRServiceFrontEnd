@@ -1,0 +1,144 @@
+.form-input-box {
+  display: flex;
+  height: 56px;
+  justify-content: space-between;
+  width: 100%;
+  padding: 4px 16px;
+  border-radius: 8px;
+  border: 1px solid $form-input-border-color;
+  position: relative;
+  &:hover{
+    border-color: $form-input-hover-color;
+  }
+  &.error {
+      border-color: #E44B52;
+    }
+}
+
+.form-input-data {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 0; // Ensure no padding to eliminate extra space
+  // align-items: flex-start;
+  // justify-content: center; /* Center items vertically in the available space */
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  border: none;
+  p {
+    font-size: 16px;
+    line-height: 24px;
+    margin: 0; // Remove margin to avoid extra space
+    padding: 0;
+    transition: all 0.2s ease-in-out;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    &.active {
+      font-size: 12px;
+      line-height: 18px;
+      margin-bottom: 4px; // Control spacing above the input
+      transform: translateY(-100%);
+    }
+  }
+}
+
+.form-input-edit {
+  background-color: transparent;
+  display: flex;
+  flex: 1; // Allow input to grow and fill the container
+  border: none;
+  align-self: flex-end;
+  outline: none;
+  height: 100%;
+  width: 100%;
+  padding: 1.5em 0 0;
+
+  &:hover,
+  &:focus,
+  &:active {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.pin-form-container {
+  display: flex;
+  gap: 1em;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: left;
+  max-width: none; // Remove max-width constraint
+  flex: 1;
+}
+
+  .pin-input-container {
+    display: flex;
+    width: 100%;
+    //justify-content: center;
+    gap: 8px;
+    will-change: gap;
+    transition: gap 0.3s ease-in-out;
+
+    @media screen and (max-width: 840px) {
+      gap: 6px;
+
+    }
+    @media screen and (max-width: 374px){
+      gap: 0px;
+    }
+  }
+  .pin-input-container.error .pin-input {
+    border-color: red;
+  }
+    .pin-input {
+      color: $theme-text;
+      background-color: transparent;
+      width: 56px;
+      height: 56px;
+      border: 1px solid $form-input-border-color;
+      text-align: center;
+      font-size: 20px;
+      border-radius: 8px;
+      appearance: none;
+      will-change: border-radius, font-size;
+      transition:
+        border-radius 0.3s ease-in-out,
+        font-size 0.3s ease-in-out;
+      &::placeholder {
+        color: #a3a3a3; // Set a different color for the placeholder
+      }
+
+      @media screen and (max-width: 840px) {
+        width: 50px;
+        height: 50px;
+
+      }
+      @media screen and (max-width: 400px){
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        border-radius: 0;
+        &:first-child {
+          border-radius: 8px 0 0 8px;
+        }
+        &:last-child {
+          border-radius: 0 8px 8px 0;
+        }
+      }
+    }
+    .pin-input:hover {
+      border-color: $form-input-hover-color;
+      outline: none;
+      appearance: none;
+    }
+    .pin-input:focus {
+      border-color: $form-input-hover-color;
+      /* Highlighted border when focused */
+      outline: none;
+      appearance: none;
+    }
+
+

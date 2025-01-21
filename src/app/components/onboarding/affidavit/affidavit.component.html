@@ -1,0 +1,131 @@
+<div class="onboarding">
+  <mat-card class="onboarding-card">
+    <mat-card-header>
+      <mat-card-title>Declaración Jurada</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <h3 class="light-centered-text">
+        ¿Estás alcanzado/a por alguna de estas normas?
+      </h3>
+      <div class="form-wrapper">
+        <form [formGroup]="AffForm" (ngSubmit)="onSubmit()">
+          <hr width="100%" size="2" />
+          <div>
+            <p class="section-title">OCDE</p>
+            <p class="hint-text">
+              Persona que paga impuestos fuera de Argentina.
+            </p>
+            <mat-radio-group
+              color="primary"
+              formControlName="ocde"
+              class="custom-radio-group"
+            >
+              <mat-radio-button value="yes">Si, lo estoy</mat-radio-button>
+              <mat-radio-button value="no">No, no lo estoy</mat-radio-button>
+            </mat-radio-group>
+          </div>
+          <div class="input-data" *ngIf="AffForm.get('ocde')?.value === 'yes'">
+            <mat-form-field appearance="fill">
+              <mat-label>Número de Identificación Tributaria</mat-label>
+              <input matInput formControlName="taxId" />
+              <mat-error *ngIf="AffForm.get('taxId')?.hasError('required')">
+                Este dato es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <hr width="100%" size="2" />
+          <div>
+            <p class="section-title">Ley FACTA</p>
+            <p class="hint-text">
+              Persona estadounidense a los efectos de la Ley FACTA de los
+              Estados Unidos.
+            </p>
+            <mat-radio-group
+              color="primary"
+              formControlName="facta"
+              class="custom-radio-group"
+            >
+              <mat-radio-button value="yes">Si, lo estoy</mat-radio-button>
+              <mat-radio-button value="no">No, no lo estoy</mat-radio-button>
+            </mat-radio-group>
+          </div>
+          <div class="input-data" *ngIf="AffForm.get('facta')?.value === 'yes'">
+            <mat-form-field>
+              <mat-label>Social Security Num (EEUU)</mat-label>
+              <input matInput formControlName="secSocialNumber" />
+              <mat-error
+                *ngIf="AffForm.get('secSocialNumber')?.hasError('required')"
+              >
+                Este dato es requerido
+              </mat-error>
+            </mat-form-field>
+            <div *ngIf="warningMessage" class="warning-message">
+              <mat-icon>chat_error</mat-icon> {{ warningMessage }}
+            </div>
+          </div>
+          <hr width="100%" size="2" />
+          <div>
+            <p class="section-title">Persona Expuesta Públicamente (PEP)</p>
+            <p class="hint-text">
+              Persona que desempeña un cargo en la función pública o es familiar
+              del mismo.
+            </p>
+            <mat-radio-group
+              color="primary"
+              formControlName="pep"
+              class="custom-radio-group"
+            >
+              <mat-radio-button value="yes">Si, lo estoy</mat-radio-button>
+              <mat-radio-button value="no">No, no lo estoy</mat-radio-button>
+            </mat-radio-group>
+          </div>
+          <div class="pep-types" *ngIf="AffForm.get('pep')?.value === 'yes'">
+            <mat-radio-group color="primary" formControlName="pepType">
+              <mat-radio-button value="pep_arg"
+                >PEP en Argentina</mat-radio-button
+              >
+              <mat-radio-button value="pep_act_ext"
+                >PEP con actividad en el exterior</mat-radio-button
+              >
+              <mat-radio-button value="pep_ext"
+                >PEP extranjero</mat-radio-button
+              >
+            </mat-radio-group>
+          </div>
+          <hr width="100%" size="2" />
+          <div>
+            <p class="section-title">Sujeto obligado</p>
+            <p class="hint-text">
+              Persona cuya profesión o tarea habitual puede estar expuesta al
+              lavado de activos.
+            </p>
+            <mat-radio-group
+              color="primary"
+              formControlName="suj"
+              class="custom-radio-group"
+            >
+              <mat-radio-button value="yes">Si, lo estoy</mat-radio-button>
+              <mat-radio-button value="no">No, no lo estoy</mat-radio-button>
+            </mat-radio-group>
+          </div>
+          <hr width="100%" size="2" />
+          <mat-card-actions>
+            <button
+              class="default-submit-button"
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="AffForm.invalid || isProcessing"
+            >
+              <span *ngIf="isProcessing; else buttonText">Procesando </span>
+              <ng-template #buttonText> Aceptar</ng-template>
+            </button>
+          </mat-card-actions>
+        </form>
+        <div *ngIf="isProcessing">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

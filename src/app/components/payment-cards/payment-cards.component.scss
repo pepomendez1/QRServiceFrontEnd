@@ -1,0 +1,78 @@
+.content {
+  display: flex;
+  gap: 1em;
+
+  .left-side {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap : 1em;
+    max-width: 416px;
+  }
+
+  .right-side {
+    display: flex;
+    flex: 2;
+    gap : 1em;
+
+    .activity-container {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 1em;
+    }
+  }
+}
+
+.know-more {
+  background-color: white;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+  gap: 1em;
+
+  .know-more-btn {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1em;
+
+    img {
+      max-height: 160px;
+    }
+  }
+}
+
+h2 {
+  margin: 0;
+  //styleName: Core/S;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 28px;
+  text-align: left;
+}
+
+p {
+  margin: 0;
+  //styleName: Core/XS;
+  font-family: Inter;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: left;
+
+}
+
+@media screen and (max-width: 1024px) {
+  .content {
+    flex-direction: column;
+
+    .left-side {
+      max-width: 100%;
+    }
+  }
+
+}

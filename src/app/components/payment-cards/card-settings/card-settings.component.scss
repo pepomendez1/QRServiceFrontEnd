@@ -1,0 +1,296 @@
+.custom-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  background-color: transparent;
+  height: 100%;
+
+
+  .content-container {
+    height: 100%;
+    background-color: transparent;
+  }
+
+
+
+  .submenu {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    height: 100%;
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      border: 1px solid #ebebeb;
+      box-shadow: none;
+
+      .settings-item-row {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1em;
+        gap: 1em;
+        border-bottom: 1px solid #f4f4f4;
+        &.first {
+          border-radius: 12px;
+        }
+        &.last {
+          border-bottom: none;
+          border-radius: 12px;
+        }
+
+        .btn-ghost-black {
+          background-color: transparent;
+          align-self: baseline;
+          padding: 0;
+        }
+      }
+    }
+
+    .menu-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-between;
+      background-color: transparent;
+      .heading-5-700 {
+        margin: 0;
+        padding: 1em 0;
+      }
+      .progress-bar-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 1em 0px;
+        width: 100%;
+       }
+      .toggle-configurations-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        flex: 1;
+
+        // empieza la asquerosidad de customizar el input
+        mat-slide-toggle {
+          width: 100%;
+          margin: 0;
+
+          ::ng-deep .mdc-form-field {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding-bottom: 1em;
+            border-bottom: 1px solid #ccc;
+
+            .mdc-label {
+              display: flex;
+              align-items: center;
+              gap: 5px;
+              text-align: left;
+              margin: 0;
+              width: 100%;
+              user-select: none;
+
+              .material-symbols-outlined {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                line-height: 24px;
+              }
+            }
+
+            .mdc-switch {
+              .mdc-switch__track {
+                background-color: #f2f2f2;
+                height: 24px;
+                border-radius: 100px;
+                border: 1px solid #ccc;
+                &::after {
+                  background-color: #2fad69;
+                }
+              }
+              .mdc-switch__handle {
+                background-color: white;
+                height: 12px;
+                width: 12px;
+                border-radius: 50%;
+                margin-left: 4px;
+
+                .mdc-switch__shadow {
+                  display: none;
+                }
+
+                .mdc-switch__ripple {
+                  display: none;
+                }
+
+                .mdc-switch__thumb {
+                  display: none;
+                }
+
+                .mdc-switch__icons {
+                  display: none;
+                }
+
+                &::after {
+                  content: none;
+                }
+              }
+
+              &.mdc-switch--disabled {
+                opacity: 0.5;
+              }
+
+            }
+          }
+        }
+
+        // fin de la asquerosidad de customizar el input
+      }
+
+      .radio-configurations-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        flex: 1;
+
+        mat-radio-group {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          user-select: none;
+
+          mat-radio-button {
+            width: 100%;
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+
+            ::ng-deep .mdc-form-field {
+              width: 100%;
+
+              .mdc-radio {
+                .mdc-radio__background {
+                  .mdc-radio__outer-circle {
+                    border-color: #ccc;
+                    background-color: #f2f2f2;
+                  }
+
+                  .mdc-radio__inner-circle {
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    border-color: white;
+                  }
+                }
+
+                .mat-ripple {
+                  display: none;
+                }
+              }
+
+              .mdc-label {
+                width: 100%;
+              }
+            }
+          }
+        }
+      }
+
+      .pin-configurations-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        flex: 1;
+
+        // input {
+        //   margin: 0;
+        //   border: 1px solid #ccc;
+        //   border-radius: 8px;
+        //   padding: 10px;
+        //   color: #333;
+        // }
+      }
+
+      .card-name-configurations-container {
+        @extend .pin-configurations-container;
+        .form-container {
+          display: flex;
+          flex-direction: column;
+          gap: 1em;
+          flex: 1;
+        }
+
+        // form {
+        //   display: flex;
+        //   flex-direction: column;
+        //   justify-content: space-between;
+        //   gap: 1em;
+        //   flex: 1;
+
+        //   .form-container {
+        //     display: flex;
+        //     flex-direction: column;
+        //     gap: 1em;
+        //     flex: 1;
+
+        //     // input {
+        //     //   margin: 0;
+        //     //   border: 1px solid #ccc;
+        //     //   border-radius: 8px;
+        //     //   padding: 10px;
+        //     //   color: #333;
+        //     // }
+        //   }
+        // }
+      }
+
+      .cancel-card-configurations-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        p {
+          margin: 0;
+        }
+        ol {
+          display: flex;
+          flex-direction: column;
+          gap: 1em;
+          margin-left: 0.5em;
+          padding: 0;
+          padding-left: 1em;
+          //list-style: circle;
+          li {
+            margin: 0;
+            padding: 0;
+
+          }
+        }
+      }
+      .btn {
+        flex: 0;
+      }
+    }
+
+    .success-change {
+
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex:1;
+      p,h1 {
+        width: 60%;
+      }
+    }
+
+  }
+}

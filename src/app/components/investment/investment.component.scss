@@ -1,0 +1,96 @@
+
+@media screen and (max-width: 800px) {
+  .general-failure{
+    height: 85vh;
+    .text-content{
+      p,h2{
+        width: 100%;
+      }
+    }
+    .button-container{
+      gap: 0.5em;
+      width: 100%;
+      .back-to-start{
+        visibility: visible;
+        width: 100%;
+      }
+      .retry-button{
+        padding: 12px 16px;
+        width: 100%;
+      }
+
+    }
+  }
+}
+
+.content {
+  display: flex;
+  gap: 16px;
+
+  .left-side {
+    width: 416px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .know-more {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  .main-content{
+    display: flex;
+    flex-direction: row;
+    gap:1.5em;
+    .cupons-img {
+      padding-top: 1em;
+      max-height: 160px;
+    }
+    .information{
+      margin-right: 2em;
+      padding-top: 1em;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+
+    }
+  }
+  .know-more-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: right;
+    text-align: right;
+    padding: 1em;
+  }
+}
+
+  .right-side {
+    flex-grow: 1; /* Take the remaining space */
+    display: flex;
+    flex-direction: column; /* Ensure content is vertically aligned */
+    gap: 1em;
+
+    .returns {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 1em;
+    }
+  }
+}
+
+
+
+h2,p {
+  margin: 0;
+}
+
+
+@media screen and (max-width: 1120px) {
+  .content {
+    flex-direction: column;
+    gap: 16px;
+
+  }
+}

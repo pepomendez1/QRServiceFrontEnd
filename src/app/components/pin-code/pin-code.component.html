@@ -1,0 +1,68 @@
+<app-pin-code-peya
+  (pinCompleted)="finishPin()"
+  (pinResetCompleted)="finishResetPin()"
+  [pinCodeMode]="pinCodeMode"
+  [debugMode]="debugMode"
+  *ngIf="onboardingPartner === 'PEYA'; else default_pin"
+>
+</app-pin-code-peya>
+<ng-template #default_pin>
+  <div class="onboarding">
+    <mat-card class="onboarding-card">
+      <mat-card-header>
+        <mat-card-title>¡Último paso!</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h3>
+          Para que tus transacciones sean más seguras, te pedimos que configures
+          un PIN de 6 dígitos numéricos
+        </h3>
+        <form [formGroup]="pinForm" (ngSubmit)="onSubmit()">
+          <div>
+            <mat-form-field appearance="fill">
+              <mat-label>Ingresar PIN </mat-label>
+              <input
+                matInput
+                formControlName="pin"
+                maxlength="6"
+                type="password"
+              />
+            </mat-form-field>
+          </div>
+          <div>
+            <mat-form-field appearance="fill">
+              <mat-label>Confirmar PIN</mat-label>
+              <input
+                matInput
+                formControlName="confirmPin"
+                maxlength="6"
+                type="password"
+              />
+            </mat-form-field>
+          </div>
+          <mat-card-actions>
+            <button
+              class="default-submit-button"
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="pinForm.invalid || isProcessing"
+            >
+              <span *ngIf="isProcessing; else buttonText">Procesando </span>
+              <ng-template #buttonText> Establecer PIN </ng-template>
+            </button>
+          </mat-card-actions>
+        </form>
+        <div *ngIf="isProcessing">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+        <div *ngIf="errorMessage" class="pin-error-message">
+          <mat-icon>feedback</mat-icon> {{ errorMessage }}
+        </div>
+        <div *ngIf="warningMessage" class="warning-message">
+          <mat-icon>chat_error</mat-icon> {{ warningMessage }}
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</ng-template>

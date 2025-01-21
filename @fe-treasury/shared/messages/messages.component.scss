@@ -1,0 +1,97 @@
+.message-container {
+  min-height: 30px; /* Reserve space for the message */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-shadow: none;
+  will-change: opacity, visibility, min-height, height;
+  transition: min-height 0.3s ease-in-out height 0.3s ease-in-out opacity 0.3s
+    ease-in-out visibility 0.3s ease-in-out;
+  visibility: visible;
+}
+
+.message-content {
+  width: 100%; /* Ensure the content fills the available space */
+}
+
+.hidden {
+  min-height: 0;
+  height: 0;
+  opacity: 0; /* Make the message content invisible */
+  visibility: hidden; /* Hide the content but keep the space reserved */
+}
+
+.error-message,
+.success-message,
+.warning-message {
+  /* Message styles as before */
+  display: flex;
+  align-self: flex-start;
+  align-items: center;
+  text-align: left;
+  background-color: #f8d7da; /* For example, error background */
+  border: none;
+  padding: 10px;
+  gap: 1em;
+  border-radius: 5px;
+  font-size: 16px;
+
+  mat-icon {
+    overflow: visible;
+    font-size: 24px;
+  }
+}
+
+.error-message {
+  background-color: #f5e0e2;
+  color: #161616;
+  mat-icon {
+    color: #161616;
+  }
+  a {
+    text-align: left;
+    color: #161616; /* Same color as text */
+    font-weight: 600;
+
+    &:hover {
+      font-size: 17px;
+      cursor: pointer;
+    }
+  }
+}
+
+.success-message {
+  background-color: #e2f3ea;
+  color: #161616;
+  mat-icon {
+    color: #161616;
+  }
+  a {
+    text-align: left;
+    color: #161616; /* Same color as text */
+    font-weight: 600;
+
+    &:hover {
+      font-size: 17px;
+      cursor: pointer;
+    }
+  }
+}
+
+.warning-message {
+  background-color: #f7f3e6;
+  color: #161616;
+  mat-icon {
+    color: #161616;
+  }
+  a {
+    text-align: left;
+    color: #161616; /* Same color as text */
+    font-weight: 600;
+
+    &:hover {
+      font-size: 17px;
+      cursor: pointer;
+    }
+  }
+}

@@ -1,0 +1,53 @@
+<div class="recovery-selection-container">
+  <app-custom-header-onb
+    [isMobile]="isMobile"
+    [title]="'Recuperación de cuenta'"
+    [description]="'Elegí la opción que necesitás:'"
+    (arrowBack)="returnToLoginButton()"
+  ></app-custom-header-onb>
+  <div class="section-content">
+    <form [formGroup]="recoveryForm">
+      <div class="form-container">
+        <mat-radio-group
+          color="primary"
+          formControlName="recoveryOptions"
+          class="custom-radio-group"
+        >
+          <mat-radio-button value="password" class="radio-option"
+            ><h2 class="paragraph-600">Recuperar mi contraseña</h2>
+            <p class="secondary-500">
+              Te enviaremos un e-mail con un código para que generes una nueva
+              contraseña.
+            </p></mat-radio-button
+          >
+          <hr width="100%" size="1" />
+          <mat-radio-button value="pin" class="radio-option"
+            ><h2 class="paragraph-600">Recuperar mi PIN</h2>
+            <p class="secondary-500">
+              Te enviaremos un e-mail con un código para que generes un nuevo
+              PIN.
+            </p></mat-radio-button
+          >
+          <hr width="100%" size="1" />
+          <mat-radio-button value="password-pin" class="radio-option">
+            <h2 class="paragraph-600">Recuperar mi contraseña y PIN</h2>
+            <p class="secondary-500">
+              Te enviaremos un e-mail con un código para que generes una nueva
+              contraseña, recuperes tu PIN y valides tu identidad.
+            </p>
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <div class="button-container">
+        <button
+          class="btn-cta-filled w-100"
+          type="button"
+          (click)="selectRecoveryType()"
+          [disabled]="recoveryForm.invalid"
+        >
+          Continuar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

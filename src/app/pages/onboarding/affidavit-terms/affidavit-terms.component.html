@@ -1,0 +1,183 @@
+<div class="affidavit-terms-container">
+  <line-stepper [currentStep]="currentStep"></line-stepper>
+  <app-custom-header-onb
+    [isMobile]="false"
+    [title]="'Declaración jurada'"
+    [description]="'Declará lo que corresponda con tu persona: '"
+    [arrowBackEnabled]="false"
+  ></app-custom-header-onb>
+
+  <div class="form-wrapper">
+    <form [formGroup]="AffForm" (ngSubmit)="onSubmit()">
+      <div class="form-content">
+        <div>
+          <h2 class="paragraph-600 p-0 m-0">OCDE</h2>
+          <p class="secondary-500-light p-0 m-0">
+            ¿Sos una persona que paga impuestos fuera de Argentina?
+          </p>
+          <mat-radio-group
+            color="primary"
+            formControlName="ocde"
+            class="custom-radio-group"
+          >
+            <mat-radio-button value="yes">Si, lo estoy</mat-radio-button>
+            <mat-radio-button value="no">No, no lo estoy</mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <div class="input-data" *ngIf="AffForm.get('ocde')?.value === 'yes'">
+          <mat-form-field appearance="outline">
+            <mat-label>NIT</mat-label>
+            <input matInput formControlName="taxId" />
+            <mat-error *ngIf="AffForm.get('taxId')?.hasError('required')">
+              Este dato es requerido
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>País</mat-label>
+            <input matInput formControlName="country" />
+            <mat-error *ngIf="AffForm.get('country')?.hasError('required')">
+              Este dato es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <hr width="100%" size="1" />
+        <div>
+          <h2 class="paragraph-600 p-0 m-0">Ley FACTA</h2>
+          <p class="secondary-500-light p-0 m-0">
+            ¿Sos una persona estadounidense a los efectos de la Ley FACTA de los
+            Estados Unidos?
+          </p>
+          <mat-radio-group
+            color="primary"
+            formControlName="facta"
+            class="custom-radio-group"
+          >
+            <mat-radio-button value="yes">Si, lo estoy</mat-radio-button>
+            <mat-radio-button value="no">No, no lo estoy</mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <div class="input-data" *ngIf="AffForm.get('facta')?.value === 'yes'">
+          <mat-form-field appearance="outline">
+            <mat-label>Social Security Num (EEUU)</mat-label>
+            <input matInput formControlName="secSocialNumber" />
+            <mat-error
+              *ngIf="AffForm.get('secSocialNumber')?.hasError('required')"
+            >
+              Este dato es requerido
+            </mat-error>
+          </mat-form-field>
+          <div *ngIf="warningMessage" class="warning-message">
+            <mat-icon>chat_error</mat-icon> {{ warningMessage }}
+          </div>
+        </div>
+        <hr width="100%" size="1" />
+        <div>
+          <h2 class="paragraph-600 p-0 m-0">PEP</h2>
+          <p class="secondary-500-light p-0 m-0">
+            ¿Sos una persona expuesta políticamente?
+          </p>
+          <mat-radio-group
+            color="primary"
+            formControlName="pep"
+            class="custom-radio-group"
+          >
+            <mat-radio-button value="yes">Si, lo estoy</mat-radio-button>
+            <mat-radio-button value="no">No, no lo estoy</mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <div class="pep-types" *ngIf="AffForm.get('pep')?.value === 'yes'">
+          <mat-radio-group color="primary" formControlName="pepType">
+            <mat-radio-button value="pep_arg">
+              <span class="secondary-500-light"
+                >PEP Argentino</span
+              ></mat-radio-button
+            >
+            <mat-radio-button value="pep_act_ext">
+              <span class="secondary-500-light"
+                >PEP Argentino con actividad en el exterior
+              </span></mat-radio-button
+            >
+            <mat-radio-button value="pep_ext"
+              ><span class="secondary-500-light"
+                >PEP extranjero</span
+              ></mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
+        <hr width="100%" size="1" />
+        <div>
+          <h2 class="paragraph-600 p-0 m-0">Sujeto obligado UIF</h2>
+          <p class="secondary-500-light p-0 m-0">
+            ¿Sos una persona cuya profesión o tarea habitual puede estar
+            expuesta al lavado de activos?
+          </p>
+          <mat-radio-group
+            color="primary"
+            formControlName="suj"
+            class="custom-radio-group"
+          >
+            <mat-radio-button value="yes">Si, lo estoy</mat-radio-button>
+            <mat-radio-button value="no">No, no lo estoy</mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <hr width="100%" size="1" />
+        <div class="terms-conditions">
+          <div class="accept-checkbox">
+            <mat-checkbox color="primary" formControlName="terms">
+              <span>Aceptar</span>
+            </mat-checkbox>
+            <button
+              mat-button
+              class="text-button-type"
+              type="button"
+              (click)="openTermDialog()"
+            >
+              T&C de uso
+            </button>
+          </div>
+          <div class="accept-checkbox">
+            <mat-checkbox color="primary" formControlName="inv_saldo">
+              <span>Aceptar</span>
+            </mat-checkbox>
+            <button
+              mat-button
+              class="text-button-type"
+              type="button"
+              (click)="openAccountTerms()"
+            >
+              T&C cuenta remunerada
+            </button>
+          </div>
+          <div class="accept-checkbox last">
+            <mat-checkbox color="primary" formControlName="disclaimer">
+              <span>Aceptar</span>
+            </mat-checkbox>
+            <button
+              mat-button
+              color="#EA044E"
+              class="text-button-type"
+              type="button"
+              (click)="openAffidavitDialog()"
+            >
+              Declaración Jurada
+            </button>
+          </div>
+        </div>
+        <!-- <p class="terms-message">
+        Al aceptar los siguientes Términos y condiciones, confirma que sus
+        fondos serán invertidos por Delta y que Wibond proporcionará el
+        financiamiento correspondiente.
+      </p> -->
+      </div>
+      <div class="button-container">
+        <button
+          class="btn-cta-filled"
+          type="submit"
+          [disabled]="AffForm.invalid || isProcessing"
+        >
+          Continuar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

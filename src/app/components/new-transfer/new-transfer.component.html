@@ -1,0 +1,220 @@
+<div [ngClass]="{'fixed-height': !showMoreContacts}">
+  <div *ngIf="actualScreen == 'chooseAccount'" >
+    <h2 class="title" [ngClass]="{'small-text': isMobile()}" >Elegí a que cuenta transferir</h2>
+    <mat-divider></mat-divider>
+    <div class="new-receving-account" (click)="showNewAccountSection()">
+      <mat-icon class="size-1 blue">add_circle_outline</mat-icon>
+      <div>
+        <div class="text-a">Nueva Cuenta</div>
+        <div class="text-b">Con CBU, CVU o alias.</div>
+      </div>
+      <mat-icon class="size-2 righted gray" >arrow_forward_ios</mat-icon>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="last-transfer-sections">
+      <div class="subtitle marg-t">Últimas transferencias realizadas</div>
+    </div>
+    <mat-divider></mat-divider>
+    <table mat-table [dataSource]="dataSource" matSortclass="mat-elevation-z0">
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Ordener por tipo">
+        </th>
+        <td mat-cell *matCellDef="let element" (click)="selectUserAccount(element)" class="pointer">
+          <div class="column-description">
+            <div class="avatar-container">
+              <ngx-avatars initialsSize="2"  size="28" [name]="element.name" ></ngx-avatars>
+            </div>
+            <div>
+              <div class="text-a">{{element.name}}</div>
+              <div class="text-b">{{element.bank}}</div>
+            </div>
+            <mat-icon class="size-2 righted gray" >arrow_forward_ios</mat-icon>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-row  *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <div class="more-contacts-section">
+      <div *ngIf="!showMoreContacts"  class="blue-text pointer" (click)="showContacts()" >Cargar mas contactos</div>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="diary-section" (click)="showDiarySection()">
+      <mat-icon style="margin-left: 3px;" class="size-3 blue">import_contacts</mat-icon>
+      <div style="margin-left: 11px; margin-top: 3px;">
+        <div class="text-a" >Ver agenda de contactos</div>
+      </div>
+      <mat-icon class="size-2 righted gray" >arrow_forward_ios</mat-icon>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+  <div *ngIf="actualScreen == 'diary'">
+    <h2 class="title" [ngClass]="{'small-text': isMobile()}">Tu agenda</h2>
+    <div style="display: flex; justify-content: center;margin-bottom: 12px;">
+      <mat-icon class="icon-pos" >search</mat-icon>
+      <input class="input-diary border-gray text-input" matInput (keyup)="applyFilter($event,contacts)" placeholder="Buscar contacto" #input>
+    </div>
+    <div *ngIf="!isMobile()">
+      <mat-grid-list [cols]="calcCols()" rowHeight="80px" style="margin-bottom: 20px;overflow: auto; ">
+        <mat-grid-tile *ngFor="let element of contactsFiltered">
+          <div class="pointer" (click)="selectUserAccount(element)">
+            <div style="display: flex;justify-content: center;">
+              <ngx-avatars initialsSize="2"  size="38" [name]="element.name" ></ngx-avatars>
+            </div>
+            <div class="text-contact">{{element.name}}</div>
+          </div>
+        </mat-grid-tile>
+      </mat-grid-list>
+      <div style="display: flex;justify-content: center;">
+        <button id="btn-1" class="height-btn text-btn btn-width" mat-stroked-button color="primary" (click)="goBack()" >Regresar</button>
+      </div>
+    </div>
+    <div *ngIf="isMobile()">
+      <mat-list style="padding-top: 0; height: 53vh;overflow: auto;">
+        <mat-list-item *ngFor="let element of contactsFiltered" style="cursor: pointer;">
+          <div class="column-description">
+            <div class="avatar-container">
+              <ngx-avatars initialsSize="2"  size="28" [name]="element.name" ></ngx-avatars>
+            </div>
+            <div>
+              <div class="text-a">{{element.name}}</div>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+  <div *ngIf="actualScreen == 'newAccount'">
+    <h2 class="title" [ngClass]="{'small-text': isMobile()}">Agregá una cuenta</h2>
+    <div >
+      <div style="margin:auto;width:fit-content;margin-bottom: 90px;">
+        <div class="info-text">Ingresá el CBU, CVU o alias</div>
+        <input class="input-new-acc text-input-2" matInput [(ngModel)]="inputAccount" (keyup)="applyFilter($event,contacts)" id="inputNewAcc">
+      </div>
+      <div class="marg-b-btn" style="display: flex;justify-content: center;">
+        <button id="btn-1" class="height-btn text-btn btn-width" mat-stroked-button (click)="goBack()" >Regresar</button>
+        <button id="blue-btn" class="height-btn text-btn btn-width" mat-stroked-button  (click)="showAccountInfo()" >Continuar</button>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="actualScreen == 'infoAccount'">
+    <h2 class="title" [ngClass]="{'small-text': isMobile()}">¿Esta es la cuenta a la que querés transferir?</h2>
+    <mat-divider class="divider-1"></mat-divider>
+    <div >
+      <div style="display: flex;margin:auto;width:fit-content;margin-bottom: 10px;margin-top: 25px;">
+        <div class="info-acc-res">
+            <div class="info-acc-title marg-b ">Nombre:</div>
+            <div class="info-acc-title marg-b ">CUIT:</div>
+            <div class="info-acc-title marg-b ">CVU:</div>
+            <div class="info-acc-title marg-b ">Entidad bancaria:</div>
+        </div>
+        <div style="width: 50%;text-align: left" >
+            <div class="text-datos-cuenta marg-b">{{this.accountSelected?.name}}</div>
+            <div class="text-datos-cuenta marg-b">{{this.accountSelected?.cuit}}</div>
+            <div class="text-datos-cuenta marg-b">{{this.accountSelected?.cvu}}</div>
+            <div class="text-datos-cuenta marg-b">{{this.accountSelected?.bank}}</div>
+        </div>
+      </div>
+    </div>
+    <mat-divider class="divider-1"></mat-divider>
+    <div class="marg-b-btn" style="display: flex;justify-content: center;margin-top: 15px;">
+      <button id="btn-1" class="height-btn text-btn btn-width" mat-stroked-button (click)="goBack()" >Regresar</button>
+      <button id="blue-btn" class="height-btn text-btn btn-width" mat-stroked-button  (click)="showAmountScreen()" >Continuar</button>
+    </div>
+  </div>
+  <div *ngIf="actualScreen == 'chooseAmount'">
+    <h2 class="title" [ngClass]="{'small-text': isMobile()}">Elegí el monto que vas a transferir</h2>
+    <div class="info-text" style="text-align: center;margin-bottom: 40px;">Vas a transferir a {{this.accountSelected?.name}}</div>
+    <div style="display: flex;justify-content: center;">
+      <input id="inputam"  maxlength="8" class="text-amount " matInput [(ngModel)]="inputAmount"
+       oninput="this.value = '$' + this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').replace('.','');"   #inputAmn>
+    </div>
+    <div class="marg-b-btn" style="display: flex;justify-content: center;margin-top: 45px;">
+      <button id="btn-1" class="height-btn text-btn btn-width" mat-stroked-button (click)="goBack()" >Regresar</button>
+      <button id="blue-btn" class="height-btn text-btn btn-width" mat-stroked-button  (click)="showReviewTransfer()" >Continuar</button>
+    </div>
+  </div>
+  <div *ngIf="actualScreen == 'reviewTransfer'">
+    <h2 class="title" [ngClass]="{'small-text': isMobile()}">Revisa si está todo bien</h2>
+    <mat-divider class="divider-1"></mat-divider>
+    <div class="w75">
+      <span (click)="showAmountScreen(true)"  class="material-symbols-outlined icon-pos-3 pointer">edit_square</span>
+      <div class="m-le" style="display: flex;margin:auto;margin-top: 10px;">
+        <div class="info-acc-res-2">
+            <div class="info-acc-title marg-b ">Vas a transferir:</div>
+        </div>
+        <div style="width: 50%;text-align: left" >
+            <div class="text-datos-cuenta marg-b" style="font-size: 18px;font-weight: 600;">$ {{this.inputAmount}}</div>
+        </div>
+      </div>
+    </div>
+    <mat-divider class="divider-1"></mat-divider>
+    <div class="w75">
+      <span (click)="showNewAccountSection(true)"  class="material-symbols-outlined icon-pos-3 pointer">edit_square</span>
+      <div class="m-le" style="display: flex;margin:auto;width:fit-content;margin-top: 15px;">
+        <div class="info-acc-res-2">
+            <div class="info-acc-title marg-b ">Para:</div>
+            <div class="info-acc-title marg-b ">Entidad bancaria:</div>
+            <div class="info-acc-title marg-b ">CVU:</div>
+        </div>
+        <div style="width: 50%;text-align: left" >
+            <div class="text-datos-cuenta marg-b">{{this.accountSelected?.name}}</div>
+            <div class="text-datos-cuenta marg-b">{{this.accountSelected?.bank}}</div>
+            <div class="text-datos-cuenta marg-b">{{this.accountSelected?.cvu}}</div>
+        </div>
+      </div>
+    </div>
+    <mat-divider class="divider-1"></mat-divider>
+    <div class="w75">
+      <span class="material-symbols-outlined icon-pos-3 pointer">edit_square</span>
+      <div class="m-le" style="display: flex;margin:auto;margin-top: 10px;">
+        <div class="info-acc-res-2">
+            <div class="info-acc-title marg-b ">Motivo:</div>
+        </div>
+        <div style="width: 50%;text-align: left" >
+            <div class="text-datos-cuenta marg-b">Varios</div>
+        </div>
+      </div>
+    </div>
+    <mat-divider class="divider-1"></mat-divider>
+    <div class="marg-b-btn" style="display: flex;justify-content: center;margin-top: 15px;">
+      <button id="btn-1" class="height-btn text-btn btn-width" mat-stroked-button (click)="goBack()"  >Cancelar</button>
+      <button id="blue-btn" class="height-btn text-btn btn-width" mat-stroked-button  (click)="goToPinScreen()" >Transferir</button>
+    </div>
+
+  </div>
+  <div *ngIf="actualScreen == 'pin'">
+    <h2 class="title" [ngClass]="{'small-text': isMobile()}">Ingresá tu pin de seguridad</h2>
+    <div style="display: flex;justify-content: center;">
+      <code-input [isCodeHidden]="true"[codeLength]="4" [initialFocusField]="0" (codeChanged)="onCodeChanged($event)"
+      (codeCompleted)="onCodeCompleted($event)"></code-input>
+    </div>
+    <div class="marg-b-btn" style="display: flex;justify-content: center;margin-top: 45px;">
+      <button id="blue-btn" class="height-btn text-btn btn-width" mat-stroked-button  [disabled]="inputPin.length < 4" (click)="createTransfer()" >Confirmar</button>
+    </div>
+  </div>
+  <div *ngIf="actualScreen == 'complete'">
+    <div *ngIf="transferSuccess">
+      <div style="display: flex;justify-content: center;">
+        <img src="/assets/success.png" class="img-success" >
+      </div>
+      <div class="text-success" style="margin-top: 40px;margin-bottom: 40px;">
+        Tu transferencia se realizo correctamente
+      </div>
+      <div class="flex" style="justify-content: center;margin-bottom: 30px;">
+        <div class="text-compr pointer" style="display: flex;align-content: center;flex-wrap: wrap;">
+          <span style="font-size: 17px;" class="material-symbols-outlined">download</span>
+          Descargar comprobante
+        </div>
+        <div class="text-compr pointer" style="display: flex;align-content: center;flex-wrap: wrap;">
+          <span style="font-size: 17px;" class="material-symbols-outlined">share</span>
+          Compartir comprobante
+        </div>
+      </div>
+      <div class="marg-b-btn flex" style="justify-content: center;margin-top: 15px;">
+        <button id="btn-1" class="height-btn text-btn btn-width-2" mat-stroked-button (click)="this.exit.emit('exit');"  >Regresar a inicio</button>
+        <button id="blue-btn" class="height-btn text-btn btn-width-2" mat-stroked-button  (click)="goBack()" >Nueva transferencia</button>
+      </div>
+    </div>
+  </div>
+</div>

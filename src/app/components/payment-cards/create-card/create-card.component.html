@@ -1,0 +1,204 @@
+<div class="order-card-container">
+  <app-side-panel-header
+    title="Pedir tarjeta"
+    (arrowBack)="decreaseStep()"
+  ></app-side-panel-header>
+  @if (loading) {
+  <div class="loading-container">
+    <mat-spinner class="center-spinner"></mat-spinner>
+  </div>
+  } @else { @switch (stepLabels[currentStep]) { @case ("propuesta_valor") {
+  <div class="card-form-container" @fadeSlide>
+    <div class="top vp-container">
+      <div *ngIf="financesImg" [innerHTML]="financesImg"></div>
+      <!-- <img
+        src="../../../../assets/peya-content/create_card_man.svg"
+        alt="Man"
+        class="svg"
+      /> -->
+      <h2 class="heading-5-700">{{ welcomeText }}</h2>
+      <div class="item-list">
+        <div class="item">
+          <div class="rounded-icon">
+            <mat-icon color="accent" class="material-symbols-outlined"
+              >insert_chart</mat-icon
+            >
+          </div>
+          <p class="paragraph-500-light">
+            Realiza compras y pagos sin efectivo, con total seguridad y
+            comodidad.
+          </p>
+        </div>
+        <div class="item">
+          <div class="rounded-icon">
+            <mat-icon color="accent" class="material-symbols-outlined"
+              >local_fire_department</mat-icon
+            >
+          </div>
+          <p class="paragraph-500-light">
+            Controla todos tus movimientos en un solo lugar.
+          </p>
+        </div>
+        <div class="item">
+          <div class="rounded-icon">
+            <mat-icon color="accent" class="material-symbols-outlined"
+              >settings</mat-icon
+            >
+          </div>
+          <p class="paragraph-500-light">
+            Pausa tu tarjeta cuando vos quieras.
+          </p>
+        </div>
+      </div>
+    </div>
+    <app-side-panel-footer
+      class="w-100"
+      buttonText="Continuar"
+      buttonStyle="filled"
+      [buttonDisabled]="loading"
+      (buttonClicked)="
+        goToStep(
+          data.canCreateVirtual
+            ? 'seleccionar_tipo_tarjeta'
+            : 'formulario_direccion'
+        )
+      "
+    ></app-side-panel-footer>
+  </div>
+  } @case ("seleccionar_tipo_tarjeta"){
+  <div class="card-form-container" @fadeSlide>
+    <div class="top">
+      <h2 class="heading-5-600">¿Qué tipo de tarjeta quieres pedir?</h2>
+
+      <mat-radio-group [formControl]="selectedCardTypeControl">
+        <div>
+          <mat-radio-button
+            color="primary"
+            value="VIRTUAL"
+            labelPosition="before"
+            [disabled]="!data.canCreateVirtual"
+            >Quiero mi tarjeta virtual</mat-radio-button
+          >
+          <div class="hint" *ngIf="!data.canCreateVirtual">
+            Ya tienes la cantidad máxima de tarjetas virtuales permitidas.
+          </div>
+        </div>
+        <div>
+          <mat-radio-button
+            color="primary"
+            value="PHYSICAL"
+            labelPosition="before"
+            [disabled]="!data.canCreatePhysical"
+            >Quiero mi tarjeta física</mat-radio-button
+          >
+          <div class="hint" *ngIf="!data.canCreatePhysical">
+            Ya tienes la cantidad máxima de tarjetas físicas permitidas.
+          </div>
+        </div>
+      </mat-radio-group>
+    </div>
+    <app-side-panel-footer
+      class="w-100"
+      buttonText="Continuar"
+      buttonStyle="filled"
+      [buttonDisabled]="loading || selectedCardTypeControl.invalid"
+      (buttonClicked)="selectedCard()"
+    ></app-side-panel-footer>
+  </div>
+  } @case ("formulario_direccion"){
+  <div class="card-form-container" @fadeSlide>
+    <div class="top">
+      <h2 class="heading-5-600">¿Dónde vas a recibir la tarjeta?</h2>
+
+      <div class="address-form-edit">
+        <div
+          class="form-input-box"
+          *ngFor="let field of addressFields; let i = index"
+        >
+          <div class="form-input-data">
+            <p
+              class="caption-500-light m-0 p-0"
+              [ngClass]="{ active: field.isFocused || field.value }"
+            >
+              {{ field.label }}
+            </p>
+            <input
+              class="form-input-edit paragraph-500"
+              [(ngModel)]="field.value"
+              (focus)="onFocus(field)"
+              (blur)="onBlur(field)"
+              [type]="'text'"
+              *ngIf="field.type != 'select'"
+            />
+            <select
+              *ngIf="field.type === 'select'"
+              class="form-input-edit paragraph-500"
+              [(ngModel)]="field.value"
+            >
+              <option
+                *ngFor="let province of provinceList"
+                [value]="province.value"
+              >
+                {{ province.viewValue }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-side-panel-footer
+      class="w-100"
+      buttonText="Pedir tarjeta"
+      buttonStyle="filled"
+      [buttonDisabled]="loading || !formIsValid()"
+      (buttonClicked)="onSubmitPhysicalCardForm()"
+    ></app-side-panel-footer>
+  </div>
+  } @case ("success_tarjeta_fisica"){
+  <div class="card-form-container" @fadeSlide>
+    <div class="top success">
+      <div *ngIf="congratsImg" [innerHTML]="congratsImg"></div>
+      <!-- <img
+        src="../../../../assets/images/welcome confetti.svg"
+        alt="Success"
+        class="svg"
+      /> -->
+
+      <h2 class="heading-5-700">¡Ya solicitaste tu tarjeta!</h2>
+      <p class="heading-5-500">
+        Seguí el estado del envío desde acá. También podrás verlo en la sección
+        Tarjetas.
+      </p>
+    </div>
+    <app-side-panel-footer
+      class="w-100"
+      buttonText="Ir a tarjetas"
+      buttonStyle="filled"
+      [buttonDisabled]="false"
+      (buttonClicked)="goToCards()"
+    ></app-side-panel-footer>
+  </div>
+  } @case ("success_tarjeta_virtual"){
+  <div class="card-form-container" @fadeSlide>
+    <div class="top success">
+      <div *ngIf="congratsImg" [innerHTML]="congratsImg"></div>
+      <!-- <img
+        src="../../../../assets/images/welcome confetti.svg"
+        alt="Success"
+        class="svg"
+      /> -->
+      <h2 class="heading-5-700">¡Ya solicitaste tu tarjeta!</h2>
+      <p>
+        En la sección de tarjetas aparecerá tu nueva tarjeta prepaga virtual
+      </p>
+    </div>
+    <app-side-panel-footer
+      class="w-100"
+      buttonText="Ir a tarjetas"
+      buttonStyle="filled"
+      [buttonDisabled]="false"
+      (buttonClicked)="goToCards()"
+    ></app-side-panel-footer>
+  </div>
+  } } }
+</div>

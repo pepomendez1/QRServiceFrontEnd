@@ -1,0 +1,21 @@
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-top: none;
+  button {
+    height: 50px;
+    width: 100%;
+  }
+}
+.footer-container-two {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  border-top: none;
+  gap:1em;
+  button {
+    height: 50px;
+    width: 50%;
+  }
+}

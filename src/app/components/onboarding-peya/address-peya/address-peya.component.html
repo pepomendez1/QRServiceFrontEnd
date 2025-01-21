@@ -1,0 +1,119 @@
+<div class="auth-container">
+  <line-stepper [currentStep]="currentStep"></line-stepper>
+  <div class="header">
+    <h1>Completá tus datos</h1>
+    <p>
+      <b>{{ userName }}</b
+      >, confirma los siguientes datos para continuar.
+    </p>
+  </div>
+  <div class="form-container">
+    <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline">
+        <mat-label>Estado Civil </mat-label>
+        <mat-select formControlName="maritalStatus">
+          <mat-option
+            *ngFor="let status of maritalStatusList"
+            [value]="status.value"
+          >
+            {{ status.viewValue }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="use-id-address">
+        <p>
+          ¿El domicilio de tu documento de identidad coincide con tu dirección
+          actual? 
+        </p>
+
+        <mat-radio-group
+          color="primary"
+          formControlName="useMetamapAddress"
+          class="custom-radio-group-col"
+        >
+          <mat-radio-button [value]="true" checked
+            >Si, es mi direccón actual</mat-radio-button
+          >
+          <mat-radio-button [value]="false"
+            >No, mi dirección actual es otra</mat-radio-button
+          >
+        </mat-radio-group>
+
+        <!-- <mat-checkbox
+          color="#EA044E"
+          [checked]="addressForm.get('useMetamapAddress')?.value"
+          (change)="onCheckboxChange($event)"
+          formControlName="useMetamapAddress"
+        >
+          <span class="check-address-metamap">Si, es mi dirección actual</span>
+        </mat-checkbox> -->
+
+        <button
+          [disabled]="addressForm.get('useMetamapAddress')?.value"
+          (click)="onShowForm()"
+          class="add-address-button"
+          type="button"
+        >
+          <mat-icon>add</mat-icon> Agregar Dirección
+        </button>
+      </div>
+      <div
+        *ngIf="!addressForm.get('useMetamapAddress')?.value"
+        class="addr-form-container"
+      >
+        <mat-form-field appearance="outline">
+          <mat-label>Dirección</mat-label>
+          <input matInput id="street" formControlName="street" type="text" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Número </mat-label>
+          <input
+            matInput
+            id="streetNumber"
+            formControlName="streetNumber"
+            type="text"
+          />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Piso y Departamento </mat-label>
+          <input
+            matInput
+            id="flatNumber"
+            formControlName="flatNumber"
+            type="text"
+          />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Provincia </mat-label>
+          <mat-select formControlName="state">
+            <mat-option
+              *ngFor="let status of provinceList"
+              [value]="status.value"
+            >
+              {{ status.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Código Postal (CP) </mat-label>
+          <input matInput id="zipCode" formControlName="zipCode" type="text" />
+          <mat-error *ngIf="addressForm.get('zipCode')?.hasError('required')">
+            Este dato es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="button-container">
+        <button
+          [ngClass]="metamapAddress ? 'fixed' : 'sticky'"
+          mat-flat-button
+          type="submit"
+          [disabled]="addressForm.invalid || isProcessing"
+        >
+          <span *ngIf="isProcessing; else buttonText">Procesando </span>
+          <ng-template #buttonText> Continuar </ng-template>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

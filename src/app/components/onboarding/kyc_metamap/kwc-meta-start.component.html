@@ -1,0 +1,51 @@
+<div class="onboarding">
+  <mat-card class="onboarding-card">
+    <mat-card-header>
+      <mat-card-title>Verificación Biométrica </mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="recommend-list">
+      <div *ngIf="isProcessing; else start">
+        <h3>Estamos procesando la información</h3>
+        <h4>este proceso puede demorar unos minutos ...</h4>
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </div>
+      <ng-template #start>
+        <h3>Vamos a pedirte que cuentes con:</h3>
+        <ul class="list-onboarding-elements">
+          <li>
+            <mat-icon class="material-symbols-outlined icon-list"
+              >badge</mat-icon
+            >
+            Documento de identidad
+          </li>
+          <li>
+            <mat-icon class="material-symbols-outlined icon-list"
+              >camera_front</mat-icon
+            >
+            Celular con cámara de fotos y vídeo
+          </li>
+          <li>
+            <mat-icon class="material-symbols-outlined icon-list"
+              >wb_incandescent</mat-icon
+            >
+            Buena iluminación
+          </li>
+        </ul>
+      </ng-template>
+    </mat-card-content>
+    <mat-card-actions *ngIf="!isProcessing">
+      <metamap-button
+        appVerification
+        (finished)="onVerificationFinished()"
+        class="custom-button"
+        clientid="6079d9a1483c3a001b1bb0e1"
+        flowId="6692be9aa8d43a001cdc9a74"
+        [metadata]="metadata"
+        color="#507CDD"
+        icon="none"
+        language="es"
+      >
+      </metamap-button>
+    </mat-card-actions>
+  </mat-card>
+</div>

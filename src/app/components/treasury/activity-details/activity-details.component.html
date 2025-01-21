@@ -1,0 +1,91 @@
+<div class="movement-details-container">
+  <app-side-panel-header
+    title="Detalle de Movimiento"
+    [arrowBackEnabled]="false"
+  ></app-side-panel-header>
+
+  <div class="activity-details">
+    @if (isLoading) {
+    <div class="spinner-container">
+      <mat-spinner></mat-spinner>
+    </div>
+    } @else {
+    <div class="details-list">
+      <h3 class="heading-5-600">
+        {{ type }}
+      </h3>
+      <div class="status-badge">
+        <span class="status {{ detail?.status }}">
+          {{ status }}
+        </span>
+      </div>
+      <div class="item">
+        <div class="subtitle">Número de operación</div>
+        <div class="text">
+          <strong>#{{ detail?.id }}</strong>
+          <mat-icon
+            class="copy-icon"
+            matTooltip="Copiar número de operación"
+            matTooltipPosition="above"
+            [cdkCopyToClipboard]="detail?.id"
+          >
+            content_copy
+          </mat-icon>
+        </div>
+      </div>
+      <div class="item">
+        <div class="subtitle">Fecha y Hora</div>
+        <div class="text">
+          <strong>
+            {{ detail?.created_at | date : "dd/MM/yyyy - HH:mm" }}
+          </strong>
+        </div>
+      </div>
+      <div class="item">
+        <div class="subtitle">Monto</div>
+        <div class="text">
+          <strong>
+            {{ detail?.amount | currency : "ARS" : "symbol-narrow" }}
+          </strong>
+        </div>
+      </div>
+      <div class="item">
+        <div class="subtitle">Destinatario</div>
+        <div class="text contact-details">
+          <strong class="name">{{ detail?.contact_name }}</strong>
+          <p class="entity">{{ detail?.entity_name }}</p>
+          <p class="cbu">CBU: {{ detail?.destination }}</p>
+        </div>
+      </div>
+      <div class="item">
+        <div class="subtitle">Motivo</div>
+        <div class="text">
+          <strong>{{ detail?.description }}</strong>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  <mat-progress-bar
+    *ngIf="isGeneratingVoucher"
+    mode="indeterminate"
+  ></mat-progress-bar>
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="'Descargar comprobante'"
+    buttonStyle="filled"
+    [buttonDisabled]="isLoading || isGeneratingVoucher"
+    (buttonClicked)="downloadVoucher()"
+  ></app-side-panel-footer>
+  <!-- <div class="button-container">
+    <button
+      class="btn btn-cta"
+      mat-flat-button
+      (click)="downloadVoucher()"
+      [disabled]="isLoading || isGeneratingVoucher"
+    >
+      Descargar comprobante
+    </button>
+  </div> -->
+</div>

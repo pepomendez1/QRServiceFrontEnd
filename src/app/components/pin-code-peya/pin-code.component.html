@@ -1,0 +1,231 @@
+<div *ngIf="!pinEntered">
+  <div class="pin-code-container">
+    <line-stepper
+      [currentStep]="currentStep"
+      *ngIf="pinCodeMode === 'new'"
+    ></line-stepper>
+
+    <div class="header">
+      <h1 *ngIf="confirmPinForm; else set_pin_title">
+        Repetí el número de tu PIN
+      </h1>
+
+      <ng-template #set_pin_title>
+        <h1 *ngIf="pinCodeMode === 'new'">Elegí el número de tu PIN</h1>
+        <h1 *ngIf="pinCodeMode === 'reset'">Cambiá tu PIN actual</h1>
+      </ng-template>
+      <p>
+        El PIN es el número de seguridad asociado a tu identidad. Al ingresarlo,
+        podrás mantener el control sobre todas las operaciones con tu cuenta.
+      </p>
+    </div>
+    <div class="form-wrapper">
+      <form
+        *ngIf="!confirmPinForm"
+        [formGroup]="pinForm"
+        (ngSubmit)="submitPin()"
+      >
+        <div class="pin-input-container">
+          <input
+            type="text"
+            pattern="[0-9]*"
+            maxlength="1"
+            minlength="1"
+            inputmode="numeric"
+            formControlName="digit1"
+            class="pin-input"
+            placeholder="0"
+            (input)="moveToNextField($event, digit2)"
+            #digit1
+          />
+          <input
+            type="text"
+            pattern="[0-9]*"
+            maxlength="1"
+            minlength="1"
+            inputmode="numeric"
+            placeholder="0"
+            formControlName="digit2"
+            class="pin-input"
+            (input)="moveToNextField($event, digit3)"
+            #digit2
+          />
+          <input
+            type="text"
+            maxlength="1"
+            pattern="[0-9]*"
+            minlength="1"
+            inputmode="numeric"
+            placeholder="0"
+            formControlName="digit3"
+            class="pin-input"
+            (input)="moveToNextField($event, digit4)"
+            #digit3
+          />
+          <input
+            type="text"
+            maxlength="1"
+            pattern="[0-9]*"
+            minlength="1"
+            placeholder="0"
+            inputmode="numeric"
+            formControlName="digit4"
+            class="pin-input"
+            (input)="moveToNextField($event, digit5)"
+            #digit4
+          />
+          <input
+            type="text"
+            maxlength="1"
+            pattern="[0-9]*"
+            minlength="1"
+            inputmode="numeric"
+            placeholder="0"
+            formControlName="digit5"
+            class="pin-input"
+            (input)="moveToNextField($event, digit6)"
+            #digit5
+          />
+          <input
+            type="text"
+            maxlength="1"
+            pattern="[0-9]*"
+            minlength="1"
+            inputmode="numeric"
+            placeholder="0"
+            formControlName="digit6"
+            class="pin-input"
+            #digit6
+          />
+        </div>
+        <div class="button-container">
+          <button
+            class="default-submit-button"
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="pinForm.invalid || isProcessing"
+          >
+            <span *ngIf="isProcessing; else buttonText">Procesando </span>
+            <ng-template #buttonText> Continuar </ng-template>
+          </button>
+        </div>
+      </form>
+      <div *ngIf="confirmPinForm" class="form-wrapper">
+        <form [formGroup]="pinConfirm" (ngSubmit)="onSubmit()">
+          <div class="pin-input-container">
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              formControlName="digit1"
+              class="pin-input"
+              placeholder="0"
+              (input)="moveToNextField($event, digit2)"
+              #digit1
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit2"
+              class="pin-input"
+              (input)="moveToNextField($event, digit3)"
+              #digit2
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit3"
+              class="pin-input"
+              (input)="moveToNextField($event, digit4)"
+              #digit3
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit4"
+              class="pin-input"
+              (input)="moveToNextField($event, digit5)"
+              #digit4
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit5"
+              class="pin-input"
+              (input)="moveToNextField($event, digit6)"
+              #digit5
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit6"
+              class="pin-input"
+              #digit6
+            />
+          </div>
+          <mat-error class="form-error" *ngIf="diffPinConfirm">
+            <mat-icon class="material-symbols-outlined">error</mat-icon> Los
+            pines no coinciden
+          </mat-error>
+          <div class="button-container">
+            <button
+              mat-stroked-button
+              color="primary"
+              type="button"
+              (click)="returnPin()"
+              class="outlined-submit-button"
+            >
+              Atrás
+            </button>
+            <button
+              class="default-submit-button"
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="pinConfirm.invalid || isProcessing"
+            >
+              <span *ngIf="isProcessing; else buttonText">Procesando </span>
+              <ng-template #buttonText> Continuar </ng-template>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- <div *ngIf="isProcessing">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+  <div *ngIf="errorMessage" class="pin-error-message">
+    <mat-icon>feedback</mat-icon> {{ errorMessage }}
+  </div>
+  <div *ngIf="warningMessage" class="warning-message">
+    <mat-icon>chat_error</mat-icon> {{ warningMessage }}
+  </div> -->
+  </div>
+</div>
+
+<div *ngIf="pinEntered">
+  <pin-code-ready></pin-code-ready>
+</div>

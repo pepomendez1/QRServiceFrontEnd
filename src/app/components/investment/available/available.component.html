@@ -1,0 +1,50 @@
+<div class="container">
+  <p class="secondary-500-light">Dinero total invertido</p>
+  <div *ngIf="loading" class="mat-spinner-container">
+    <mat-spinner mode="indeterminate" [diameter]="40"></mat-spinner>
+  </div>
+  <div *ngIf="!loading && errors.length > 0" class="errors">
+    <div *ngFor="let error of errors" class="investment-info-error">
+      <mat-icon class="material-symbols-outlined">error</mat-icon>
+      <p class="paragraph-500 p-0 m-0">
+        {{ error }}
+      </p>
+    </div>
+
+    <button class="btn-ghost-color" (click)="getInvestmentsInfoRetry()">
+      Intentar de nuevo
+    </button>
+  </div>
+  <div *ngIf="!loading && errors.length === 0" class="info">
+    <app-amount-display
+      [symbol]="'$'"
+      [amount]="totalInvested"
+    ></app-amount-display>
+    <hr width="100%" size="1" color="#EBEBEB" />
+    <div class="returns">
+      <p class="paragraph-500">Rendimiento anual estimado</p>
+      <div class="tag-700 return-percent">{{ tna | percent }}</div>
+    </div>
+    <hr width="100%" size="1" color="#EBEBEB" />
+    <button
+      class="btn btn-ghost-color stop-investment"
+      (click)="openConfirmationDialog('stop')"
+      *ngIf="hasInversion; else wantToInvest"
+    >
+      <span class="paragraph-600">Dejar de invertir</span>
+    </button>
+    <span *ngIf="hasInversion" class="caption-400-light"
+      >La inversión será sobre la totalidad del saldo existente en la cuenta.
+      Fondo: Delta Pesos. Sociedad Gerente: Delta Asset Management S. A.
+      Sociedad Depositaria: Banco de Valores S. A.</span
+    >
+    <ng-template #wantToInvest>
+      <button
+        class="btn-cta-filled btn-lg"
+        (click)="openConfirmationDialog('start')"
+      >
+        Invertir mi dinero
+      </button>
+    </ng-template>
+  </div>
+</div>

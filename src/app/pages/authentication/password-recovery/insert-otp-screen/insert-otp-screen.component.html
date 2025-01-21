@@ -1,0 +1,43 @@
+<div class="otp-screen-container w-100">
+  <app-custom-header-onb
+    [title]="''"
+    [description]="''"
+    [isMobile]="isMobile"
+    (arrowBack)="returnToEmailForm()"
+  ></app-custom-header-onb>
+  <div class="otp-content">
+    <div *ngIf="OTPinputImg" [innerHTML]="OTPinputImg"></div>
+    <h1 class="heading-4-700 m-0 p-0">
+      Te enviamos un código al e-mail {{ emailOTP }}
+    </h1>
+    <p class="paragraph-500 m-0 p-1">
+      {{ headerDescription }}
+    </p>
+
+    <app-otp-form
+      class="otp-form w-100"
+      [timeLeft]="timeLeft"
+      [resetTimer]="resetTimer"
+      [clearForm]="clearForm"
+      (otpSubmit)="handleOtpEvent($event)"
+      (timeOut)="handleTimeOut()"
+      (enableButton)="handleButtonState($event)"
+    ></app-otp-form>
+    <button mat-ripple class="btn-link-primary" (click)="resendCode()">
+      <span class="secondary-600-primary">Reenviar código</span>
+    </button>
+  </div>
+  <app-messages class="left-aligned-message w-100"></app-messages>
+
+  <div class="button-container w-100">
+    <button
+      class="btn-cta-filled paragraph-600"
+      type="button"
+      (click)="submitOtpForm()"
+      [disabled]="!isSubmitButtonEnabled || isProcessing || timeOut"
+    >
+      <span *ngIf="isProcessing; else buttonText">Procesando </span>
+      <ng-template #buttonText> Continuar </ng-template>
+    </button>
+  </div>
+</div>

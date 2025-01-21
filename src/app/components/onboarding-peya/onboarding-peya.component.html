@@ -1,0 +1,32 @@
+<!-- <div class="onboarding-peya">
+  <div class="shared-content"></div>
+  <div class="dynamic-content">
+    <router-outlet></router-outlet>
+
+  </div>
+</div> -->
+
+<!-- <div>Onboarding PEYA</div> -->
+
+<div *ngIf="isLoading; else onb_end">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<ng-template #onb_end>
+  <app-end-peya *ngIf="onboardingFinished; else main_data"></app-end-peya>
+</ng-template>
+<ng-template #main_data>
+  <div class="onboarding-peya">
+    <app-kyc-peya
+      *ngIf="currentStep === ONBOARDING_STEPS.START"
+      (stepCompleted)="handleMetamap($event)"
+    ></app-kyc-peya>
+    <app-address-peya
+      *ngIf="currentStep === ONBOARDING_STEPS.ADDRESS"
+      (stepCompleted)="goToStep()"
+    ></app-address-peya>
+    <app-affidavit-peya
+      *ngIf="currentStep === ONBOARDING_STEPS.AFFIDAVIT"
+      (stepCompleted)="goToStep()"
+    ></app-affidavit-peya>
+  </div>
+</ng-template>

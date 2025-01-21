@@ -1,0 +1,153 @@
+<div *ngIf="onboardingPartnerInput === 'PEYA'; else default_auth" class="h-100">
+  <app-auth-wrapper class="auth-wrapper"></app-auth-wrapper>
+</div>
+<ng-template #default_auth>
+  <div class="auth-container">
+    <h2>Autenticación</h2>
+    <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
+      <div
+        *ngIf="
+          !needNewPassword &&
+          !showMFA &&
+          !mfaSetupRequired &&
+          !mfaSelection &&
+          !showPhoneNumberInput
+        "
+      >
+        <label for="username">Usuario:</label>
+        <input id="username" formControlName="username" type="text" />
+        <div
+          *ngIf="authForm.controls['username']?.errors?.['required'] && (authForm.controls['username'].touched || authForm.controls['username'].dirty)"
+          class="error-message"
+        >
+          El usuario es requerido.
+        </div>
+        <div
+          *ngIf="authForm.controls['username']?.errors?.['email'] && (authForm.controls['username'].touched || authForm.controls['username'].dirty)"
+          class="error-message"
+        >
+          El usuario debe ser un correo electrónico válido.
+        </div>
+
+        <label for="password">Contraseña:</label>
+        <input id="password" formControlName="password" type="password" />
+        <div
+          *ngIf="authForm.controls['password']?.errors?.['required'] && (authForm.controls['password'].touched || authForm.controls['password'].dirty)"
+          class="error-message"
+        >
+          La contraseña es requerida.
+        </div>
+        <div
+          *ngIf="authForm.controls['password']?.errors?.['minlength'] && (authForm.controls['password'].touched || authForm.controls['password'].dirty)"
+          class="error-message"
+        >
+          La contraseña debe tener al menos 8 caracteres.
+        </div>
+        <button type="submit" [disabled]="!isSubmitEnabled">Enviar</button>
+      </div>
+
+      <div *ngIf="needNewPassword">
+        <label for="newPassword">Nueva Contraseña:</label>
+        <input id="newPassword" formControlName="newPassword" type="password" />
+        <div
+          *ngIf="authForm.controls['newPassword']?.errors?.['required'] && (authForm.controls['newPassword'].touched || authForm.controls['newPassword'].dirty)"
+          class="error-message"
+        >
+          La nueva contraseña es requerida.
+        </div>
+        <div
+          *ngIf="authForm.controls['newPassword']?.errors?.['minlength'] && (authForm.controls['newPassword'].touched || authForm.controls['newPassword'].dirty)"
+          class="error-message"
+        >
+          La nueva contraseña debe tener al menos 8 caracteres.
+        </div>
+        <div
+          *ngIf="authForm.controls['newPassword']?.errors?.['passwordPattern'] && (authForm.controls['newPassword'].touched || authForm.controls['newPassword'].dirty)"
+          class="error-message"
+        >
+          La nueva contraseña debe contener al menos una letra mayúscula, una
+          letra minúscula, un número y un carácter especial.
+        </div>
+
+        <label for="confirmPassword">Confirmar Nueva Contraseña:</label>
+        <input
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          type="password"
+        />
+        <div
+          *ngIf="authForm.controls['confirmPassword']?.errors?.['required'] && (authForm.controls['confirmPassword'].touched || authForm.controls['confirmPassword'].dirty)"
+          class="error-message"
+        >
+          La confirmación de la contraseña es requerida.
+        </div>
+        <div
+          *ngIf="authForm.errors?.['passwordMismatch'] && (authForm.controls['confirmPassword'].touched || authForm.controls['confirmPassword'].dirty)"
+          class="error-message"
+        >
+          Las contraseñas no coinciden.
+        </div>
+        <button type="submit" [disabled]="!isSubmitEnabled">Enviar</button>
+      </div>
+
+      <div *ngIf="showMFA">
+        <label for="mfaCode">Código MFA:</label>
+        <input id="mfaCode" formControlName="mfaCode" type="text" />
+        <div
+          *ngIf="authForm.controls['mfaCode']?.errors?.['required'] && (authForm.controls['mfaCode'].touched || authForm.controls['mfaCode'].dirty)"
+          class="error-message"
+        >
+          El código MFA es requerido.
+        </div>
+        <button type="submit" [disabled]="!isSubmitEnabled">Enviar</button>
+      </div>
+
+      <div *ngIf="mfaSelection && !showPhoneNumberInput && !qrShown">
+        <label for="mfaType">Tipo de MFA:</label>
+        <select id="mfaType" formControlName="mfaType">
+          <option value="SOFTWARE_TOKEN_MFA">App de autenticación</option>
+          <option value="SMS_MFA">SMS</option>
+        </select>
+        <button type="submit" [disabled]="!isSubmitEnabled">Continuar</button>
+      </div>
+
+      <div *ngIf="showPhoneNumberInput">
+        <label for="phoneNumber">Número de teléfono:</label>
+        <input id="phoneNumber" formControlName="phoneNumber" type="text" />
+        <div
+          *ngIf="authForm.controls['phoneNumber']?.errors?.['required'] && (authForm.controls['phoneNumber'].touched || authForm.controls['phoneNumber'].dirty)"
+          class="error-message"
+        >
+          El número de teléfono es requerido.
+        </div>
+        <div
+          *ngIf="authForm.controls['phoneNumber']?.errors?.['pattern'] && (authForm.controls['phoneNumber'].touched || authForm.controls['phoneNumber'].dirty)"
+          class="error-message"
+        >
+          El número de teléfono no es válido.
+        </div>
+        <button type="button" (click)="back()">Volver</button>
+        <button type="submit" [disabled]="!isSubmitEnabled">
+          Enviar código
+        </button>
+      </div>
+
+      <div *ngIf="mfaSetupRequired && qrShown">
+        <p>Escanea este código con tu aplicación de autenticación:</p>
+        <qrcode
+          *ngIf="qrCodeImage"
+          [qrdata]="qrCodeImage"
+          [width]="256"
+          [errorCorrectionLevel]="'M'"
+        ></qrcode>
+        <p>o ingresa este código manualmente: {{ secretCode }}</p>
+        <label for="mfaToken">Código de verificación:</label>
+        <input id="mfaToken" formControlName="mfaToken" type="text" />
+        <label for="deviceName">Nombre del dispositivo (opcional):</label>
+        <input id="deviceName" formControlName="deviceName" type="text" />
+        <button type="button" (click)="back()">Volver</button>
+        <button type="submit" [disabled]="!isSubmitEnabled">Enviar</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

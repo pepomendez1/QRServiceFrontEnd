@@ -1,0 +1,79 @@
+<div class="content">
+  <app-side-panel-header
+    [title]="'Ver datos de mi tarjeta'"
+    [arrowBackEnabled]="steps[currentStep] !== 'viewCard'"
+    (arrowBack)="handleArrowBack()"
+    [confirmRequired]="true"
+    (closePressed)="close()"
+  ></app-side-panel-header>
+  @if (loading) {
+  <div class="loading-container">
+    <mat-spinner class="center-spinner"></mat-spinner>
+  </div>
+  } @else {
+  <!-- step validate with otp -->
+  <div class="otp-validation" *ngIf="steps[currentStep] === 'otp'">
+    <div class="otp-content">
+      <div *ngIf="enterOTPImg" [innerHTML]="enterOTPImg"></div>
+      <h1 class="heading-4-700 m-0 p-0">
+        Te enviamos un código al e-mail {{ email }}
+      </h1>
+      <p class="paragraph-500 m-0 p-1">
+        Copia acá ese código para poder ver los datos de tu tarjeta
+      </p>
+      <app-otp-form
+        class="otp-form"
+        [timeLeft]="timeLeftOTP"
+        [resetTimer]="resetTimer"
+        [clearForm]="clearForm"
+        [incorrectOTP]="incorrectOTP"
+        (otpSubmit)="handleOtpEvent($event)"
+        (timeOut)="handleTimeOut()"
+        (enableButton)="handleButtonState($event)"
+      ></app-otp-form>
+      <button mat-ripple class="btn-link-primary" (click)="resendCode()">
+        <span class="secondary-600-primary">Reenviar código</span>
+      </button>
+    </div>
+    <app-messages class="w-100"></app-messages>
+    <app-side-panel-footer
+      class="w-100"
+      [buttonText]="isProcessing ? 'Validando' : 'Continuar'"
+      buttonStyle="filled"
+      [buttonDisabled]="!isSubmitButtonEnabled || isProcessing || timeOut"
+      (buttonClicked)="submitOtp()"
+    ></app-side-panel-footer>
+  </div>
+
+  <div *ngIf="steps[currentStep] === 'viewCard'" class="view-card-container">
+    <div *ngIf="errors.length > 0" class="errors">
+      <p *ngFor="let error of errors">{{ error }}</p>
+      <button mat-ripple class="btn-link" (click)="getCardIframeUrl(data.id)">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+
+    <div class="card-iframe-container">
+      <iframe
+        *ngIf="!loading"
+        [src]="iframeUrl"
+        frameborder="0"
+        width="100%"
+        height="100%"
+        class="card-iframe"
+      >
+      </iframe>
+    </div>
+    <app-side-panel-footer
+      class="w-100"
+      [buttonText]="'Cerrar (' + (timeLeft | secondsToTimeString) + ')'"
+      buttonStyle="ghost"
+      [buttonDisabled]="!isSubmitButtonEnabled || isProcessing || timeOut"
+      (buttonClicked)="close()"
+    ></app-side-panel-footer>
+    <!-- <button mat-ripple class="btn btn-ghost" (click)="close()">
+      Cerrar ({{ timeLeft | secondsToTimeString }})
+    </button> -->
+  </div>
+  }
+</div>

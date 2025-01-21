@@ -1,0 +1,51 @@
+<div class="otp-screen-container">
+  <div *ngIf="isMobile" class="return-arrow" (click)="returnToEmailForm()">
+    <mat-icon>arrow_back</mat-icon>
+    <p>Reingresar mail</p>
+  </div>
+
+  <div class="header">
+    <h1>{{ notificationTitle }}</h1>
+    <p>{{ notificationText }}</p>
+  </div>
+  <div class="otp-form-wrapper-outer">
+    <app-otp-form
+      [gap]="isMobile ? '0.5rem' : '1rem'"
+      [squareInputSize]="isMobile ? '40px' : '50px'"
+      [timeLeft]="timeLeft"
+      [resetTimer]="resetTimer"
+      (otpSubmit)="handleOtp($event)"
+      (timeOut)="handleTimeOut()"
+      (enableButton)="handleButtonState($event)"
+    ></app-otp-form>
+  </div>
+  <app-messages class="left-aligned-message"></app-messages>
+  <div class="button-container">
+    <button
+      *ngIf="!isMobile"
+      class="outline-button"
+      mat-stroked-button
+      type="button"
+      (click)="returnToEmailForm()"
+    >
+      Reingresar mail
+    </button>
+    <button
+      class="default-submit-button"
+      mat-raised-button
+      color="primary"
+      (click)="submitOtpForm()"
+      type="button"
+      [disabled]="!isSubmitButtonEnabled || isProcessing || timeOut"
+    >
+      <span *ngIf="isProcessing; else buttonText">Procesando </span>
+      <ng-template #buttonText> Continuar </ng-template>
+    </button>
+  </div>
+  <div *ngIf="isProcessing">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+  <div *ngIf="errorMessage" class="error-message">
+    <mat-icon>feedback</mat-icon> {{ errorMessage }}
+  </div>
+</div>

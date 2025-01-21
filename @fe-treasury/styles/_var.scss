@@ -1,0 +1,160 @@
+@use '@angular/material' as mat;
+/**
+  General
+ */
+$brand-primary: #F50050;
+$page-load-background: #13293d;
+$elevation: 2;
+
+$color-success: #7cb342;
+
+$spacing: 24px;
+$border-radius: 8px;
+
+$padding-xxl: 48px;
+$padding-xl: 40px;
+$padding-lg: 32px;
+$padding: 24px;
+$padding-md: 16px;
+$padding-sm: 12px;
+$padding-xs: 8px;
+$padding-xxs: 4px;
+$padding-0: 0px;
+
+$paddings: (
+  '-0': $padding-0,
+  -xxs: $padding-xxs,
+  -xs: $padding-xs,
+  -sm: $padding-sm,
+  -md: $padding-md,
+  '': $padding,
+  -lg: $padding-lg,
+  -xl: $padding-xl,
+  -xxl: $padding-xl,
+);
+
+$icon-sizes: (
+  -xs: 14px,
+  -sm: 18px,
+  -md: 20px,
+  '': 24px,
+  -lg: 28px,
+  -xl: 32px
+);
+
+$margin-xxl: 48px;
+$margin-xl: 40px;
+$margin-lg: 32px;
+$margin: 24px;
+$margin-md: 16px;
+$margin-sm: 12px;
+$margin-xs: 8px;
+$margin-xxs: 4px;
+$margin-0: 0px;
+
+$margins: (
+  '-0': $margin-0,
+  -xxs: $margin-xxs,
+  -xs: $margin-xs,
+  -sm: $margin-sm,
+  -md: $margin-md,
+  '': $margin,
+  -lg: $margin-lg,
+  -xl: $margin-xl,
+  -xxl: $margin-xl,
+);
+
+
+/**
+  Card
+ */
+$card-header-height: 64px;
+/**
+  Header
+ */
+$toolbar-height: 7.5em;
+$toolbar-z-index: 500;
+$toolbar-button-width: 40px;
+
+// Sidenav
+$sidenav-width: 270px;
+$sidenav-collapsed-width: 74px;
+$sidenav-toolbar-height: $toolbar-height;
+
+// Sidepanel
+$sidepanel-width: 600px;
+$sidepanel-padding: 2.5em;
+// Sidenav Item
+$sidenav-item-icon-size: 22px;
+$sidenav-item-height: 44px;
+$sidenav-item-padding-left: 24px;
+$sidenav-item-padding-right: 16px;
+$sidenav-item-margin-right: 8px;
+// Sidenav width can be changed
+$sidenav-z-index: 700;
+$blink-scrollbar-width: 12px;
+
+// Page Layout
+$page-layout-height: 200px;
+$page-layout-toolbar-height: $toolbar-height;
+
+/**
+  Mixins
+ */
+$media-xs: 'screen and (max-width: 599px)';
+@mixin media-xs {
+  @media #{$media-xs} {
+    @content;
+  }
+}
+
+$media-sm: 'screen and (min-width: 599px) and (max-width: 959px)';
+@mixin media-sm {
+  @media #{$media-sm} {
+    @content;
+  }
+}
+
+@each $key, $value in $paddings {
+  .p#{$key} {
+    padding: $value;
+  }
+
+  .pt#{$key} {
+    padding-top: $value;
+  }
+
+  .pb#{$key} {
+    padding-bottom: $value;
+  }
+
+  .pl#{$key} {
+    padding-left: $value;
+  }
+
+  .pr#{$key} {
+    padding-right: $value;
+  }
+}
+
+@each $key, $value in $margins {
+  .m#{$key} {
+    margin: $value;
+  }
+
+  .mt#{$key} {
+    margin-top: $value;
+  }
+
+  .mb#{$key} {
+    margin-bottom: $value;
+  }
+
+  .ml#{$key} {
+    margin-left: $value;
+  }
+
+  .mr#{$key} {
+    margin-right: $value;
+  }
+}

@@ -1,0 +1,9 @@
+<div *ngIf="isLoading">
+  <p>Loading, please wait...</p>
+  <!-- Puedes agregar aquí un spinner o una animación de carga -->
+</div>
+
+<div *ngIf="!isLoading">
+  <!-- El contenido normal de la aplicación se renderiza aquí cuando isLoading es falso -->
+  <router-outlet></router-outlet>
+</div>

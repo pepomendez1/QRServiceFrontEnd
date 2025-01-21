@@ -1,0 +1,267 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  background-color: white;
+  padding: 1em;
+
+  .mat-spinner-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    justify-content: space-between;
+    width: 100%;
+
+    .new-card{
+      padding: 2px 0.5em;
+    }
+  }
+
+  mat-form-field {
+    mat-select {
+      display: flex;
+    }
+  }
+
+}
+
+.card-option {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  position: relative;
+}
+.paused-pill{
+  text-align: center;
+  background-color: #F4F4F4;
+  padding: 0 2px;
+  color:#161616;
+  border-radius: 4px;
+}
+.cancelled-pill{
+  text-align: center;
+  background-color: #f7d6d6;
+  padding: 0 2px;
+  color:#161616;
+  border-radius: 4px;
+}
+p {
+  margin: 0;
+}
+
+.icon {
+  width: 40px;
+  height: 32px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  .overlay {
+    background-color: #F50050 ;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1; /* Adjust opacity as needed */
+    pointer-events: none; /* Allows clicks to pass through the overlay */
+  }
+}
+
+.col {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.three-col-buttons-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1em;
+
+}
+
+.two-col-buttons-container {
+  @extend .three-col-buttons-container;
+
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.bnt-round {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0.7em;
+  border: #EBEBEB solid 1px;
+  background-color: transparent;
+  color: #161616;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:active {
+    cursor: pointer;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: #fa0050;
+    cursor: not-allowed;
+  }
+
+}
+
+.errors {
+  display: flex;
+  color: #fa0050;
+  justify-content: space-between;
+}
+
+.highlight {
+  border: 2px solid #fa0050b0;
+  animation: pulse 3s ease-in-out infinite;
+  @keyframes pulse {
+    0% {
+      border: 2px solid #fa0050b0;
+    }
+    50% {
+      border: 2px solid #fa005020;
+    }
+    100% {
+      border: 2px solid #fa0050b0;
+    }
+  }
+
+}
+
+::ng-deep.mat-mdc-form-field-flex .mat-mdc-form-field-infix {
+  padding: 0;
+}
+::ng-deep.mat-mdc-text-field-wrapper{
+  border-radius: 100px;
+}
+
+.activities-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 700px;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  .mat-spinner-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1em;
+  }
+
+  .activity-item {
+    display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 1em 0;
+gap: 1em;
+border-bottom: 1px solid #f4f4f4;
+
+    .activity-info {
+      display: flex;
+align-items: center;
+.rounded-icon {
+  min-width: 40px;
+  margin-right: 1em;
+}
+      .details {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+      }
+    }
+    .activity-amount {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      flex: 1;
+      .activity-date {
+        margin: 0;
+        font-size: 12px;
+        color: #666;
+      }
+    }
+  }
+  :last-child {
+    border-bottom: none;
+  }
+}
+
+.text-gray {
+  color: gray; /* Cambia el color a gris */
+  font-weight: normal; /* Opcional: Ajusta el grosor del texto si es necesario */
+  font-size: 10px;
+  margin-left: 8px;
+}
+
+.row-container {
+  display: flex; /* Alinea los elementos en una fila */
+  align-items: center; /* Alinea verticalmente */
+  justify-content: space-between; /* Distribuye los elementos dejando espacio entre ellos */
+  padding: 8px 16px; /* Ajusta los márgenes internos según tu diseño */
+}
+
+.details {
+  display: flex;
+  flex-direction: column; /* Mantiene los textos de `details` en una columna */
+  flex: 1; /* Toma el espacio restante para empujar el botón hacia el borde derecho */
+}
+
+.paragraph-600 {
+  display: flex;
+  align-items: center; /* Alinea el texto y el texto adicional en la misma línea */
+}
+
+
+
+button[mat-icon-button] {
+  margin-left: 16px; /* Espacio entre el menú y los demás elementos */
+}
+
+.custom-button {
+  font-size: 16px; /* Tamaño del texto del botón */
+  padding: 10px 20px;
+  background-color: white;
+  border: 2px dotted black; /* Borde punteado */
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex; /* Alinea los elementos horizontalmente */
+  align-items: center; /* Alinea los elementos verticalmente */
+}
+
+.plus-sign {
+  font-size: 30px; /* Tamaño específico para el signo "+" */
+  margin-right: -2px; /* Espacio entre el signo y el texto */
+  line-height: 1; /* Ajusta la altura del signo "+" */
+  margin-top: -4px;
+  display: inline-flex; /* Asegura que el signo respete la alineación */
+}
+
+.custom-button:hover {
+  background-color: #f9f9f9; /* Fondo gris claro al pasar el mouse */
+  border-color: gray; /* Cambiar el color del borde al pasar el mouse */
+}
+
+

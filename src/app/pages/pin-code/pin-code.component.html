@@ -1,0 +1,265 @@
+<div
+  *ngIf="logoUrl && !isMobile"
+  [innerHTML]="logoUrl"
+  class="svg-logo-container"
+></div>
+<div class="pin-code-container-full">
+  <div class="pin-code-main-container box-container w-100">
+    <div class="pin-code-container">
+      <line-stepper [currentStep]="currentStep"></line-stepper>
+
+      <app-custom-header-onb
+        [isMobile]="isMobile"
+        [title]="
+          confirmPinForm
+            ? 'Repetí el número de tu PIN'
+            : 'Elegí el número de tu PIN'
+        "
+        [description]="
+          confirmPinForm
+            ? ''
+            : 'El PIN es el número de seguridad con el que podrás mantener el control sobre todas las operaciones que realices con tu cuenta.'
+        "
+        (arrowBack)="arrowBack()"
+        [arrowBackEnabled]="true"
+      ></app-custom-header-onb>
+
+      <div class="section-content">
+        <form
+          class="pin-form"
+          *ngIf="!confirmPinForm"
+          [formGroup]="pinForm"
+          (ngSubmit)="submitPin()"
+        >
+          <div class="pin-form-container">
+            <div class="pin-input-container">
+              <input
+                type="text"
+                pattern="[0-9]*"
+                maxlength="1"
+                minlength="1"
+                inputmode="numeric"
+                formControlName="digit1"
+                class="pin-input"
+                placeholder="0"
+                (keydown)="handleBackspace($event, null)"
+                (input)="moveToNextField($event, digit2)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit1
+              />
+              <input
+                type="text"
+                pattern="[0-9]*"
+                maxlength="1"
+                minlength="1"
+                inputmode="numeric"
+                placeholder="0"
+                formControlName="digit2"
+                class="pin-input"
+                (keydown)="handleBackspace($event, digit1)"
+                (input)="moveToNextField($event, digit3)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit2
+              />
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                inputmode="numeric"
+                placeholder="0"
+                formControlName="digit3"
+                class="pin-input"
+                (keydown)="handleBackspace($event, digit2)"
+                (input)="moveToNextField($event, digit4)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit3
+              />
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                placeholder="0"
+                inputmode="numeric"
+                formControlName="digit4"
+                class="pin-input"
+                (keydown)="handleBackspace($event, digit3)"
+                (input)="moveToNextField($event, digit5)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit4
+              />
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                inputmode="numeric"
+                placeholder="0"
+                formControlName="digit5"
+                class="pin-input"
+                (keydown)="handleBackspace($event, digit4)"
+                (input)="moveToNextField($event, digit6)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit5
+              />
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                inputmode="numeric"
+                placeholder="0"
+                formControlName="digit6"
+                class="pin-input"
+                (keydown)="handleBackspace($event, digit5)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit6
+              />
+            </div>
+          </div>
+          <div class="button-container">
+            <button
+              class="btn-cta-filled"
+              type="submit"
+              [disabled]="pinForm.invalid || isProcessing"
+            >
+              <!-- <button
+            class="default-submit-button"
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="pinForm.invalid || isProcessing"
+          > -->
+              <span *ngIf="isProcessing; else buttonText">Procesando </span>
+              <ng-template #buttonText> Continuar </ng-template>
+            </button>
+          </div>
+        </form>
+
+        <form
+          class="confirm-pin-form"
+          *ngIf="confirmPinForm"
+          [formGroup]="pinConfirm"
+          (ngSubmit)="submitPinConfirm()"
+        >
+          <div class="pin-form-container">
+            <div
+              class="pin-input-container"
+              [ngClass]="{ error: diffPinConfirm }"
+            >
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                inputmode="numeric"
+                formControlName="digit1"
+                class="pin-input"
+                placeholder="0"
+                (keydown)="handleBackspace($event, null)"
+                (input)="moveToNextField($event, digit2)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit1
+              />
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                inputmode="numeric"
+                placeholder="0"
+                formControlName="digit2"
+                class="pin-input"
+                (keydown)="handleBackspace($event, digit1)"
+                (input)="moveToNextField($event, digit3)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit2
+              />
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                inputmode="numeric"
+                placeholder="0"
+                formControlName="digit3"
+                class="pin-input"
+                (keydown)="handleBackspace($event, digit2)"
+                (input)="moveToNextField($event, digit4)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit3
+              />
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                inputmode="numeric"
+                placeholder="0"
+                formControlName="digit4"
+                class="pin-input"
+                (keydown)="handleBackspace($event, digit3)"
+                (input)="moveToNextField($event, digit5)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit4
+              />
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                inputmode="numeric"
+                placeholder="0"
+                formControlName="digit5"
+                class="pin-input"
+                (keydown)="handleBackspace($event, digit4)"
+                (input)="moveToNextField($event, digit6)"
+                (keypress)="allowOnlyNumbers($event)"
+                #digit5
+              />
+              <input
+                type="text"
+                maxlength="1"
+                pattern="[0-9]*"
+                minlength="1"
+                inputmode="numeric"
+                placeholder="0"
+                formControlName="digit6"
+                (keydown)="handleBackspace($event, digit5)"
+                (keypress)="allowOnlyNumbers($event)"
+                class="pin-input"
+                #digit6
+              />
+            </div>
+            <mat-error class="form-error" *ngIf="diffPinConfirm">
+              <mat-icon class="material-symbols-outlined">error</mat-icon> Los
+              números de PIN ingresados no coinciden. Revisalos y volvé a
+              intentar.
+            </mat-error>
+          </div>
+          <div class="button-container">
+            <button
+              class="btn-cta-filled"
+              type="button"
+              (click)="submitPinConfirm()"
+              [disabled]="pinConfirm.invalid || isProcessing"
+            >
+              <!-- <button
+            class="default-submit-button"
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="submitPinConfirm()"
+            [disabled]="pinConfirm.invalid || isProcessing"
+          > -->
+              <span *ngIf="isProcessing; else buttonText">Procesando </span>
+              <ng-template #buttonText> Continuar </ng-template>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <app-onb-footer></app-onb-footer>
+</div>

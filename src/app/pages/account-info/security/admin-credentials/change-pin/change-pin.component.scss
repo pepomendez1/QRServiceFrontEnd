@@ -1,0 +1,100 @@
+.change-pin-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1em;
+
+  .insert-password-container {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    .input-box {
+      display: flex;
+      height: 56px;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #dbdbdb;
+
+      .input-data {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .input-edit {
+          background-color: transparent;
+          display: flex;
+          width: 100%;
+          border: none;
+          outline: none;
+          flex: 1;
+          &:hover,
+          &:focus,
+          &:active {
+            border: none;
+            outline: none;
+            box-shadow: none;
+          }
+        }
+      }
+      .input-box.error {
+        border: 1px solid red;
+      }
+    }
+  }
+  .insert-otp-container {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    gap: 1em;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .insert-pin-container {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1; /* Ensure the form takes up remaining space */
+    }
+    .pin-form-container {
+      display: flex;
+      gap: 1em;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: left;
+      max-width: none; // Remove max-width constraint
+      flex: 1;
+    }
+  }
+
+  .success-change {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    p {
+      width: 70%;
+    }
+  }
+}

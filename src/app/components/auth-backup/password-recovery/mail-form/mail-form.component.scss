@@ -1,0 +1,120 @@
+.recovery-mail-container {
+  padding: 2em 4em;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1em;
+  .return-arrow {
+    align-self: flex-start;
+    padding-top: 1rem;
+    mat-icon {
+      color: #161616;
+      font-size: 24px;
+    }
+  }
+  .header {
+    width: 100%;
+    align-items: center;
+    text-align: left;
+    padding-bottom: 0.2rem;
+
+    h1 {
+      font-size: 28px;
+      color: #161616;
+      font-weight: 700;
+      line-height: 37.24px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #161616;
+      font-weight: 500;
+      line-height: 24px;
+    }
+  }
+
+  form {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .form-container {
+      display: flex;
+      flex-grow: 1;
+      align-items: center;
+      justify-content: flex-start;
+      flex-direction: column;
+      width: 100%;
+      max-width: none; // Remove max-width constraint
+
+      mat-form-field {
+        width: 100%; // Full width of the form field
+      }
+    }
+  }
+
+  .button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 1.2rem;
+    position: bottom;
+    gap: 1em;
+    width: 100%;
+
+    button {
+      display: flex;
+      flex-grow: 1;
+      height: 48px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
+    .outline-button {
+      border-width: 2px;
+      border-color: #EA044E1A;
+      color: #EA044E;
+      box-shadow: none;
+    }
+
+    .default-submit-button {
+      border-color: #EA044E;
+      background-color: #EA044E;
+      color: white;
+      box-shadow: none;
+
+      &:disabled {
+        background-color: #cccccc;
+        /* Disabled background color */
+        border-color: #cccccc;
+        /* Disabled border color */
+        color: #666666;
+        /* Disabled text color */
+        cursor: not-allowed;
+        /* Change cursor to indicate disabled state */
+      }
+    }
+
+  }
+
+
+}
+
+@media screen and (max-width: 840px) {
+  .recovery-mail-container  {
+    width: 100%;
+    padding: 1em;
+    box-shadow: none;
+  }
+  .button-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+}

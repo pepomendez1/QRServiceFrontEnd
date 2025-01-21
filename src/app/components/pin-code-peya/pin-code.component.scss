@@ -1,0 +1,188 @@
+.pin-code-container {
+  padding: 2em 4em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+
+
+  .return-arrow.visible {
+    visibility: visible;
+  }
+
+  .header {
+    align-items: center;
+    text-align: left;
+
+    h1 {
+      font-size: 28px;
+      color: #161616;
+      font-weight: 700;
+      line-height: 37.24px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #6B6B6B;
+      font-weight: 500;
+      line-height: 24px;
+    }
+  }
+
+
+  .form-wrapper {
+    display: flex;
+    width: 100%;
+    align-items: left;
+    justify-content: left;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 2em;
+
+      .pin-input-container {
+        display: flex;
+        flex-grow: 1;
+        gap: 1em;
+        align-items: left;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        flex-direction: row;
+  
+        .pin-input {
+          width: 40px;
+          height: 40px;
+          border: 2px solid #ccc;
+          border-radius: 8px;
+          text-align: center;
+          font-size: 16px;
+          appearance: none;
+        }
+  
+        .pin-input:last-child {
+          margin-right: 0;
+          /* No margin after the last input */
+        }
+  
+        .pin-input:focus {
+          border-color: #0d0d0e;
+          /* Highlighted border when focused */
+          outline: none;
+          appearance: none;
+        }
+      }
+
+      .button-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1em;
+  
+        button {
+          flex-grow: 1;
+          padding: 1.5em;
+          border-radius: 8px;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1em;
+          font-weight: 600;
+
+          &.default-submit-button {
+            border-color: #EA044E;
+            background-color: #EA044E;
+            color: white;
+            &:disabled {
+              background-color: #cccccc;
+              /* Disabled background color */
+              border-color: #cccccc;
+              /* Disabled border color */
+              color: #666666;
+              /* Disabled text color */
+              cursor: not-allowed;
+              /* Change cursor to indicate disabled state */
+            }
+          }
+
+          &.outlined-submit-button {
+            border-color: #EA044E1A;
+            border-width: 2px;
+            background-color: transparent;
+            color: #EA044E;
+          }
+        }
+      }
+    }
+
+
+
+  }
+
+  .form-error {
+    padding-top: 1%;
+    font-size: 12px;
+    font-weight: 400;
+    color: #E5434A;
+    display: flex;
+
+    mat-icon {
+      font-size: 12px;
+      height: 16px;
+      width: 16px;
+      margin-right: 0;
+
+      .material-symbols-outlined {
+        color: #E5434A;
+        font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' -25,
+          'opsz' 20
+      }
+    }
+
+  }
+
+  .warning-message {
+    display: flex;
+    align-items: center;
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border: 1px solid #ffeeba;
+    font-size: 14px;
+
+    mat-icon {
+      font-size: 24px;
+      margin-right: 8px;
+      color: #856404;
+    }
+  }
+
+  .pin-error-message mat-icon {
+    font-size: 24px;
+    margin-right: 8px;
+    color: #680707;
+    /* Same color as text */
+  }
+
+}
+
+@media screen and (max-width: 840px) {
+  .pin-code-container {
+    height: 100%;
+    justify-content: space-between;
+    padding: 2em;
+
+    .form-wrapper {
+      form {
+        .pin-input-container {
+          gap: 0.5em;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,145 @@
+.custom-card {
+  background-color: $theme-card;
+  box-shadow: none;
+  padding: 1em;
+  gap: 1em;
+  border-radius: 12px;
+  border: 1px solid #ebebeb;
+}
+.container {
+  border-radius: 1em;
+  background-color:  $theme-card;
+  border: 1px solid #ebebeb;
+  padding: 1em;
+}
+.rounded-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 12px;
+  gap:0.5em;
+  width: auto;
+  height: 48px;
+  border-radius: 20px;
+  border: 1px solid #E6E6E6;
+  button[mat-icon-button] {
+    width: 16px;
+    height: 16px;
+    min-width: 16px; // Ensures that the button won't expand
+    padding: 0; // Removes extra padding around the button
+
+  }
+  &.disabled {
+    pointer-events: none; // Prevent interaction
+    opacity: 0.5; // Dim the appearance
+    cursor: not-allowed; // Show not-allowed cursor
+
+    .download-button {
+      cursor: not-allowed; // Ensure button reflects the disabled state
+    }
+  }
+}
+
+.btn-round {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0.7em;
+  border: #EBEBEB solid 1px;
+  background-color: transparent;
+  color: $theme-text;
+
+  &:hover {
+    background-color: $theme-background-hover;
+    cursor: pointer;
+  }
+
+  &:active {
+    cursor: pointer;
+  }
+
+  &:disabled {
+    color: rgb(163, 163, 163);
+    border: 2px solid #888;
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+  }
+}
+
+.highlight {
+  border: 2px solid $theme-color-primary;
+  animation: pulse 3s ease-in-out infinite;
+  @keyframes pulse {
+    0% {
+      border: 2px solid $theme-color-primary;
+    }
+    50% {
+      border: 2px solid $primary-color-hover;
+    }
+    100% {
+      border: 2px solid $theme-color-primary;
+    }
+  }
+
+}
+
+.clickable {
+  cursor: pointer;
+  &:hover {
+    background-color: $theme-background-hover;
+  }
+}
+
+.backdrop-class {
+  background-color: $theme-backdrop; /* Adjust opacity and color as needed */
+}
+
+.paused-pill{
+  text-align: center;
+  background-color: #F4F4F4;
+  padding: 0 2px;
+  color:#161616;
+  border-radius: 4px;
+}
+.cancelled-pill{
+  text-align: center;
+  background-color: #f7d6d6;
+  padding: 0 2px;
+  color:#161616;
+  border-radius: 4px;
+}
+.box-container{
+  background-color: $theme-card;
+  border-radius: 1em;
+  box-shadow: $theme-box-shadow;
+  width: 700px;
+  padding: 2em 4em;
+
+}
+.svg-logo-container {
+  width: 200px;
+  height: 50px;
+  position: absolute;
+  top: 1em;
+  left: 1em;
+
+  .svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.svg-logo-login-container {
+  width: 200px;
+  height: 50px;
+  margin: 0;
+  padding: 0;
+  display: block; /* Ensure it behaves like a block-level container */
+  overflow: hidden; /* Hide any overflow content */
+}
+.svg-logo-login-container svg {
+  width: 100%;
+  height: 100%;
+}

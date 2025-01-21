@@ -1,0 +1,36 @@
+.notification-screen-container {
+  width: 100%;
+  content: {
+    display: flex;
+    align-items: space-between;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+  }
+  .main-content {
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    display: flex;
+    flex:1;
+  }
+
+   .progress-bar-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding-top: 20px;
+    width: 100%;
+   }
+ }
+
+ @media screen and (max-width: 840px) {
+ .main-content{
+  height: calc(85vh - 2em);
+}
+.progress-bar-loading{
+  height: 15vh ;
+}
+ }

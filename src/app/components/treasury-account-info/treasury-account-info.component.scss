@@ -1,0 +1,143 @@
+@import "../../../../@fe-treasury/styles/var";
+
+$icon-button-size: 24px;
+
+.account-info-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1em;
+
+  .info-wrapper {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1; /* Allow the content to grow and fill the available space */
+    gap: 1em;
+  }
+
+  .account-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    justify-content: space-between;
+    .info-box {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .input-box {
+      display: flex;
+      height: 56px;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #dbdbdb;
+
+      .input-data {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .actions-button {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5em;
+        .outline-button {
+          padding: 0;
+          margin: 0;
+          width: $icon-button-size;
+          height: $icon-button-size;
+          min-width: $icon-button-size;
+          min-height: $icon-button-size;
+          line-height: $icon-button-size;
+        }
+      }
+    }
+    .input-alias {
+      width: 100%;
+      border: none;
+      outline: none;
+
+      &:hover,
+      &:focus,
+      &:active {
+        border: none;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
+    .value-and-copy {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .input-box p {
+      margin: 0;
+    }
+
+    .copy-icon {
+      margin-left: 10px;
+      mat-icon {
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+.error-message {
+  margin-top: 10px;
+  color: red;
+}
+
+.copy-message {
+  margin-top: 10px;
+  color: green;
+}
+mat-form-field {
+  width: 100%;
+}
+
+/* Ajustes para el preloader centrado */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh; /* Altura específica y más pequeña para el spinner */
+  width: 100%;
+  mat-spinner {
+    width: 50px !important; /* Ajustar el ancho del spinner */
+    height: 50px !important; /* Ajustar la altura del spinner */
+  }
+}
+
+.section-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  text-align: center;
+  width: 100%;
+  //box-shadow: 0px 4px 24px 0px #16161629;
+  .btn {
+    height: 60px;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+  }
+}

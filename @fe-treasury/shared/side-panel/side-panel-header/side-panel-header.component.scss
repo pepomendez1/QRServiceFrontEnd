@@ -1,0 +1,45 @@
+.side-panel-header {
+  position: sticky;
+  top: 0;
+  background-color: transparent;
+  display: flex;
+  padding-bottom: 1em;
+  gap: 1em;
+  width: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 999;
+
+  .side-panel-title {
+    display: flex;
+    flex: 1;
+    align-items: flex-start;
+
+    h2 {
+      margin: 0;
+    }
+
+    .return-arrow {
+      font-size: 24px;
+    }
+  }
+
+  .buttons-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+    align-items: center;
+
+    .button {
+      background-color: transparent;
+      align-items: center;
+      border: none;
+      margin: 0;
+      padding: 0;
+
+      &.hidden {
+        visibility: hidden;
+      }
+    }
+  }
+}

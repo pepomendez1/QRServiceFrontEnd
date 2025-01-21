@@ -1,0 +1,52 @@
+<div class="auth-container">
+  <line-stepper [currentStep]="currentStep"></line-stepper>
+  
+  <div class="header">
+    <h1>Validemos tu identidad</h1>
+    <p>
+      Por seguridad, ayudanos cargando los siguientes datos para validar tu
+      identidad
+    </p>
+  </div>
+
+  <div class="list-onboarding-elements">
+    <div class="list-element">
+      <mat-icon class="material-symbols-outlined icon-list">id_card</mat-icon>
+      <div class="description-text">
+        Asegurate de tener en mano tu documento de identidad
+      </div>
+    </div>
+    <div class="list-element">
+      <mat-icon class="material-symbols-outlined icon-list"
+        >add_photo_alternate</mat-icon
+      >
+      <div class="description-text">
+        Las fotos deben contar con una iluminación adecuada
+      </div>
+    </div>
+  </div>
+  <!-- <button
+    class="default-submit-button"
+    mat-raised-button
+    (click)="goToParent()"
+    type="button"
+  >
+    Ir a address
+  </button> -->
+  <metamap-button
+    appVerificationPeya
+    (finished)="onVerificationFinishedPeya()"
+    class="custom-button"
+    clientid="6079d9a1483c3a001b1bb0e1"
+    flowId="6692be9aa8d43a001cdc9a74"
+    [metadata]="metadata"
+    color="#EA044E"
+    icon="none"
+    [disabled]="isProcessing"
+    language="es"
+  >
+  </metamap-button>
+  <div *ngIf="isProcessing">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+</div>

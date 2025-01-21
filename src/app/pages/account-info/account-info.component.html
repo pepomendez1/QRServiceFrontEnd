@@ -1,0 +1,44 @@
+<div class="account-info-wrapper">
+  <div class="account-info-list">
+    <div class="info-item-row clickable" (click)="openAdminInfo()">
+      <div class="item-text">
+        <p class="paragraph-600 p-0 m-0">Información personal</p>
+        <p class="secondary-500-light p-0 m-0">Domicilio, e-mail y teléfono</p>
+      </div>
+      <div class="btn-ghost-black">
+        <mat-icon>chevron_right</mat-icon>
+      </div>
+    </div>
+    <div class="info-item-row clickable" (click)="openAccounData()">
+      <div class="item-text">
+        <p class="paragraph-600 p-0 m-0">Datos de la cuenta</p>
+        <p class="secondary-500-light p-0 m-0">Alias y CVU</p>
+      </div>
+      <div class="btn-ghost-black">
+        <mat-icon>chevron_right</mat-icon>
+      </div>
+    </div>
+    <div class="info-item-row clickable" (click)="openSecurityPanel()">
+      <div class="item-text">
+        <p class="paragraph-600 p-0 m-0">Seguridad</p>
+        <p class="secondary-500-light p-0 m-0">
+          Métodos de verificación y dispositivos vinculados
+        </p>
+      </div>
+      <div class="btn-ghost-black">
+        <mat-icon>chevron_right</mat-icon>
+      </div>
+    </div>
+    <div class="info-item-row clickable last" (click)="openLegalInfo()">
+      <div class="item-text">
+        <p class="paragraph-600 p-0 m-0">Información legal</p>
+        <p class="secondary-500-light p-0 m-0">
+          Términos y condiciones de uso sobre tu cuenta
+        </p>
+      </div>
+      <div class="btn-ghost-black">
+        <mat-icon>chevron_right</mat-icon>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+app-otp-form {
+  .form-wrapper {
+    form{
+      .otp-input {
+        color: $theme-text;
+        background-color: transparent;
+        border: 1px solid #ccc;
+      }
+
+      // border-color: #0d0d0e;
+
+      .otp-input:focus {
+        border-color: $theme-text;
+        /* Highlighted border when focused */
+        outline: none;
+       appearance: none;
+      }
+    }
+  }
+  @media (max-width: 600px) {
+    .form-wrapper {
+      form {
+        .otp-form-container {
+          .otp-input-container {
+            .otp-input {
+              border-right: 0px solid #ccc;
+              &:focus,&:active {
+                border: 2px solid lighten($theme-text, 10%);
+              }
+            }
+          }
+      }
+    }
+   }
+ }
+}

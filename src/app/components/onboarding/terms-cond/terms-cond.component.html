@@ -1,0 +1,56 @@
+<div class="onboarding">
+  <mat-card class="onboarding-card">
+    <mat-card-header>
+      <mat-card-title
+        >Términos y condiciones del uso de nuestra plataforma</mat-card-title
+      >
+    </mat-card-header>
+    <mat-card-content class="accept-checkbox-group">
+      <form [formGroup]="termsForm" (ngSubmit)="onSubmit()">
+        <div class="accept-checkbox">
+          <mat-checkbox color="primary" formControlName="terms">
+            <span>Acepto</span>
+          </mat-checkbox>
+          <button
+            mat-button
+            color="primary"
+            class="text-button-type"
+            type="button"
+            (click)="openTermDialog()"
+          >
+            Términos y condiciones
+          </button>
+        </div>
+        <div class="accept-checkbox">
+          <mat-checkbox color="primary" formControlName="disclaimer">
+            <span>Acepto</span>
+          </mat-checkbox>
+          <button
+            mat-button
+            color="primary"
+            class="text-button-type"
+            type="button"
+            (click)="openAffidavitDialog()"
+          >
+            Declaración Jurada
+          </button>
+        </div>
+        <mat-card-actions>
+          <button
+            class="default-submit-button"
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="termsForm.invalid || isProcessing"
+          >
+            <span *ngIf="isProcessing; else buttonText">Procesando </span>
+            <ng-template #buttonText> Aceptar</ng-template>
+          </button>
+        </mat-card-actions>
+      </form>
+      <div *ngIf="isProcessing">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

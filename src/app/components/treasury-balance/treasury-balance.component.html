@@ -1,0 +1,63 @@
+<div class="balance-card custom-card">
+  <!-- Contenedor de título y botón "Datos de cuenta" -->
+  <div class="balance-header">
+    <h2 class="secondary-500-light">Dinero disponible</h2>
+    <button class="btn-ghost-color btn-md" (click)="showSection()">
+      <span class="body-2">Datos de tu cuenta</span>
+    </button>
+  </div>
+
+  <!-- Mostrar preloader solo en la sección de balance y rendimientos -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <!-- Spinner de Material -->
+  </div>
+
+  <!-- Mostrar el contenido de balance solo si los datos han sido cargados -->
+  <div *ngIf="!isLoading">
+    <!-- Monto disponible (formateado con parte entera y decimales separados) -->
+    <app-amount-display [amount]="availableAmount"></app-amount-display>
+
+    <!-- Información adicional - Rendimientos generados (con flecha y sección clickeable) -->
+    <div
+      class="balance-details clickable"
+      [routerLink]="['/app/investments']"
+      (click)="onEarningsClick()"
+    >
+      <div class="earnings-info" *ngIf="!investmentInfoError">
+        <p class="earnings-summary paragraph-500">
+          $ {{ totalReturns }}
+          <span class="paragraph-500">rendimientos generados</span>
+        </p>
+        <div class="earnings-growth">
+          <span class="growth-percentage tag-700">{{ tna }} %</span>
+          <mat-icon class="arrow-icon">chevron_right</mat-icon>
+          <!-- Flecha al final -->
+        </div>
+      </div>
+
+      <div class="earnings-error" *ngIf="investmentInfoError">
+        <mat-icon class="material-symbols-outlined">error</mat-icon>
+        <p class="paragraph-500">
+          Error en la obtención de datos de inversiones
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón de Transferir -->
+  <div class="balance-actions">
+    <button
+      (click)="startTransfer()"
+      class="btn-cta-filled w-100 btn-lg"
+      [disabled]="availableAmount <= 0"
+    >
+      Transferir
+    </button>
+  </div>
+</div>
+
+<!-- Mensaje de copiado -->
+<div *ngIf="copyMessage" class="copy-message">
+  {{ copyMessage }}
+</div>

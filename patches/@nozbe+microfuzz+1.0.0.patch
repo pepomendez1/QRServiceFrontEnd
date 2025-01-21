@@ -1,0 +1,18 @@
+diff --git a/node_modules/@nozbe/microfuzz/dist/index.d.ts b/node_modules/@nozbe/microfuzz/dist/index.d.ts
+index b306f2d..e505280 100644
+--- a/node_modules/@nozbe/microfuzz/dist/index.d.ts
++++ b/node_modules/@nozbe/microfuzz/dist/index.d.ts
+@@ -65,11 +65,11 @@ export type FuzzySearchStrategy = 'off' | 'smart' | 'aggressive'
+ 
+ export type FuzzySearchOptions = {
+   key?: string
+-  getText?: (unknown) => Array<string | null>
++  getText?: (arg0: unknown) => Array<string | null>
+   strategy?: FuzzySearchStrategy
+ }
+ 
+-export type FuzzySearcher<T> = (string) => Array<FuzzyResult<T>>
++export type FuzzySearcher<T> = (arg0: string) => Array<FuzzyResult<T>>
+ 
+ /**
+  * Creates a fuzzy search function that can be used to search `list` by passing `queryText` to it:

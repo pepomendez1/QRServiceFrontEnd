@@ -1,0 +1,27 @@
+<div class="side-panel-header">
+  <div class="buttons-container">
+    <button
+      [ngClass]="{ hidden: !arrowBackEnabled }"
+      mat-icon-button
+      (click)="onArrowBack()"
+      class="button"
+      aria-label="Back"
+      matTooltip="Atrás"
+    >
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <button
+      *ngIf="closeButtonEnabled"
+      mat-icon-button
+      (click)="closeSidePanel()"
+      class="button"
+      aria-label="Close"
+      matTooltip="Cerrar"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="side-panel-title">
+    <h2>{{ title }}</h2>
+  </div>
+</div>

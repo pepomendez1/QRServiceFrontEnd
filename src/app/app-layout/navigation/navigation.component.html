@@ -1,0 +1,21 @@
+<div class="menu" fxShow.gt-sm>
+  <div *ngFor="let item of sidenavItems$ | async; let index = index" #menuItem>
+    <mat-nav-list class="navigation-item-container" *ngIf="item.navigation">
+      <a
+        mat-list-item
+        (click)="handleClick(item)"
+        class="navigation-item paragraph-500"
+        fxLayout="row"
+        [routerLink]="item.enabled ? item.routeOrFunction : null"
+        [ngClass]="{ 'disabled-link': !item.enabled }"
+        fxLayoutAlign="start center"
+        routerLinkActive="active"
+      >
+        <mat-icon class="material-symbols-outlined" *ngIf="item.icon">{{
+          item.icon
+        }}</mat-icon>
+        <span class="name" #nameElement>{{ item.name }}</span>
+      </a>
+    </mat-nav-list>
+  </div>
+</div>

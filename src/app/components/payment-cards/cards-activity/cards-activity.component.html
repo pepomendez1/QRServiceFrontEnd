@@ -1,0 +1,97 @@
+<div class="container">
+  <div class="header">
+    <h2 class="heading-5-700">
+      {{ activityTitle }}
+    </h2>
+  </div>
+
+  <div class="activities-container">
+    <!-- Loader for the initial fetch -->
+    <div *ngIf="loading && !activities.length" class="mat-spinner-container">
+      <mat-spinner mode="indeterminate" [diameter]="40"></mat-spinner>
+    </div>
+
+    <!-- No transactions message -->
+    <div *ngIf="!loading && !activities.length" class="no-transactions">
+      <div *ngIf="problemImg" [innerHTML]="problemImg"></div>
+      <p class="secondary-500-light">{{ noActivityMessage }}</p>
+    </div>
+
+    <!-- List of transactions -->
+    <div *ngIf="!loading && activities.length" class="activities-container">
+      <div class="activity-item" *ngFor="let activity of activities">
+        <div class="activity-info">
+          <div class="rounded-icon">
+            <mat-icon class="material-symbols-outlined">{{
+              activity.icon
+            }}</mat-icon>
+          </div>
+          <div class="details">
+            <div class="paragraph-600">
+              {{
+                activity.description ? activity.description : "Sin descripción"
+              }}
+            </div>
+            <div class="secondary-500-light">
+              {{
+                activity.merchant_name
+                  ? activity.merchant_name
+                  : "Comercio desconocido"
+              }}
+            </div>
+          </div>
+        </div>
+        <div class="activity-amount">
+          <div
+            class="paragraph-400"
+            [ngClass]="{
+              'paragraph-400': true,
+              'paragraph-400-green': activity.transaction_type === 'cash_in'
+            }"
+          >
+            {{
+              activity.transaction_type === "cash_in"
+                ? "+" + (activity.amount | currency : "ARS" : "symbol-narrow")
+                : "-" + (activity.amount | currency : "ARS" : "symbol-narrow")
+            }}
+          </div>
+          <div class="activity-date">
+            {{ activity.created_at | date : "dd/MMM" }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show More Button with loader -->
+
+    <div
+      class="btn-cta-ghost"
+      (click)="showMoreTransactions()"
+      *ngIf="activities.length < totalItems && activities.length"
+    >
+      <span *ngIf="!loadingMore" class="paragraph-600"
+        >Mostrar más consumos</span
+      >
+      <mat-spinner
+        *ngIf="loadingMore"
+        mode="indeterminate"
+        [diameter]="24"
+      ></mat-spinner>
+    </div>
+
+    <!-- <div *ngIf="activities.length < totalItems" class="show-more-container">
+      <button
+        class="btn-cta-ghost btn-md"
+        [disabled]="loadingMore"
+        (click)="showMoreTransactions()"
+      >
+        <span *ngIf="!loadingMore">Mostrar más consumos</span>
+        <mat-spinner
+          *ngIf="loadingMore"
+          mode="indeterminate"
+          [diameter]="24"
+        ></mat-spinner>
+      </button>
+    </div> -->
+  </div>
+</div>

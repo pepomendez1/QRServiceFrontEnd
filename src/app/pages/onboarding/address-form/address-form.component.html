@@ -1,0 +1,201 @@
+<div class="address-container">
+  <line-stepper [currentStep]="currentStep"></line-stepper>
+  <app-custom-header-onb
+    [isMobile]="isMobile"
+    [title]="'Completá tus datos'"
+    [description]="'Confirmá los siguientes datos para continuar: '"
+    [arrowBackEnabled]="false"
+  ></app-custom-header-onb>
+  <div class="section-content">
+    <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+      <div class="form-container">
+        <mat-form-field appearance="outline">
+          <mat-label>Estado Civil </mat-label>
+          <mat-select
+            formControlName="maritalStatus"
+            (focus)="onMaritalStatusFocus()"
+            (blur)="onMaritalStatusBlur()"
+          >
+            <mat-option
+              *ngFor="let status of maritalStatusList"
+              [value]="status.value"
+            >
+              {{ status.viewValue }}
+            </mat-option>
+          </mat-select>
+          <mat-error
+            class="form-error"
+            *ngIf="
+              !maritalStatusFocus &&
+              addressForm.get('maritalStatus')?.errors?.required
+            "
+          >
+            <mat-icon class="material-symbols-outlined">error</mat-icon>
+            Estado Civil es obligatorio.
+          </mat-error>
+        </mat-form-field>
+        <div class="phone-input-container">
+          <mat-form-field appearance="outline">
+            <mat-label>Número de Teléfono </mat-label>
+            <div matPrefix class="flag-container">
+              <span class="flag-icon flag-icon-ar"></span>
+              <span class="secondary-500-light"> +54</span>
+            </div>
+            <input
+              matInput
+              type="text"
+              inputmode="numeric"
+              placeholder="112345678"
+              formControlName="phoneNumber"
+              maxlength="10"
+              (focus)="onPhoneNumberFocus()"
+              (blur)="onPhoneNumberBlur()"
+            />
+            <mat-error
+              class="form-error"
+              *ngIf="
+                !isPhoneNumberFocused &&
+                addressForm.get('phoneNumber')?.errors as errors
+              "
+            >
+              <mat-icon class="material-symbols-outlined">error</mat-icon>
+              <span *ngFor="let error of getErrorMessages(errors)">
+                {{ error }}
+              </span>
+            </mat-error>
+            <mat-hint class="phone-hint caption"
+              >Ingresá tu número con el código de área sin los prefijos 0 y 15.
+              Ejemplo: 1123456789 ó 3512345678
+            </mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="divider-container">
+          <mat-divider class="responsive-divider"></mat-divider>
+        </div>
+        <div class="use-id-address">
+          <p class="paragraph-500 mt-0">
+            ¿El domicilio de tu documento de identidad coincide con tu dirección
+            actual?
+          </p>
+
+          <mat-radio-group
+            color="primary"
+            formControlName="useMetamapAddress"
+            class="custom-radio-group-col"
+          >
+            <mat-radio-button [value]="true" checked
+              >Si, es mi dirección actual</mat-radio-button
+            >
+            <mat-radio-button [value]="false"
+              >No, mi dirección actual es otra</mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
+
+        <div
+          *ngIf="!addressForm.get('useMetamapAddress')?.value"
+          class="addr-form-container"
+        >
+          <div class="form-group-cols">
+            <mat-form-field class="street-form" appearance="outline">
+              <mat-label>Calle</mat-label>
+              <input
+                matInput
+                id="street"
+                formControlName="street"
+                type="text"
+                (focus)="onFocus('street')"
+                (blur)="updateErrorMessage()"
+              />
+            </mat-form-field>
+            <mat-form-field class="address-inputs" appearance="outline">
+              <mat-label>Número </mat-label>
+              <input
+                matInput
+                id="streetNumber"
+                formControlName="streetNumber"
+                type="text"
+                (focus)="onFocus('streetNumber')"
+                (blur)="updateErrorMessage()"
+              />
+            </mat-form-field>
+          </div>
+          <div class="form-group-cols">
+            <mat-form-field class="address-inputs" appearance="outline">
+              <mat-label>Piso y Departamento </mat-label>
+              <input
+                matInput
+                id="flatNumber"
+                formControlName="flatNumber"
+                type="text"
+              />
+            </mat-form-field>
+            <mat-form-field class="address-inputs" appearance="outline">
+              <mat-label>Ciudad </mat-label>
+              <input
+                matInput
+                id="city"
+                formControlName="city"
+                type="text"
+                (focus)="onFocus('city')"
+                (blur)="updateErrorMessage()"
+              />
+            </mat-form-field>
+          </div>
+          <div class="form-group-cols">
+            <mat-form-field class="address-inputs" appearance="outline">
+              <mat-label>Provincia </mat-label>
+              <mat-select
+                formControlName="state"
+                (focus)="onFocus('state')"
+                (blur)="updateErrorMessage()"
+              >
+                <mat-option
+                  *ngFor="let status of provinceList"
+                  [value]="status.value"
+                >
+                  {{ status.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="address-inputs" appearance="outline">
+              <mat-label>Código Postal (CP) </mat-label>
+              <input
+                matInput
+                id="zipCode"
+                formControlName="zipCode"
+                type="text"
+                (focus)="onFocus('zipCode')"
+                (blur)="updateErrorMessage()"
+              />
+            </mat-form-field>
+          </div>
+        </div>
+        <mat-error class="form-error" *ngIf="errorMessage">
+          <mat-icon class="material-symbols-outlined">error</mat-icon>
+          {{ errorMessage }}
+        </mat-error>
+      </div>
+
+      <div class="button-container">
+        <button
+          [ngClass]="metamapAddress ? 'fixed' : 'sticky'"
+          class="btn-cta-filled"
+          type="submit"
+          [disabled]="addressForm.invalid || isProcessing"
+        >
+          <!-- <button
+          [ngClass]="metamapAddress ? 'fixed' : 'sticky'"
+          class="default-submit-button"
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="addressForm.invalid || isProcessing"
+        > -->
+          <span *ngIf="isProcessing; else buttonText">Procesando </span>
+          <ng-template #buttonText> Continuar </ng-template>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

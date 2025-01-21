@@ -1,0 +1,130 @@
+<div class="treasury-activity">
+  <div class="treasury-activity-filters">
+    <!-- Contenedor de los filtros y el botón de borrar -->
+    <div *ngIf="!hideFilters" class="filters-container">
+      <!-- Filtros alineados a la izquierda -->
+      <div class="filters-wrapper">
+        <div class="rounded-box clickable" (click)="openFiltersPanel()">
+          <p class="paragraph-600">Filtros</p>
+          <mat-icon class="material-symbols-outlined"
+            >keyboard_arrow_down</mat-icon
+          >
+        </div>
+
+        <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
+          <mat-icon class="search-icon-light">search</mat-icon>
+          <input
+            class="input-search paragraph-500"
+            placeholder="Buscar"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="filterTransactions()"
+            (focus)="isFocused = true"
+            (blur)="isFocused = false"
+          />
+          <mat-spinner
+            class="search-spinner"
+            [class.show]="searching"
+          ></mat-spinner>
+        </div>
+      </div>
+      <div
+        class="rounded-box clickable"
+        (click)="exportToCSV()"
+        [class.disabled]="noTransactions"
+      >
+        <p class="paragraph-600 download-label">Descargar</p>
+        <mat-icon class="material-symbols-outlined">file_download</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <div class="treasury-activity-container custom-card">
+    <!-- Mensaje de sin resultados -->
+    <div *ngIf="!hideTitle" class="card-title heading-5-700">
+      {{ headerTitle }}
+    </div>
+    <div *ngIf="noTransactions && !loading" class="no-transactions">
+      <div *ngIf="problemImg" [innerHTML]="problemImg"></div>
+      <!-- <img src="../../../assets/images/problem.svg" alt="No Activity Image" /> -->
+      <p class="paragraph-500" *ngIf="hideFilters">
+        No tenés ningun movimiento aún
+      </p>
+      <p class="paragraph-500" *ngIf="!hideFilters">
+        No hay transacciones disponibles.
+      </p>
+    </div>
+    <!-- Loader -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner></mat-spinner>
+      <!-- O cualquier otro tipo de loader que prefieras -->
+    </div>
+    <!-- Lista de transacciones -->
+    <div *ngIf="!loading && !noTransactions" class="transaction-list">
+      <div
+        *ngFor="let transaction of filteredTransactions; let isLast = last"
+        class="transaction-item clickable"
+        [ngClass]="{ last: isLast }"
+        (click)="viewActivity(transaction.id)"
+      >
+        <div class="transaction-info">
+          <div class="rounded-icon">
+            <mat-icon class="material-symbols-outlined">{{
+              transaction.icon
+            }}</mat-icon>
+          </div>
+          <div class="details">
+            <div class="paragraph-600">
+              {{
+                transaction.description
+                  ? transaction.description
+                  : transaction.type === "cash_in"
+                  ? "Transferencia Recibida"
+                  : "Sin descripción"
+              }}
+            </div>
+            <div class="secondary-500-light">
+              {{
+                transaction.contact_name
+                  ? transform(transaction.contact_name)
+                  : "Sin contacto"
+              }}
+            </div>
+          </div>
+        </div>
+        <div class="transaction-amount">
+          <div
+            class="paragraph-400"
+            [ngClass]="{
+              'paragraph-400': true,
+              'paragraph-400-green': transaction.type === 'cash_in'
+            }"
+          >
+            {{
+              transaction.type === "cash_in"
+                ? "+" +
+                  (transaction.amount | currency : "ARS" : "symbol-narrow")
+                : "-" +
+                  (transaction.amount | currency : "ARS" : "symbol-narrow")
+            }}
+          </div>
+          <div class="caption-light">
+            {{ transaction.created_at | date : "dd/MMM" }}
+          </div>
+        </div>
+      </div>
+      <div
+        class="btn-cta-ghost go-to-activity"
+        (click)="goToActivity()"
+        *ngIf="activityShortcut"
+      >
+        <span class="paragraph-600">Ver historial de actividad</span>
+        <mat-icon>chevron_right</mat-icon>
+      </div>
+    </div>
+
+    <!-- <div *ngIf="!loading && noTransactions" class="no-transactions">
+      <img src="../../../assets/images/problem.svg" alt="No Activity Image" />
+      <p class="no-transactions-message">No hay transacciones disponibles.</p>
+    </div> -->
+  </div>
+</div>

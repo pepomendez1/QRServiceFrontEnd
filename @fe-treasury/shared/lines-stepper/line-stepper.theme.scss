@@ -1,0 +1,11 @@
+line-stepper {
+  .custom-stepper {
+    .step {
+      &.completed {
+        .line {
+          background-color: $line-step-color !important; /* Set the background color */
+        }
+      }
+    }
+  }
+}

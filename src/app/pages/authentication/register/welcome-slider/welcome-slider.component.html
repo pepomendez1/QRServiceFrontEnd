@@ -1,0 +1,50 @@
+<div class="welcome-full-content">
+  <div class="welcome-container">
+    <!-- Conditional Logo -->
+    <div
+      *ngIf="logoUrl && showLogo"
+      [innerHTML]="logoUrl"
+      class="svg-logo-container"
+    ></div>
+
+    <!-- Swiper Container -->
+    <swiper-container
+      [pagination]="pagination"
+      [navigation]="navigation"
+      [keyboard]="{ enabled: true, onlyInViewport: true }"
+      space-between="40"
+    >
+      <!-- Dynamic Slides -->
+      <swiper-slide *ngFor="let slide of slides">
+        <div class="swiper-card-container">
+          <div class="swiper-card">
+            <!-- Dynamic Background Image -->
+            <div
+              class="image-container"
+              [style.backgroundImage]="'url(' + slide.slideImage + ')'"
+              [style.background-color]="primaryColor"
+            ></div>
+
+            <!-- Content -->
+            <div class="content">
+              <div class="text-content">
+                <h2 class="heading-4-700">{{ slide.slideTitle }}</h2>
+                <p class="paragraph-400">
+                  {{ slide.slideDescription }}
+                </p>
+              </div>
+              <!-- Action Button -->
+              <button
+                class="btn btn-cta-filled create-account-btn"
+                (click)="goToSetPassword()"
+              >
+                Continuar
+              </button>
+            </div>
+          </div>
+        </div>
+      </swiper-slide>
+    </swiper-container>
+  </div>
+  <app-onb-footer></app-onb-footer>
+</div>

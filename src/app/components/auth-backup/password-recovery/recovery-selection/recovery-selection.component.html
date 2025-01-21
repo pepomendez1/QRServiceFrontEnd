@@ -1,0 +1,62 @@
+<div class="recovery-selection-container">
+  <div *ngIf="isMobile" class="return-arrow">
+    <mat-icon (click)="returnToLoginButton()">arrow_back</mat-icon>
+  </div>
+  <div class="header">
+    <h1>Recuperación de cuenta</h1>
+    <p>Elegí cual de las claves olvidaste y necesitas recuperar</p>
+  </div>
+  <form [formGroup]="recoveryForm">
+    <div class="form-container">
+      <mat-radio-group
+        color="primary"
+        formControlName="recoveryOptions"
+        class="custom-radio-group"
+      >
+        <mat-radio-button value="password" class="radio-option"
+          ><h2>Recuperar mi contraseña</h2>
+          <p>
+            Te enviaremos un link a tu mail para que generes una nueva
+            contraseña
+          </p></mat-radio-button
+        >
+        <hr width="100%" size="1" />
+        <mat-radio-button value="pin" class="radio-option"
+          ><h2>Recuperar mi PIN</h2>
+          <p>
+            Te enviaremos un link a tu mail para que generes un nuevo PIN
+          </p></mat-radio-button
+        >
+        <hr width="100%" size="1" />
+        <mat-radio-button value="password-pin" class="radio-option">
+          <h2>Recuperar mi contraseña y PIN</h2>
+          <p>
+            Te enviaremos un link a tu mail para que generes una nueva
+            contraseña y PIN, además de validar tu identidad
+          </p>
+        </mat-radio-button>
+        <hr width="100%" size="1" />
+      </mat-radio-group>
+    </div>
+    <div class="button-container">
+      <button
+        *ngIf="!isMobile"
+        class="outline-button"
+        mat-stroked-button
+        type="button"
+        (click)="returnToLoginButton()"
+      >
+        Volver
+      </button>
+      <button
+        class="default-submit-button"
+        mat-raised-button
+        type="button"
+        (click)="selectRecoveryType()"
+        [disabled]="recoveryForm.invalid"
+      >
+        Continuar
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,76 @@
+@use '@angular/material' as mat;
+@use 'sass:color';
+
+$theme-primary-hue: 200 !default;
+$theme-accent-hue: 200 !default;
+$theme-warn-hue: 500 !default;
+
+$config: mat.get-color-config($theme);
+//@debug 'Theme Config:' $config;
+
+$theme-foreground-map: map-get($config, foreground);
+$theme-background-map: map-get($config, background);
+//@debug 'Theme Text Color:' $theme-foreground-map;
+
+//@debug 'Background Map: #{$theme-background-map}';
+$theme-primary-map: map-get($config, primary);
+$theme-accent-map: map-get($config, accent);
+$theme-warn-map: map-get($config, warn);
+
+// @debug 'ForeGround Map: ' $theme-foreground-map;
+// TEXT
+
+$theme-text: #161616 !default;
+$theme-hint-text: #A3A3A3 !default;
+$theme-secondary-text: #4D4D4D !default;
+$theme-divider: #6B6B6B !default;
+
+$theme-icon: mat.get-color-from-palette($theme-foreground-map, icon);
+$theme-elevation: mat.get-color-from-palette($theme-foreground-map, elevation);
+//@debug 'Theme Text Color: #{$theme-text}';
+//@debug 'Theme Text Color: #{color.to-hex($theme-text)}';
+// @debug 'Hint Text Color: ' $theme-hint-text;
+// @debug 'Divider Text Color: ' $theme-divider;
+// @debug 'Secondary Text Color: #{color.to-hex($theme-secondary-text)}';
+// @debug 'Divider Color: #{color.to-hex($theme-divider)}';
+// @debug 'Icon Color: #{color.to-hex($theme-icon)}';
+// BACKGROUND
+
+$theme-background: mat.get-color-from-palette($theme-background-map, background);
+$theme-app-bar: mat.get-color-from-palette($theme-background-map, app-bar);
+$theme-status-bar: mat.get-color-from-palette($theme-background-map, status-bar);
+$theme-background-hover: mat.get-color-from-palette($theme-background-map, hover);
+$theme-card: mat.get-color-from-palette($theme-background-map, card);
+
+$theme-background: mat.get-color-from-palette($theme-background-map, background);
+$theme-app-bar: mat.get-color-from-palette($theme-background-map, app-bar);
+$theme-status-bar: mat.get-color-from-palette($theme-background-map, status-bar);
+$theme-background-hover: mat.get-color-from-palette($theme-background-map, hover);
+$theme-card: mat.get-color-from-palette($theme-background-map, card);
+
+
+$theme-color-primary-palette: map-get($config, primary);
+$theme-color-accent-palette: map-get($config, accent);
+$theme-color-warn-palette: map-get($config, warn);
+
+$theme-color-primary: mat.get-color-from-palette($theme-color-primary-palette);
+$theme-color-accent: mat.get-color-from-palette($theme-color-accent-palette);
+$theme-color-warn: mat.get-color-from-palette($theme-color-warn-palette);
+
+$theme-color-primary-contrast: mat.get-contrast-color-from-palette($theme-color-primary-palette, $theme-primary-hue);
+$theme-color-accent-contrast: mat.get-contrast-color-from-palette($theme-color-accent-palette, $theme-accent-hue);
+$theme-color-warn-contrast: mat.get-contrast-color-from-palette($theme-color-warn-palette, $theme-warn-hue);
+//@debug 'Theme Color primary: ' $theme-color-primary;
+
+// From Core
+$primary-color-light: mat.get-color-from-palette($theme-color-primary-palette, 100);
+$primary-color-hover: mat.get-color-from-palette($theme-color-primary-palette, 300);
+$primary-color-pressed: mat.get-color-from-palette($theme-color-primary-palette, 600);
+
+$primary-color-rgb: var(--primary-color-rgb); // RGB value
+
+$primary-color-opacity-10: rgba($primary-color-rgb, 0.1); // 10% opacity
+$primary-color-opacity-80: rgba($primary-color-rgb, 0.8); // 80% opacity
+$primary-color-opacity-24: rgba($primary-color-rgb, 0.24); // 24% opacity
+$theme-background-opacity-80: rgba($theme-background, 0.8);
+// $text-color: mat.get-contrast-color-from-palette(theme.$custom-primary-palette, 200);

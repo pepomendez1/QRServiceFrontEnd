@@ -1,0 +1,145 @@
+<!-- app-layout.component.html -->
+<mat-sidenav-container class="main-container">
+  <!-- SIDENAV -->
+  <mat-sidenav
+    class="nav-sidebar"
+    position="start"
+    [mode]="isMobile ? 'over' : 'side'"
+    [opened]="isMobile ? false : true"
+    *ngIf="sideNavigation$ | async"
+    #menuenav
+  >
+    <div *ngIf="isMobile" class="sidenav-toolbar-mobile">
+      <div [routerLink]="['/app/account-info']" class="sidenav-toolbar-profile">
+        <div class="btn-ghost-black">
+          <mat-icon class="material-symbols-outlined">account_circle</mat-icon>
+        </div>
+        <div class="item-text">
+          <p class="paragraph-600 p-0 m-0">{{ accountName$ | async }}</p>
+          <p class="secondary-500-light p-0 m-0">Tu perfil</p>
+        </div>
+        <div class="btn-ghost-black">
+          <mat-icon>chevron_right</mat-icon>
+        </div>
+      </div>
+    </div>
+    <div
+      *ngIf="!isMobile"
+      class="sidenav-toolbar"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <div [routerLink]="['/']" class="sidenav-toolbar-logo">
+        <div
+          *ngIf="logoUrl"
+          [innerHTML]="logoUrl"
+          class="svg-logo-login-container"
+        ></div>
+      </div>
+    </div>
+
+    <div class="nav-list-wrapper">
+      <mat-nav-list class="sidenav-menu-list">
+        <ng-container *ngFor="let item of sidenavItems$ | async">
+          <a
+            class="sidenav-item-link paragraph-500"
+            mat-list-item
+            [routerLink]="item.enabled ? item.routeOrFunction : null"
+            routerLinkActive="active"
+            [ngClass]="{ 'disabled-link': !item.enabled }"
+            matRipple
+            *ngIf="!item.action"
+          >
+            <div class="nav-item-wrapper" *ngIf="item.navigation">
+              <mat-icon class="material-symbols-outlined" *ngIf="item.icon">
+                {{ item.icon }}
+              </mat-icon>
+              <span class="name">{{ item.name }}</span>
+            </div>
+          </a>
+
+          <!-- Special case for actions like logout -->
+          <a
+            class="sidenav-item-link paragraph-500"
+            mat-list-item
+            (click)="item.action()"
+            matRipple
+            *ngIf="item.action"
+          >
+            <div class="nav-item-wrapper">
+              <mat-icon class="material-symbols-outlined">{{
+                item.icon
+              }}</mat-icon>
+              <span class="name">{{ item.name }}</span>
+            </div>
+          </a>
+        </ng-container>
+      </mat-nav-list>
+      <!--
+      <mat-nav-list class="sidenav-menu-list">
+        <a
+          class="sidenav-item-link paragraph-500"
+          mat-list-item
+          *ngFor="let item of menuItems"
+          [routerLink]="item.enabled ? item.routeOrFunction : null"
+          routerLinkActive="active"
+          [ngClass]="{ 'disabled-link': !item.enabled }"
+          matRipple
+        >
+          <div class="nav-item-wrapper">
+            <mat-icon class="material-symbols-outlined" *ngIf="item.icon">{{
+              item.icon
+            }}</mat-icon>
+            <span class="name">{{ item.name }}</span>
+          </div>
+        </a>
+      </mat-nav-list> -->
+
+      <!-- <mat-nav-list class="sidenav-menu-list">
+        <a
+          class="sidenav-item-link paragraph-500"
+          mat-list-item
+          (click)="logoutUser()"
+          matRipple
+        >
+          <div class="nav-item-wrapper">
+            <mat-icon class="material-symbols-outlined">logout</mat-icon>
+            <span class="name">Cerrar sesión</span>
+          </div>
+        </a>
+      </mat-nav-list> -->
+    </div>
+
+    <!-- <app-sidenav></app-sidenav> -->
+  </mat-sidenav>
+  <!-- END SIDENAV -->
+
+  <!-- SIDEPANEL (Right Side Panel) -->
+  <mat-sidenav
+    #sidePanel
+    position="end"
+    mode="over"
+    class="side-panel-sidenav"
+    [class.padding-zero]="isPaddingZero"
+    [disableClose]="disableClose"
+  >
+    <ng-template #dynamicComponentContainer></ng-template>
+  </mat-sidenav>
+  <!-- END SIDEPANEL -->
+
+  <!-- CONTENT -->
+  <mat-sidenav-content class="content-container">
+    <app-header [sidenav]="menuenav"></app-header>
+    <app-navigation *ngIf="topNavigation$ | async"></app-navigation>
+
+    <div class="content-inner">
+      <router-outlet></router-outlet>
+    </div>
+
+    <footer class="footer caption-500-light">
+      Este sistema cumple con lo dispuesto por las normas de CNV
+    </footer>
+  </mat-sidenav-content>
+
+  <!-- END CONTENT -->
+</mat-sidenav-container>

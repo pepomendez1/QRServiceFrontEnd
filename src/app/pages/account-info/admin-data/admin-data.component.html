@@ -1,0 +1,219 @@
+<div class="personal-info-container">
+  <app-side-panel-header
+    [title]="'Información personal'"
+    [arrowBackEnabled]="showArrowBack"
+    (arrowBack)="handleArrowBack()"
+  ></app-side-panel-header>
+
+  @if (loading) {
+  <div class="loading-container">
+    <mat-spinner class="center-spinner"></mat-spinner>
+  </div>
+  } @else {
+  <div class="admin-info">
+    <div *ngIf="!editMode" class="info-wrapper">
+      <div class="input-box" id="name-input">
+        <div class="input-data">
+          <p class="caption-500-light m-0 p-0">Nombre y Apellido</p>
+          <span class="paragraph-500">{{
+            accountInfo?.name || "Cargando..."
+          }}</span>
+        </div>
+      </div>
+
+      <div class="input-box" id="name-input">
+        <div class="input-data">
+          <p class="caption-500-light m-0 p-0">Email</p>
+          <span class="paragraph-500">{{
+            accountInfo?.email || "Cargando..."
+          }}</span>
+        </div>
+        <div class="actions-button">
+          <button
+            mat-icon-button
+            class="outline-button"
+            (click)="editData('email')"
+          >
+            <mat-icon class="material-symbols-outlined"
+              >mode_edit_outline</mat-icon
+            >
+          </button>
+        </div>
+      </div>
+
+      <div class="input-box" id="name-input">
+        <div class="input-data">
+          <p class="caption-500-light m-0 p-0">Teléfono</p>
+          <span class="paragraph-500">{{
+            accountInfo?.phone || "Cargando..."
+          }}</span>
+        </div>
+        <div class="actions-button">
+          <button
+            mat-icon-button
+            class="outline-button"
+            (click)="editData('phone')"
+          >
+            <mat-icon class="material-symbols-outlined"
+              >mode_edit_outline</mat-icon
+            >
+          </button>
+        </div>
+      </div>
+
+      <div class="input-box" id="name-input">
+        <div class="input-data">
+          <p class="caption-500-light m-0 p-0">Domicilio</p>
+          <span class="paragraph-500">{{
+            accountInfo?.address_text || "Cargando..."
+          }}</span>
+        </div>
+        <div class="actions-button">
+          <button
+            mat-icon-button
+            class="outline-button"
+            (click)="editData('address')"
+          >
+            <mat-icon class="material-symbols-outlined"
+              >mode_edit_outline</mat-icon
+            >
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="editMode" class="info-wrapper-edit">
+      <div class="edit-info-wrapper">
+        <h1 class="heading-5-600">Editar {{ dataToEdit.title }}</h1>
+
+        <!-- If editing the address, show multiple input fields for each part of the address -->
+        <div *ngIf="dataToEdit.value === 'address'" class="address-form-edit">
+          <div class="input-box">
+            <div class="input-data">
+              <p class="caption-500-light m-0 p-0">Calle</p>
+              <input
+                class="input-edit paragraph-500"
+                [(ngModel)]="editedAddress.street"
+                (ngModelChange)="resetMessages()"
+              />
+            </div>
+          </div>
+
+          <div class="input-box">
+            <div class="input-data">
+              <p class="caption-500-light m-0 p-0">Número de calle</p>
+              <input
+                class="input-edit paragraph-500"
+                [(ngModel)]="editedAddress.street_number"
+                (ngModelChange)="resetMessages()"
+              />
+            </div>
+          </div>
+
+          <div class="input-box">
+            <div class="input-data">
+              <p class="caption-500-light m-0 p-0">Piso/Departamento</p>
+              <input
+                class="input-edit paragraph-500"
+                [(ngModel)]="editedAddress.flat_number"
+                (ngModelChange)="resetMessages()"
+              />
+            </div>
+          </div>
+
+          <div class="input-box">
+            <div class="input-data">
+              <p class="caption-500-light m-0 p-0">Ciudad</p>
+              <input
+                class="input-edit paragraph-500"
+                [(ngModel)]="editedAddress.city"
+                (ngModelChange)="resetMessages()"
+              />
+            </div>
+          </div>
+
+          <div class="input-box">
+            <div class="input-data">
+              <p class="caption-500-light m-0 p-0">Estado/Provincia</p>
+              <select
+                class="input-edit paragraph-500"
+                *ngIf="dataToEdit.value === 'address'"
+                [(ngModel)]="editedAddress.state"
+                (ngModelChange)="resetMessages()"
+              >
+                <option
+                  *ngFor="let province of provinceList"
+                  [value]="province.value"
+                >
+                  {{ province.viewValue }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-box">
+            <div class="input-data">
+              <p class="caption-500-light m-0 p-0">Código Postal</p>
+              <input
+                class="input-edit paragraph-500"
+                [(ngModel)]="editedAddress.zip_code"
+                (ngModelChange)="resetMessages()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- If editing something else like email or phone, use the existing single input -->
+        <div *ngIf="dataToEdit.value !== 'address'">
+          <div class="input-box">
+            <div class="input-data">
+              <p class="caption-500-light m-0 p-0">{{ dataToEdit.label }}</p>
+              <input
+                class="input-edit paragraph-500"
+                [(ngModel)]="editedValue"
+                (ngModelChange)="resetMessages()"
+              />
+            </div>
+          </div>
+          <mat-hint *ngIf="dataToEdit.value === 'phone'" class="caption"
+            >Ingresá tu número con el código de área sin los prefijos 0 y 15.
+            Ejemplo: 1123456789 ó 3512345678
+          </mat-hint>
+        </div>
+        <div *ngIf="dataToEdit.value === 'email'" class="warning-message-box">
+          <mat-icon class="material-symbols-outlined">error_outline</mat-icon>
+          <div class="message-box-content">
+            <h1 class="paragraph-600 p-0 m-0">Cambio de e-mail</h1>
+            <span class="secondary-500"
+              >Para actualizar tu e-mail, se requiere un proceso de verificación
+              que puede demorar unos días antes de que lo veas reflejado en tu
+              cuenta.</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <app-messages class="w-100"></app-messages>
+      <app-side-panel-footer
+        class="w-100"
+        buttonText="Guardar"
+        buttonStyle="filled"
+        [buttonDisabled]="isProcessing || !formIsValid()"
+        (buttonClicked)="saveData()"
+      ></app-side-panel-footer>
+      <!-- <div class="section-footer">
+
+        <button
+          matRipple
+          class="btn btn-cta"
+          type="button"
+          (click)="saveData()"
+          [disabled]="loading || editedValue === accountInfo[dataToEdit.value]"
+        >
+          Guardar
+        </button>
+      </div> -->
+    </div>
+  </div>
+  }
+</div>

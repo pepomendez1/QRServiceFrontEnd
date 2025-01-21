@@ -1,0 +1,31 @@
+@import '../../../custom-styles/onboarding.scss';
+
+.done-card {
+  max-width: 400px;
+  margin: 20px auto;
+  text-align: center;
+
+  .done-card-avatar {
+    background-color: #4caf50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
+  }
+
+  mat-icon {
+    color: white;
+    font-size: 36px;
+  }
+
+  mat-card-title {
+    color: #4caf50;
+    font-weight: bold;
+  }
+
+  mat-card-actions {
+    justify-content: center;
+  }
+}

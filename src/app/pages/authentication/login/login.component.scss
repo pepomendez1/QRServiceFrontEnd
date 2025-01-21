@@ -1,0 +1,141 @@
+.login-page {
+  display: flex;
+  width: 100vw;
+  overflow: hidden;
+  justify-content: space-between;
+  padding: 0;
+  .header-container {
+    padding: 2em;
+    height: 100%;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 1em;
+
+     h1 {
+      max-width: 400px; /* Limit max width */
+
+     }
+    img{
+
+      align-self: center;
+    }
+    .feature-list{
+      padding-top: 1.5em;
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 400px; /* Limit max width */
+      margin: 0 auto; /* Center the list horizontally */
+      .feature{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0;
+        .rounded-icon{
+          min-width: 40px;
+          height: 40px;
+          display:flex;
+          align-items: center;
+          margin: 1em;
+        }
+
+      }
+    }
+  }
+  .login-form-container {
+    width:100%;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+    margin: 0 auto;
+
+    img {
+      padding: 20px;
+    }
+
+    .login-form {
+      width:100%;
+      max-width: 530px; /* Limit max width */
+      margin: 0 auto; /* Center the form horizontally */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+      gap: 1em;
+
+
+      form {
+        width: 100%; // Ensure form stretches fully
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+      }
+
+
+      .button-container {
+        display: flex;
+        width: 100%;
+        gap: 20px; /* Space between buttons */
+        flex-direction: column;
+        align-items: center;
+        padding-top: 1.2rem;
+        justify-content: center;
+      }
+      .progress-bar-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding-top: 20px;
+        width: 100%;
+       }
+    }
+
+  }
+
+}
+/* Media query for mobile */
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+    height: unset;
+    max-width: 100%;
+    margin: 0 auto;
+    justify-content: left;
+    .header-container {
+      display:block;
+      padding: 2em 1em;
+      gap: 28px;
+      height: unset;
+      width: unset;
+      border-radius: 0px;
+      h1{
+        text-align: left;
+        font-size: 24px;
+        line-height: 32px;
+        font-weight: 700;
+      }
+      img{
+        margin-bottom: 1em;
+      }
+    }
+    .login-form-container {
+      max-width: 100%; /* Full width on smaller screens */
+      padding: 0;
+    }
+
+    .login-form {
+      width: 100%;
+      padding: 1em;
+      width: unset;
+    }
+  }
+}

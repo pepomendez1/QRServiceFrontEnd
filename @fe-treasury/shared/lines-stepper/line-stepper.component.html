@@ -1,0 +1,9 @@
+<div class="custom-stepper">
+  <div
+    *ngFor="let step of steps; let i = index"
+    class="step"
+    [ngClass]="{ completed: i == currentStep - 1 }"
+  >
+    <div class="line"></div>
+  </div>
+</div>

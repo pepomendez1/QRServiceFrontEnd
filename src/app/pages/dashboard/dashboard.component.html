@@ -1,0 +1,22 @@
+@if(treasuryFailure){
+<app-general-failure [backToStartEnable]="false"></app-general-failure>
+}@else{
+<div class="layout-container">
+  <div class="left-column">
+    <app-treasury-balance
+      (generalFailure)="getFailureStatus($event)"
+    ></app-treasury-balance>
+    <app-card-order></app-card-order>
+  </div>
+  <div class="right-column">
+    <app-treasury-activity
+      headerTitle="Última actividad"
+      [hideTitle]="false"
+      [hideFilters]="true"
+      [activityShortcut]="true"
+      [limitTransactions]="true"
+      [transactionLimit]="5"
+    ></app-treasury-activity>
+  </div>
+</div>
+}

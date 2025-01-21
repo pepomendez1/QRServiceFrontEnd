@@ -1,0 +1,42 @@
+.onb-footer-content {
+  padding: 2em 1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+  flex-direction: column;
+  @media (max-width: 768px) {
+    padding: 1em 0.5em;
+  }
+  .nav-items ul {
+    list-style: none; /* Remove bullets */
+    display: flex; /* Make the list horizontal */
+    margin: 0;
+    padding: 0;
+    justify-content: space-between;
+    gap: 2.5em;
+    @media (max-width: 768px) {
+      align-items: flex-start;
+      gap: 1em;
+    }
+    @media (max-width: 400px) {
+      gap: 0.5em;
+    }
+    li {
+      text-decoration: underline; /* Underline links */
+      white-space: nowrap; /* Prevent wrapping of individual links */
+      &:hover {
+        font-weight: 600;
+        cursor: pointer;
+      }
+    }
+  }
+  .disclaimer-footer{
+    min-width: 300px;
+    @media (max-width: 768px) {
+      padding: 0 0.5em;
+      text-align: center; /* Align text to the start on mobile */
+      align-items: flex-start;
+    }
+  }
+}

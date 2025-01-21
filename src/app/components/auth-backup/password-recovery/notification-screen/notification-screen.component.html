@@ -1,0 +1,31 @@
+<div class="notification-screen-container">
+  <div class="header">
+    <h1>
+      ¡Listo! <br />
+      {{ notificationTitle }}
+    </h1>
+    <p>{{ notificationText }}</p>
+  </div>
+  <div class="button-container">
+    <button
+      *ngIf="notificationType === 'biometric-ok'"
+      class="default-submit-button"
+      (click)="goToResetCredentials()"
+      mat-raised-button
+      type="button"
+    >
+      Configurar credenciales
+    </button>
+    <button
+      *ngIf="
+        notificationType === 'success' || notificationType === 'biometric-error'
+      "
+      class="default-submit-button"
+      (click)="goToLogin()"
+      mat-raised-button
+      type="button"
+    >
+      Finalizar
+    </button>
+  </div>
+</div>

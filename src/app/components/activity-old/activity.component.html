@@ -1,0 +1,51 @@
+<mat-card class="main-card">
+  <div class="activity-container">
+    <h2 class="activity-title">Tu actividad</h2>
+    <div class="filters">
+      <mat-select
+        placeholder="Período"
+        (selectionChange)="onPeriodChange($event.value)"
+        [value]="selectedPeriod"
+      >
+        <mat-option *ngFor="let period of periodOptions" [value]="period">{{
+          period
+        }}</mat-option>
+      </mat-select>
+    </div>
+    <div class="activity-list" #activityList>
+      <div *ngIf="isLoading" class="preloader">
+        <mat-spinner></mat-spinner>
+      </div>
+      <div *ngIf="!isLoading">
+        <div *ngFor="let activity of filteredActivities">
+          <mat-divider></mat-divider>
+          <div class="activity-item">
+            <div class="activity-details">
+              <div class="activity-title">{{ activity.description }}</div>
+              <div class="activity-date">
+                {{ formatDate(activity.created_at) }}
+                <span *ngIf="activity.contact_name">
+                  - {{ activity.contact_name }}</span
+                >
+              </div>
+            </div>
+            <div class="activity-amount">
+              <div [ngClass]="getAmountClass(activity.amount)">
+                {{
+                  formatAmount(
+                    activity.amount,
+                    activity.currency,
+                    activity.type
+                  )
+                }}
+              </div>
+              <div class="activity-balance">
+                {{ activity.balance | currency: activity.currency : "ARS" }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-card>

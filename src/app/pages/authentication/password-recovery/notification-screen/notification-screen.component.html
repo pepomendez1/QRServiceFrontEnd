@@ -1,0 +1,28 @@
+<div class="notification-screen-container">
+  <div class="content">
+    <div class="main-content">
+      <div *ngIf="imageSource" [innerHTML]="imageSource"></div>
+      <h1 class="heading-4-700" [innerHTML]="notificationTitle"></h1>
+      <p class="paragraph-500">{{ notificationText }}</p>
+    </div>
+
+    <div class="button-container">
+      <button
+        *ngIf="notificationType === 'biometric-error'"
+        class="btn-cta-filled"
+        type="button"
+        (click)="goToLogin()"
+      >
+        Entendido
+      </button>
+      <button
+        *ngIf="notificationType === 'success'"
+        class="btn-cta-filled"
+        type="button"
+        (click)="goToLogin()"
+      >
+        Ingresar a mi cuenta digital
+      </button>
+    </div>
+  </div>
+</div>

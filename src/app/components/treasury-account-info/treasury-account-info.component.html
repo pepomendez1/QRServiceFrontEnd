@@ -1,0 +1,106 @@
+<!-- Mostrar la información solo cuando los datos estén cargados -->
+<div class="account-info-container">
+  <app-side-panel-header
+    [title]="'Datos de tu cuenta'"
+    [arrowBackEnabled]="showArrowBack"
+    (arrowBack)="handleArrowBack()"
+    [closeButtonEnabled]="false"
+  ></app-side-panel-header>
+
+  <div class="info-wrapper">
+    @if (loading) {
+    <div class="loading-container">
+      <mat-spinner class="center-spinner"></mat-spinner>
+    </div>
+    } @else {
+    <div class="account-info">
+      <div class="info-box">
+        <!-- First Input (non-editable, for copy) -->
+        <div class="input-box" id="cbu-input">
+          <div class="input-data">
+            <p class="caption-500-light">CVU</p>
+            <span class="paragraph-500">{{
+              accountInfo?.cvu || "Cargando..."
+            }}</span>
+          </div>
+          <div class="actions-button">
+            <button
+              mat-icon-button
+              (click)="copyToClipboard('CVU')"
+              class="outline-button"
+            >
+              <mat-icon class="material-symbols-outlined"
+                >content_copy</mat-icon
+              >
+            </button>
+          </div>
+        </div>
+
+        <!-- Second Input (editable, with copy/edit/save/cancel) -->
+        <div class="input-box" id="alias-input">
+          <div class="input-data">
+            <p class="caption-500-light">Alias</p>
+            <input
+              class="input-alias paragraph-500"
+              *ngIf="isEditMode; else displayMode"
+              [(ngModel)]="accountInfo.alias"
+            />
+
+            <ng-template #displayMode>
+              <span class="paragraph-500">{{
+                accountInfo?.alias || "Cargando..."
+              }}</span>
+            </ng-template>
+          </div>
+
+          <!-- Display copy/edit buttons if not in edit mode -->
+          <div *ngIf="!isEditMode" class="actions-button">
+            <button
+              mat-icon-button
+              (click)="enableEditMode()"
+              class="outline-button"
+            >
+              <mat-icon class="material-symbols-outlined"
+                >mode_edit_outline</mat-icon
+              >
+            </button>
+            <button
+              mat-icon-button
+              (click)="copyToClipboard('Alias')"
+              class="outline-button"
+            >
+              <mat-icon class="material-symbols-outlined"
+                >content_copy</mat-icon
+              >
+            </button>
+          </div>
+
+          <!-- Display save/cancel buttons in edit mode -->
+          <div *ngIf="isEditMode" class="actions-button">
+            <button mat-icon-button (click)="saveEdit()" class="outline-button">
+              <mat-icon class="material-symbols-outlined">check</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="cancelEdit()"
+              class="outline-button"
+            >
+              <mat-icon class="material-symbols-outlined">close</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  <app-messages class="w-100"></app-messages>
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="'Copiar datos de mi cuenta'"
+    buttonStyle="ghost"
+    [buttonDisabled]="!accountOwnerName"
+    (buttonClicked)="copyToClipboard('')"
+  ></app-side-panel-footer>
+  <!-- Mostrar preloader si los datos aún están cargando -->
+</div>

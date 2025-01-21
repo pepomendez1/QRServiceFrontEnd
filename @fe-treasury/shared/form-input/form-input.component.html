@@ -1,0 +1,50 @@
+<div class="input-box" [ngClass]="{ error: showErrors && control.invalid }">
+  <div class="input-data">
+    <!-- Animated Label -->
+    <p
+      class="caption-500-light m-0 p-0"
+      [ngClass]="{ active: isFocused || control.value }"
+    >
+      {{ label }}<span *ngIf="hasValidator(control, 'required')"> *</span>
+    </p>
+    <!-- Input Field -->
+    <input
+      class="input-edit paragraph-500"
+      [formControl]="control"
+      [placeholder]="placeholder"
+      [type]="getInputType()"
+      [attr.maxLength]="maxLength || null"
+      [attr.autocomplete]="autocomplete || 'off'"
+      [attr.name]="name || ''"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    />
+    <!-- Validation Errors -->
+  </div>
+  <div class="actions-button" *ngIf="type === 'password'">
+    <button
+      type="button"
+      mat-icon-button
+      class="outline-button"
+      (click)="hidePassword = !hidePassword"
+      [attr.aria-label]="'Hide password'"
+      [attr.aria-pressed]="hidePassword"
+      (mousedown)="$event.preventDefault()"
+      tabindex="-1"
+    >
+      <mat-icon class="material-symbols-outlined">{{
+        hidePassword ? "visibility_off" : "visibility"
+      }}</mat-icon>
+    </button>
+  </div>
+</div>
+
+<!-- Validation Errors -->
+<div class="error-message" *ngIf="showErrors && control.invalid">
+  <ng-container *ngFor="let error of errorMessages">
+    <mat-error class="form-error">
+      <mat-icon class="material-symbols-outlined">error</mat-icon>
+      {{ error }}
+    </mat-error>
+  </ng-container>
+</div>

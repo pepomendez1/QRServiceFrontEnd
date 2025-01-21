@@ -1,0 +1,89 @@
+.auth-container {
+  padding: 2em 4em;
+}
+
+
+
+.header {
+  padding: 10px;
+
+  h1 {
+    font-size: 28px;
+    color: #161616;
+    font-weight: 700;
+    line-height: 37.24px;
+  }
+
+  p {
+    font-size: 16px;
+    color: #6B6B6B;
+    font-weight: 500;
+    line-height: 24px;
+  }
+}
+
+.recommend-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+
+}
+
+.list-onboarding-elements {
+  align-items: center;
+  text-align: left;
+  flex-direction: column;
+  gap: 1em;
+  padding: 10px;
+
+  .list-element {
+    text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+
+    .material-symbols-outlined {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      font-size: 40px;
+      margin: 0;
+      color: #004ADD;
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+    }
+
+    .description-text {
+      text-align: left;
+      width: fit-content;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 24px;
+    }
+  }
+
+}
+
+
+.custom-button {
+  display: flex;
+  flex-grow: 1;
+  padding: 1em;
+  border-radius: 8px;
+  border-color: #EA044E;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+}
+
+@media screen and (max-width: 840px) {
+  .auth-container {
+    padding: 2em;
+  }
+}

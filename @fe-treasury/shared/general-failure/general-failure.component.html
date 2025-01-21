@@ -1,0 +1,23 @@
+<div class="general-failure">
+  <div class="text-content">
+    <div
+      *ngIf="problemImg"
+      [innerHTML]="problemImg"
+      alt="General Failure"
+    ></div>
+    <h2 class="heading-4-700">Algo no salió como esperábamos con los datos</h2>
+    <p class="paragraph-500">Lo sentimos. Volvé a intentar en unos minutos.</p>
+  </div>
+  <div class="button-container">
+    <button class="btn-cta-filled w-100 btn-md" (click)="retryLoad()">
+      Reintentar
+    </button>
+    <button
+      class="btn-link-primary w-100 btn-md"
+      (click)="backToStart()"
+      [ngClass]="{ visible: backToStartEnable, hidden: !backToStartEnable }"
+    >
+      Ir al inicio
+    </button>
+  </div>
+</div>

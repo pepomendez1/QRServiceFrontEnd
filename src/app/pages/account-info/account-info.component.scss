@@ -1,0 +1,36 @@
+.account-info-wrapper {
+  flex:1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  border: 1px solid #EBEBEB;
+  box-shadow: none;
+  z-index: 2;
+}
+
+.account-info-list{
+  flex-grow: 1; /* El contenedor crecerá para ocupar el espacio disponible */
+}
+
+.info-item-row{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em;
+  gap:1em;
+  border-bottom: 1px solid #F4F4F4;
+  &.last{
+    border-bottom: none;
+  }
+ .item-text{
+  display: flex;
+  flex-direction: column;
+  gap:4px;
+ }
+ .btn-ghost-black{
+  background-color: transparent;
+  align-self:baseline;
+  padding:0;
+ }
+}

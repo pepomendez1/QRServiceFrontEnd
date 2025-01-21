@@ -1,0 +1,46 @@
+<div *ngIf="!showTerms" class="terms-opts">
+  <div class="legal-info-wrapper">
+    <app-side-panel-header
+      [title]="'Información legal'"
+      [arrowBackEnabled]="true"
+      (arrowBack)="handleArrowBack()"
+    ></app-side-panel-header>
+
+    <div class="legal-info-list">
+      <div class="legal-item-row clickable" (click)="openTerms('terms_cond')">
+        <p class="paragraph-600 p-0 m-0">Términos y condiciones generales</p>
+
+        <div class="btn-ghost-black">
+          <mat-icon>chevron_right</mat-icon>
+        </div>
+      </div>
+      <div
+        class="legal-item-row clickable"
+        (click)="openTerms('terms_inv_sal')"
+      >
+        <p class="paragraph-600 p-0 m-0">
+          Términos y condiciones cuenta remunerada
+        </p>
+
+        <div class="btn-ghost-black">
+          <mat-icon>chevron_right</mat-icon>
+        </div>
+      </div>
+      <div
+        class="legal-item-row clickable last"
+        (click)="openTerms('disclaimer')"
+      >
+        <p class="paragraph-600 p-0 m-0">Declaración Jurada</p>
+
+        <div class="btn-ghost-black">
+          <mat-icon>chevron_right</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-affidavit-terms-info
+  *ngIf="showTerms"
+  [termsOpt]="termsOpt"
+  (backToTermsOpt)="returnToOpts()"
+></app-affidavit-terms-info>

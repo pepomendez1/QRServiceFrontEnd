@@ -1,0 +1,56 @@
+<div class="kyc-validation-container">
+  <line-stepper [currentStep]="currentStep"></line-stepper>
+  <app-custom-header-onb
+    [isMobile]="isMobile"
+    [title]="'Confirmá tu identidad'"
+    [description]="
+      'Antes de continuar, tené en cuenta las siguientes recomendaciones: '
+    "
+    [arrowBackEnabled]="false"
+  ></app-custom-header-onb>
+  <div class="main-container">
+    <div class="recomendations-container">
+      <div class="list-onboarding-elements">
+        <div class="list-element">
+          <mat-icon color="primary" class="material-symbols-outlined icon-list"
+            >add_photo_alternate</mat-icon
+          >
+          <span class="description-text paragraph-600">
+            Sacá las fotos con la cámara de tu celular y con buena iluminación.
+          </span>
+        </div>
+        <div class="list-element">
+          <mat-icon color="primary" class="material-symbols-outlined icon-list"
+            >id_card</mat-icon
+          >
+          <span class="description-text paragraph-600">
+            Asegurate de tener en mano tu documento de identidad
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      class="metamap-button-container"
+      [style.pointer-events]="isProcessing ? 'none' : 'auto'"
+    >
+      <metamap-button
+        appValidation
+        (finished)="onVerificationFinishe()"
+        class="custom-button"
+        [ngClass]="{ disabled: isProcessing === true }"
+        clientid="6079d9a1483c3a001b1bb0e1"
+        flowId="6692be9aa8d43a001cdc9a74"
+        [metadata]="metadata"
+        [attr.textcolor]="isDarkMode ? '#000' : '#fff'"
+        [color]="isProcessing ? '#cccccc' : primaryColor"
+        icon="none"
+        [disabled]="isProcessing"
+        language="es"
+      >
+      </metamap-button>
+    </div>
+    <div *ngIf="isProcessing">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  </div>
+</div>

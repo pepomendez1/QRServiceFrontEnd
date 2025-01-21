@@ -1,0 +1,26 @@
+@import '../../../custom-styles/onboarding.scss';
+
+.onboarding .onboarding-card .light-centered-text {
+    font-size: 18px;
+    font-weight: 300;
+    margin-bottom: 2rem;
+}
+
+
+.onboarding .onboarding-card .address-card-content .form-container {
+  width: 60vw;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0 auto;
+}
+
+.onboarding .onboarding-card .icon-input {
+    margin-bottom: 1rem;
+  }
+
+  .onboarding .onboarding-card .icon-input mat-icon {
+    opacity: 0.7;
+    font-size: 24px;
+  }

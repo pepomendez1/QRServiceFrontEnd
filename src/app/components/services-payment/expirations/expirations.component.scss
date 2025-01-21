@@ -1,0 +1,260 @@
+
+$icon-button-size: 24px;
+.container {
+  display: flex;
+  flex-direction: column;
+  //align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  background-color: white;
+  padding: 1em;
+  width: 100%;
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    width: 100%;
+
+    .heading-5-700 {
+      width: 100%;
+    }
+
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      width: 100%;
+    }
+  }
+
+  .activities-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 700px;
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    .mat-spinner-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 1em;
+    }
+
+    .activity-item {
+      display: flex;
+  justify-content: space-between;
+ // align-items: center;
+  padding: 1em 0;
+  gap: 1em;
+  border-bottom: 1px solid #f4f4f4;
+
+      .activity-info {
+        display: flex;
+  align-items: center;
+  .rounded-icon {
+    min-width: 40px;
+    margin-right: 1em;
+  }
+        .details {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+
+        }
+      }
+      .activity-amount {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        flex: 1;
+        .activity-date {
+          margin: 0;
+          font-size: 12px;
+          color: #666;
+        }
+      }
+    }
+    :last-child {
+      border-bottom: none;
+    }
+  }
+
+  mat-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  mat-checkbox {
+    margin-right: 16px;
+  }
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .details {
+    flex-grow: 1;
+  }
+
+  .price {
+    text-align: right;
+  }
+
+
+  mat-card {
+    padding: 16px;
+  }
+
+
+  .vencimiento {
+    display: flex; /* Usamos Flexbox para alinear elementos */
+    align-items: center; /* Alinea verticalmente al centro */
+    gap: 4px; /* Espacio entre el texto y el ícono */
+  }
+
+  .texto-rojo {
+    color: red; /* Color del texto */
+    font-weight: bold; /* Hace el texto más visible */
+  }
+
+  .icono-warning {
+    font-size: 16px; /* Tamaño del ícono */
+    vertical-align: middle; /* Asegura que el ícono esté alineado con el texto */
+  }
+
+
+
+
+
+
+}
+.footer {
+  display: flex; /* Activa Flexbox */
+  justify-content: right; /* Distribuye el contenido horizontalmente */
+  align-items: center; /* Alinea verticalmente los elementos */
+  padding: 16px; /* Espaciado interno */
+  border-top: 1px solid #e0e0e0; /* Línea superior */
+}
+
+.total {
+  align-self: center;
+  display: flex;
+  flex-direction: column; /* Apila el texto y el monto verticalmente */
+}
+
+.total span {
+  font-size: 14px;
+  color: #757575; /* Color gris para el texto auxiliar */
+}
+
+.total strong {
+  font-size: 18px;
+}
+
+button {
+  padding: 8px 16px; /* Espaciado interno del botón */
+  font-size: 16px;
+  text-transform: none; /* Evita que el texto esté en mayúsculas */
+  margin-left: 25px;
+  background-color: #EA044E;
+  color: white;
+  gap: 1em;
+  border-radius: .5em;
+  width: 30%;
+  &:disabled {
+    background-color: #DBDBDB;
+    color:#A3A3A3;
+    cursor: not-allowed;
+  }
+}
+
+.filters-container {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 16px;
+  justify-content: space-between;
+  z-index: 10; /* Asegura que los filtros se mantengan en la parte superior */
+}
+
+.filters-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.filter-button {
+  height: 40px;
+  cursor: pointer;
+  .filter-label {
+    margin: 0;
+    padding: 8px;
+  }
+  .arrow-button {
+    padding: 0;
+    margin: 0;
+    border: none;
+    background-color: transparent;
+    width: $icon-button-size;
+    height: $icon-button-size;
+    min-width: $icon-button-size;
+    min-height: $icon-button-size;
+    line-height: $icon-button-size;
+  }
+  padding-right: 4px; // Removes extra padding around the button
+  mat-icon {
+    font-size: $icon-button-size;
+  }
+}
+
+.search-box {
+  height: 40px;
+  .search-icon-light {
+    color: #a3a3a3;
+    font-size: 24px;
+    padding-right: 8px;
+  }
+  .input-search {
+    width: 100%;
+    border: none;
+    outline: none;
+
+    &:hover,
+    &:focus,
+    &:active {
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+  .search-spinner {
+    margin-right: 0.5em;
+    circle {
+      stroke: #757575; /* Set your desired color here */
+    }
+    width: 24px !important; /* Ajustar el ancho del spinner */
+    height: 24px !important; /* Ajustar la altura del spinner */
+    visibility: hidden;
+   &.show {
+    visibility: visible;
+   }
+  }
+  &.focused {
+    border-color: #7e7c7c; /* Border color on focus */
+    .search-icon-light {
+       color: #7e7c7c;
+    }
+  }
+}
+

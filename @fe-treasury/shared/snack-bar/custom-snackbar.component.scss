@@ -1,0 +1,16 @@
+.custom-snackbar {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+
+  .message {
+    flex: 1;
+    margin-right: 8px;
+  }
+
+  button {
+    color: #fff;
+  }
+}

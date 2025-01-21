@@ -1,0 +1,407 @@
+<div class="change-pin-container">
+  <app-side-panel-header
+    [title]="'Editar PIN'"
+    [arrowBackEnabled]="true"
+    (arrowBack)="handleArrowBack()"
+  ></app-side-panel-header>
+
+  @switch (viewState) { @case ("insertPassword") {
+  <div class="insert-password-container">
+    <h1 class="heading-5-600">Ingresá tu contraseña actual</h1>
+    <div class="input-box" [ngClass]="{ error: incorrectPass }">
+      <div class="input-data">
+        <input
+          class="input-edit paragraph-500"
+          [(ngModel)]="passwordToValidate"
+          (ngModelChange)="resetIncorrectPass()"
+          placeholder="Contraseña actual"
+          [type]="hidePassword ? 'password' : 'text'"
+        />
+      </div>
+      <div class="actions-button">
+        <button
+          mat-icon-button
+          class="outline-button"
+          (click)="hidePassword = !hidePassword"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hidePassword"
+        >
+          <mat-icon class="material-symbols-outlined">{{
+            hidePassword ? "visibility_off" : "visibility"
+          }}</mat-icon>
+        </button>
+      </div>
+    </div>
+    <mat-error class="form-error" *ngIf="incorrectPass">
+      <mat-icon class="material-symbols-outlined">error</mat-icon> Error en la
+      validación de credenciales. Revisa tus datos y volvé a intentar.
+    </mat-error>
+  </div>
+  <app-messages class="w-100"></app-messages>
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="isProcessing ? 'Procesando' : 'Continuar'"
+    buttonStyle="filled"
+    [buttonDisabled]="!passwordFormIsValid() || isProcessing"
+    (buttonClicked)="validatePasswordForm()"
+  ></app-side-panel-footer>
+  } @case ("insertOTP") {
+  <div class="insert-otp-container">
+    <div *ngIf="OTPinputImg" [innerHTML]="OTPinputImg"></div>
+    <h1 class="heading-4-700 m-0 p-0">
+      Te enviamos un código al e-mail {{ email }}
+    </h1>
+    <p class="paragraph-500 m-0 p-0">Ingresalo acá para generar un nuevo PIN</p>
+    <app-otp-form
+      class="otp-form"
+      [timeLeft]="timeLeft"
+      [resetTimer]="resetTimer"
+      [clearForm]="clearForm"
+      (otpSubmit)="handleOtpEvent($event)"
+      (timeOut)="handleTimeOut()"
+      (enableButton)="handleButtonState($event)"
+    ></app-otp-form>
+  </div>
+  <app-messages class="w-100"></app-messages>
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="isProcessing ? 'Validando' : 'Continuar'"
+    buttonStyle="filled"
+    [buttonDisabled]="!isSubmitButtonEnabled || isProcessing || timeOut"
+    (buttonClicked)="submitOtpForm()"
+  ></app-side-panel-footer>
+  } @case ("insertPIN") {
+  <div class="insert-pin-container">
+    <h1 class="heading-5-600">Ingresá tu PIN de seguridad actual</h1>
+    <form [formGroup]="pinForm">
+      <div class="pin-form-container">
+        <div class="pin-input-container" [ngClass]="{ error: incorrectPin }">
+          <input
+            type="text"
+            pattern="[0-9]*"
+            maxlength="1"
+            minlength="1"
+            inputmode="numeric"
+            formControlName="digit1"
+            class="pin-input"
+            placeholder="0"
+            (keydown)="handleBackspace($event, null)"
+            (input)="moveToNextField($event, digit2)"
+            (keypress)="allowOnlyNumbers($event)"
+            #digit1
+          />
+          <input
+            type="text"
+            pattern="[0-9]*"
+            maxlength="1"
+            minlength="1"
+            inputmode="numeric"
+            placeholder="0"
+            formControlName="digit2"
+            class="pin-input"
+            (keydown)="handleBackspace($event, digit1)"
+            (input)="moveToNextField($event, digit3)"
+            (keypress)="allowOnlyNumbers($event)"
+            #digit2
+          />
+          <input
+            type="text"
+            maxlength="1"
+            pattern="[0-9]*"
+            minlength="1"
+            inputmode="numeric"
+            placeholder="0"
+            formControlName="digit3"
+            class="pin-input"
+            (keydown)="handleBackspace($event, digit2)"
+            (input)="moveToNextField($event, digit4)"
+            (keypress)="allowOnlyNumbers($event)"
+            #digit3
+          />
+          <input
+            type="text"
+            maxlength="1"
+            pattern="[0-9]*"
+            minlength="1"
+            placeholder="0"
+            inputmode="numeric"
+            formControlName="digit4"
+            class="pin-input"
+            (keydown)="handleBackspace($event, digit3)"
+            (input)="moveToNextField($event, digit5)"
+            (keypress)="allowOnlyNumbers($event)"
+            #digit4
+          />
+          <input
+            type="text"
+            maxlength="1"
+            pattern="[0-9]*"
+            minlength="1"
+            inputmode="numeric"
+            placeholder="0"
+            formControlName="digit5"
+            class="pin-input"
+            (keydown)="handleBackspace($event, digit4)"
+            (input)="moveToNextField($event, digit6)"
+            (keypress)="allowOnlyNumbers($event)"
+            #digit5
+          />
+          <input
+            type="text"
+            maxlength="1"
+            pattern="[0-9]*"
+            minlength="1"
+            inputmode="numeric"
+            placeholder="0"
+            formControlName="digit6"
+            class="pin-input"
+            (keydown)="handleBackspace($event, digit5)"
+            (keypress)="allowOnlyNumbers($event)"
+            #digit6
+          />
+        </div>
+        <mat-error class="form-error" *ngIf="incorrectPin">
+          <mat-icon class="material-symbols-outlined">error</mat-icon>
+          Error en la validación de credenciales. Revisa tus datos y volvé a
+          intentar.
+        </mat-error>
+      </div>
+    </form>
+  </div>
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="isProcessing ? 'Verificando' : 'Continuar'"
+    buttonStyle="filled"
+    [buttonDisabled]="pinForm.invalid || isProcessing"
+    (buttonClicked)="submitPin()"
+  ></app-side-panel-footer>
+  } @case ("resetPinCode") { @if (!confirmPinForm) {
+  <div class="insert-pin-container">
+    <h1 class="heading-5-600">Ingresá tu nuevo PIN</h1>
+    <div class="section-content">
+      <form [formGroup]="newPinForm">
+        <div class="pin-form-container">
+          <div class="pin-input-container" [ngClass]="{ error: incorrectPin }">
+            <input
+              type="text"
+              pattern="[0-9]*"
+              maxlength="1"
+              minlength="1"
+              inputmode="numeric"
+              formControlName="digit1"
+              class="pin-input"
+              placeholder="0"
+              (keydown)="handleBackspace($event, null)"
+              (input)="moveToNextField($event, digit2)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit1
+            />
+            <input
+              type="text"
+              pattern="[0-9]*"
+              maxlength="1"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit2"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit1)"
+              (input)="moveToNextField($event, digit3)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit2
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit3"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit2)"
+              (input)="moveToNextField($event, digit4)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit3
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              placeholder="0"
+              inputmode="numeric"
+              formControlName="digit4"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit3)"
+              (input)="moveToNextField($event, digit5)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit4
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit5"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit4)"
+              (input)="moveToNextField($event, digit6)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit5
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit6"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit5)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit6
+            />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="isProcessing ? 'Procesando' : 'Continuar'"
+    buttonStyle="filled"
+    [buttonDisabled]="newPinForm.invalid || isProcessing"
+    (buttonClicked)="submitNewPin()"
+  ></app-side-panel-footer>
+  } @else {
+  <div class="insert-pin-container">
+    <h1 class="heading-5-600">Confirmá tu nuevo PIN</h1>
+    <div class="section-content">
+      <form [formGroup]="pinConfirm">
+        <div class="pin-form-container">
+          <div
+            class="pin-input-container"
+            [ngClass]="{ error: diffPinConfirm }"
+          >
+            <input
+              type="text"
+              pattern="[0-9]*"
+              maxlength="1"
+              minlength="1"
+              inputmode="numeric"
+              formControlName="digit1"
+              class="pin-input"
+              placeholder="0"
+              (keydown)="handleBackspace($event, null)"
+              (input)="moveToNextField($event, digit2)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit1
+            />
+            <input
+              type="text"
+              pattern="[0-9]*"
+              maxlength="1"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit2"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit1)"
+              (input)="moveToNextField($event, digit3)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit2
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit3"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit2)"
+              (input)="moveToNextField($event, digit4)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit3
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              placeholder="0"
+              inputmode="numeric"
+              formControlName="digit4"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit3)"
+              (input)="moveToNextField($event, digit5)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit4
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit5"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit4)"
+              (input)="moveToNextField($event, digit6)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit5
+            />
+            <input
+              type="text"
+              maxlength="1"
+              pattern="[0-9]*"
+              minlength="1"
+              inputmode="numeric"
+              placeholder="0"
+              formControlName="digit6"
+              class="pin-input"
+              (keydown)="handleBackspace($event, digit5)"
+              (keypress)="allowOnlyNumbers($event)"
+              #digit6
+            />
+          </div>
+          <mat-error class="form-error" *ngIf="diffPinConfirm">
+            <mat-icon class="material-symbols-outlined">error</mat-icon>
+            Los números de PIN ingresados no coinciden. Revisalos y volvé a
+            intentar.
+          </mat-error>
+        </div>
+      </form>
+    </div>
+  </div>
+  <app-messages class="left-aligned-message w-100"></app-messages>
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="isProcessing ? 'Procesando' : 'Continuar'"
+    buttonStyle="filled"
+    [buttonDisabled]="pinConfirm.invalid || isProcessing"
+    (buttonClicked)="submitPinConfirm()"
+  ></app-side-panel-footer>
+  } } @case ("changeSuccess") {
+  <div class="success-change">
+    <div *ngIf="successImg" [innerHTML]="successImg"></div>
+    <h1 class="heading-4-700 m-0 p-0">¡Ya cambiaste tu PIN!</h1>
+    <p class="paragraph-500 m-0 p-0">
+      Recordá que la próxima ves que ingreses, deberás usar tu nuevo PIN
+    </p>
+  </div>
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="'Volver al inicio'"
+    buttonStyle="filled"
+    [buttonDisabled]="false"
+    (buttonClicked)="backToOptions()"
+  ></app-side-panel-footer>
+  } }
+</div>

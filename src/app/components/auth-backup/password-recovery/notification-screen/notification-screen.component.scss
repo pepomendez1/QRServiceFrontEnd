@@ -1,0 +1,56 @@
+.notification-screen-container {
+  padding: 2%;
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    margin: 0 auto;
+    height: 90vh;
+    width: 90%;
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #161616;
+      font-weight: 700;
+      line-height: 37.24px;
+    }
+    p {
+      margin: 0;
+      font-size: 16px;
+      color:#161616;
+      font-weight: 500;
+      line-height: 24px;
+    }
+   }
+
+   .button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 1.2rem;
+    font-weight: 700;
+  .default-submit-button {
+    height: 48px;
+    width: 90%;
+    border-radius: 8px;
+    border-color: #EA044E;
+    background-color: #EA044E;
+    color: white;
+    box-shadow: none;
+  }
+  .default-link-button {
+    color: #EA044E; /* Use your primary color */
+    background-color: transparent;
+    border: none; /* Optional border for unfilled button */
+    box-shadow: none;
+  }
+   }
+
+ }
+
+
+

@@ -1,0 +1,33 @@
+<div class="pop-over-content">
+  <h1 class="heading-4-700">
+    {{ messageTitle }}
+  </h1>
+  <span class="secondary-500"> {{ messageContent }}</span>
+  <div class="checkbox-group" *ngIf="data.type === 'start'">
+    <mat-checkbox [required]="true" color="primary" required [(ngModel)]="tyc">
+      Acepto TyC Cuenta Remunerada
+    </mat-checkbox>
+    <mat-checkbox
+      [required]="true"
+      color="primary"
+      required
+      [(ngModel)]="rules"
+    >
+      Acepto Reglamento FCI
+    </mat-checkbox>
+  </div>
+  <div class="buttons-container">
+    <div mat-dialog-actions>
+      <button class="btn btn-link-primary cancel-btn" (click)="onCancel()">
+        {{ cancelText }}
+      </button>
+      <button
+        class="btn btn-cta-filled continue-btn"
+        [disabled]="data.type === 'start' && !(tyc && rules)"
+        (click)="onConfirm()"
+      >
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

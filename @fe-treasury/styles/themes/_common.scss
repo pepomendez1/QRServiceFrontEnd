@@ -1,0 +1,80 @@
+// Utilities
+@import "../partials/utilities";
+// Buttons
+@import "../partials/buttons";
+// Containers
+@import "../partials/containers";
+
+@import "../partials/messages";
+// Side-panel
+@import "../partials/forms";
+$sidebar-width: 480px !default;
+$sidebar-background: $theme-background !default;
+$sidebar-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, .40) !default;
+
+// Sidenav
+$sidenav-background: $theme-status-bar !default;
+$sidenav-color: $theme-text !default;
+$sidenav-box-shadow: none; //0 2px 8px 0 rgba(0, 0, 0, .40) !default;
+$sidenav-toolbar-background: darken($sidenav-background, 3.5) !default;
+$sidenav-logo-color: white !default;
+$sidenav-item-background-active: #E6E6E6;
+$sidenav-item-color-active: #E6E6E6;
+$sidenav-item-background-hover:  #E6E6E6;
+$sidenav-item-color-hover:  #E6E6E6;
+//$sidenav-secondary-text: $light-secondary-text !default;
+$sidenav-collapsed-hover-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, .40) !default;
+@import "../../../src/app/app-layout/sidenav/sidenav.component.theme.scss";
+
+//Login
+$login-sidepanel-background-color: $light-background-color;
+@import "../../../src/app/pages/authentication/login/login.component.theme.scss";
+
+
+// Toolbar
+$toolbar-background: $theme-card !default;
+$toolbar-color: $theme-text !default;
+$toolbar-elevation: 1 !default;
+$toolbar-logo-color: $theme-text !default;
+
+$toolbar-button-separator-color: rgba(0, 0, 0, 0.08) !default;
+
+$toolbar-user-dropdown-elevation: $elevation !default;
+$toolbar-notification-elevation: $elevation !default;
+
+$toolbar-search-background: $theme-app-bar !default;
+$toolbar-search-dropdown-elevation: $elevation !default;
+
+@import '../../../src/app/app-layout/header/header.component.theme.scss';
+
+$line-step-color: $theme-color-primary !default;
+
+@import '../../shared/lines-stepper/line-stepper.theme.scss';
+
+// Transfer contact section
+// Slider button
+
+@import '../../../src/app/components/transfer/transfer-contacts/transfer-contacts.theme.scss';
+// Treasury
+$activity-background: $theme-card !default;
+@import '../../../src/app/components/treasury-activity/treasury.activity.theme.scss';
+
+@import '../../../src/app/app-layout/app-layout.theme.scss';
+
+@import '../../../src/app/pages/pin-code/pin-code.theme.scss';
+
+@import '../../../src/app/pages/onboarding/onboarding.theme.scss';
+
+@import '../../../src/app/app-layout/navigation/navigation.component.theme.scss';
+
+$icon-color: $theme-icon;
+$button-hover: $theme-background-hover;
+@import '../../shared/side-panel/side-panel-header/side-panel-header.theme.scss';
+@import '../../shared/side-panel/side-panel-footer/side-panel-footer.component.scss';
+
+@import '../../shared/otp-form/otp-form.theme.scss';
+
+//Onboarding
+
+//welcome - swiper
+@import '../../../src/app/pages/authentication/register/welcome-slider/welcome-slider.theme.scss';

@@ -1,0 +1,38 @@
+<!-- messages.component.html -->
+<div class="message-container" [ngClass]="{ hidden: !isVisible }">
+  <div class="message-content">
+    <!-- Error message -->
+    <div
+      *ngIf="messageType === 'error' && messageContent"
+      class="error-message"
+    >
+      <mat-icon class="material-symbols-outlined">error</mat-icon>
+      <span>{{ messageContent }}</span>
+      <a *ngIf="linkText && action" (click)="executeAction()">{{ linkText }}</a>
+    </div>
+
+    <!-- Success message -->
+    <div
+      *ngIf="messageType === 'success' && messageContent"
+      class="success-message"
+    >
+      <mat-icon class="material-symbols-outlined">check_circle</mat-icon>
+      {{ messageContent }}
+      <a *ngIf="linkText && action" (click)="executeAction()">{{ linkText }}</a>
+    </div>
+
+    <!-- Warning message -->
+    <div
+      *ngIf="messageType === 'warning' && messageContent"
+      class="warning-message"
+    >
+      <mat-icon class="material-symbols-outlined">warning</mat-icon>
+      <span>
+        {{ messageContent }}
+        <a *ngIf="linkText && action" (click)="executeAction()">{{
+          linkText
+        }}</a>
+      </span>
+    </div>
+  </div>
+</div>

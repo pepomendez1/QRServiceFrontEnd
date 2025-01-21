@@ -1,0 +1,17 @@
+@if(cardsFailure){
+<app-general-failure [backToStartEnable]="true"></app-general-failure>
+}@else{
+
+<div class="content">
+  <span class="left-side">
+    <app-my-cards (generalFailure)="getFailureStatus($event)"></app-my-cards>
+  </span>
+
+  <span class="right-side">
+    <app-cards-activity
+      class="activity-container"
+      (generalFailure)="getFailureStatus($event)"
+    ></app-cards-activity>
+  </span>
+</div>
+}

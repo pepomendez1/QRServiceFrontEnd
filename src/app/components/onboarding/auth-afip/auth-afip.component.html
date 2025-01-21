@@ -1,0 +1,77 @@
+<!-- auth-afip.component.html -->
+<div class="onboarding">
+  <mat-card class="onboarding-card">
+    <mat-card-header>
+      <mat-card-title
+        >Validación de clave de AFIP, teléfono y correo
+        electrónico</mat-card-title
+      >
+    </mat-card-header>
+    <mat-card-content>
+      <h3 class="light-centered-text">
+        Ingresá tu CUIL/CUIT para continuar con la creación de tu cuenta
+      </h3>
+
+      <form [formGroup]="cuilForm" (ngSubmit)="onSubmit()">
+        <div class="form-container">
+          <mat-form-field class="icon-input" appearance="fill">
+            <mat-label>CUIL/CUIT </mat-label>
+            <input
+              matInput
+              id="cuil"
+              maxlength="11"
+              formControlName="cuil"
+              type="text"
+            />
+            <mat-icon matSuffix></mat-icon>
+          </mat-form-field>
+        </div>
+        <div class="form-container">
+          <mat-form-field class="icon-input" appearance="fill">
+            <mat-label>email </mat-label>
+            <input matInput id="email" formControlName="email" type="email" />
+            <mat-icon matSuffix>mail</mat-icon>
+            <mat-error *ngIf="cuilForm.get('email')?.hasError('required')">
+              Este dato es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="form-container">
+          <mat-form-field class="icon-input" appearance="fill">
+            <mat-label>teléfono </mat-label>
+            <input matInput formControlName="phone" required />
+            <mat-icon matSuffix>phone</mat-icon>
+            <mat-hint>Incluir código de área sin el 0 ej. 11 o 351</mat-hint>
+            <mat-error *ngIf="cuilForm.get('phone')?.hasError('required')">
+              Este dato es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <mat-card-actions>
+          <button
+            class="default-submit-button"
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="cuilForm.invalid || isProcessing"
+          >
+            <span *ngIf="isProcessing; else buttonText">Procesando </span>
+            <ng-template #buttonText> Enviar </ng-template>
+          </button>
+        </mat-card-actions>
+      </form>
+      <div *ngIf="isProcessing">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </div>
+      <div *ngIf="warningMessage" class="warning-message">
+        <mat-icon>chat_error</mat-icon> {{ warningMessage }}
+      </div>
+      <div
+        *ngIf="cuilForm.controls['cuil']?.errors?.['required'] && (cuilForm.controls['cuil'].touched || cuilForm.controls['cuil'].dirty)"
+        class="cuil-error-message"
+      >
+        <mat-icon>chat_error </mat-icon> El CUIL/CUIT es requerido
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

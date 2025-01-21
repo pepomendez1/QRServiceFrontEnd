@@ -1,0 +1,145 @@
+
+.btn-cta-filled {
+  font-family: Figtree;
+  font-size: 16px;
+  line-height: 24px;
+  background-color: $theme-color-primary;
+  color: $theme-color-primary-contrast;
+  font-weight: 600;
+  border: none;
+  padding: 1em;
+  box-shadow: none;
+  border-radius: 0.5em;
+
+  &:hover {
+    background-color: $primary-color-hover;
+    cursor: pointer;
+  }
+
+  &:active {
+    background-color: $primary-color-pressed;
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    color: rgb(163, 163, 163);
+    background-color: rgb(244, 244, 244);
+    cursor: not-allowed;
+  }
+}
+
+.btn-ghost-color {
+  font-family: Figtree;
+  //background-color: rgba(255, 255, 255, 0.8);
+  background-color: $theme-background-opacity-80;
+  color: $theme-color-primary;
+  font-weight: 600;
+  border: 2px solid $primary-color-opacity-10;
+  padding: 1em;
+  border-radius: 0.5em;
+
+  &:hover {
+    background-color: $primary-color-opacity-24;
+    border: 2px solid $primary-color-opacity-80;
+    cursor: pointer;
+  }
+
+  &:active {
+    background-color: $primary-color-opacity-24;
+    border: 2px solid $primary-color-opacity-10;
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    color: rgb(163, 163, 163);
+    border: 2px solid #888;
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+  }
+}
+
+.btn-link-primary {
+  font-family: Figtree;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  text-decoration: none;
+  text-underline-offset: 2px;
+  color: $theme-color-primary;
+  border-radius: 1em;
+
+  &:hover {
+    background-color: $primary-color-opacity-10;
+    cursor: pointer;
+  }
+
+  &:active {
+    background-color: $primary-color-opacity-24;
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    cursor: not-allowed;
+    color: rgb(163, 163, 163);
+  }
+}
+
+.btn-cta-ghost {
+  font-family: Figtree;
+  background-color: transparent;
+  color: $theme-color-primary;
+  font-weight: 600;
+  padding: 1em;
+  border-radius: 1em;
+
+  &:hover {
+    background-color: $theme-background-hover;
+    cursor: pointer;
+  }
+
+  &:active {
+    background-color: $theme-background-hover;
+    cursor: pointer;
+    //color: white;
+  }
+  &:disabled {
+    background-color: $theme-background-hover;
+    cursor: not-allowed;
+    //color: white;
+  }
+}
+
+$btn-padding-sizes: (
+  sm: 4px 8px,
+  md: 8px 12px,
+  lg: 12px 16px
+);
+
+// Utility classes for button sizes
+.btn-sm {
+  padding: map.get($btn-padding-sizes, sm);
+}
+
+.btn-md {
+  padding: map.get($btn-padding-sizes, md);
+}
+
+.btn-lg {
+  padding: map.get($btn-padding-sizes, lg);
+}

@@ -1,0 +1,16 @@
+app-side-panel-header {
+  .side-panel-header{
+    .buttons-container {
+      .button {
+        &:hover {
+          background-color: $button-hover;
+          cursor: pointer;
+        }
+        mat-icon {
+          font-size: 24px;
+          color: $icon-color;
+        }
+      }
+    }
+  }
+}

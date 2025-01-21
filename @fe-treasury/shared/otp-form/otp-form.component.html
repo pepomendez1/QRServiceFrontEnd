@@ -1,0 +1,117 @@
+<div class="form-wrapper">
+  <form [formGroup]="otpForm" #formElement="ngForm" (ngSubmit)="onSubmit()">
+    <div class="otp-form-container">
+      <div
+        class="otp-input-container"
+        [style.gap]="gap"
+        [ngClass]="{ error: incorrectOTP }"
+      >
+        <input
+          type="text"
+          formControlName="digit1"
+          [style.width]="squareInputSize"
+          [style.height]="squareInputSize"
+          #digit1
+          maxlength="1"
+          minlength="1"
+          class="otp-input"
+          (keydown)="handleBackspace($event, null)"
+          (input)="moveToNextField($event, digit2)"
+          (paste)="handlePaste($event)"
+        />
+        <input
+          type="text"
+          formControlName="digit2"
+          [style.width]="squareInputSize"
+          [style.height]="squareInputSize"
+          #digit2
+          maxlength="1"
+          minlength="1"
+          class="otp-input"
+          (keydown)="handleBackspace($event, digit1)"
+          (input)="moveToNextField($event, digit3)"
+        />
+        <input
+          type="text"
+          formControlName="digit3"
+          [style.width]="squareInputSize"
+          [style.height]="squareInputSize"
+          #digit3
+          maxlength="1"
+          minlength="1"
+          class="otp-input"
+          (keydown)="handleBackspace($event, digit2)"
+          (input)="moveToNextField($event, digit4)"
+        />
+        <input
+          type="text"
+          formControlName="digit4"
+          [style.width]="squareInputSize"
+          [style.height]="squareInputSize"
+          #digit4
+          maxlength="1"
+          minlength="1"
+          class="otp-input"
+          (keydown)="handleBackspace($event, digit3)"
+          (input)="moveToNextField($event, digit5)"
+        />
+        <input
+          type="text"
+          formControlName="digit5"
+          [style.width]="squareInputSize"
+          [style.height]="squareInputSize"
+          #digit5
+          maxlength="1"
+          minlength="1"
+          class="otp-input"
+          (keydown)="handleBackspace($event, digit4)"
+          (input)="moveToNextField($event, digit6)"
+        />
+        <input
+          type="text"
+          formControlName="digit6"
+          [style.width]="squareInputSize"
+          [style.height]="squareInputSize"
+          #digit6
+          maxlength="1"
+          minlength="1"
+          class="otp-input"
+          (keydown)="handleBackspace($event, digit5)"
+          (input)="moveToNextField($event, digit7)"
+        />
+        <input
+          type="text"
+          formControlName="digit7"
+          [style.width]="squareInputSize"
+          [style.height]="squareInputSize"
+          #digit7
+          maxlength="1"
+          minlength="1"
+          class="otp-input"
+          (keydown)="handleBackspace($event, digit6)"
+          (input)="moveToNextField($event, digit8)"
+        />
+        <input
+          type="text"
+          formControlName="digit8"
+          [style.width]="squareInputSize"
+          [style.height]="squareInputSize"
+          #digit8
+          maxlength="1"
+          minlength="1"
+          class="otp-input"
+          (keydown)="handleBackspace($event, digit7)"
+        />
+      </div>
+      <mat-error class="form-error" *ngIf="incorrectOTP">
+        <mat-icon class="material-symbols-outlined">error</mat-icon>
+        El código ingresado es incorrecto. Revisalo y volvé a intentar.
+      </mat-error>
+    </div>
+
+    <p *ngIf="!counterFinished" class="time-left">
+      Tiempo restante: {{ timeLeftValue | secondsToTimeString }}
+    </p>
+    <p *ngIf="counterFinished">Tiempo restante: 0.00</p>
+  </form>
+</div>

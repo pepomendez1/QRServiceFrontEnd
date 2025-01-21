@@ -1,0 +1,12 @@
+<div class="pop-over-content">
+  <h1 class="pop-over-title">{{ data.title }}</h1>
+  <span class="pop-over-text" mat-dialog-content> {{ data.content }} </span>
+
+  <div class="buttons-container">
+    <div mat-dialog-actions>
+      <button class="btn btn-cta-filled" (click)="onAccept()" color="primary">
+        Aceptar
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,140 @@
+@use '@angular/material' as mat; // Import Angular Material theming utilities
+
+.auth-container {
+  padding: 2em 4em;
+}
+
+line-stepper {
+  width: 100%;
+}
+
+.header {
+  width: 100%;
+  align-items: center;
+  text-align: left;
+  h1 {
+    font-size: 28px;
+    color: #161616;
+    font-weight: 700;
+    line-height: 37.24px;
+  }
+  p {
+    font-size: 16px;
+    color:#6B6B6B;
+    font-weight: 500;
+    line-height: 24px;
+  }
+}
+
+.form-container {
+  width: 100%; /* Width of the container relative to the viewport */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center contents vertically */
+
+  .custom-mat-form-field {
+    width: 100%; /* Full width of the form fields container */
+  }
+
+  .button-container {
+    display: flex;
+    width: 100%;
+    gap: 1em;
+    padding: 1em 0;
+
+    button {
+      border-radius: 8px;
+      flex-grow: 1;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 1.5em;
+    }
+
+    .mat-mdc-button {
+      background-color: #EA044E;
+      color: white;
+
+      &.mat-mdc-button-disabled {
+        background-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+
+    .mat-mdc-outlined-button {
+      border-width: 2px;
+      border-color: #EA044E1A;
+      color: #EA044E;
+
+      &.mat-mdc-button-disabled {
+        border-color: #cccccc;
+        color: #cccccc;
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+  }
+
+}
+
+.password-requirements {
+  padding: 1%;
+  .list-wrapper{
+    color: #6B6B6B;
+    padding-left: 1%;
+  }
+  li {
+    list-style-type: none;
+    padding-bottom: 1%;
+
+    .fulfilled{
+      color: green;
+    }
+  }
+
+  .requirement-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .check-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    padding-right: 1%;
+    color: green;
+  }
+  .unchecked-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    padding-right: 1%;
+  }
+
+}
+
+.pin-error-message {
+  display: flex;
+  align-items: center;
+  background-color: #dbbcb8;
+  color: #680707;
+  padding: 5px;
+  border-radius: 5px;
+  margin-top: 10px;
+  border: 1px solid #dbbcb8;
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 24px;
+    margin-right: 8px;
+    color: #680707;
+  }
+}
+
+@media screen and (max-width: 840px) {
+  .auth-container {
+    max-width: 100%;
+    padding: 1em
+  }
+}

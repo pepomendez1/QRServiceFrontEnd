@@ -1,0 +1,72 @@
+<div class="container custom-card">
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="noReturns && !loading" class="no-returns">
+    <div *ngIf="problemImg" [innerHTML]="problemImg"></div>
+    <!-- <img src="../../../assets/images/problem.svg" alt="No Activity Image" /> -->
+    <p class="paragraph-500-light">
+      Aún no tenés rendimientos. Cuando ingreses dinero a tu <br />
+      cuenta podrás ver como crece
+    </p>
+  </div>
+  <div *ngIf="!noReturns && !loading" class="returns-content">
+    <span class="toolbar">
+      <div class="returns-info">
+        <p class="secondary-500-light">
+          Rendimiento {{ selectedPeriodToTimeLapse }}
+        </p>
+        <app-amount-display
+          *ngIf="!loading && !animating"
+          [symbol]="'$'"
+          [amount]="currentTotal"
+          @fade
+        ></app-amount-display>
+        <p class="secondary-500" style="text-transform: capitalize">
+          {{ selectedPeriodString }}
+        </p>
+      </div>
+      <div class="filters-actions">
+        <div class="rounded-box clickable" [matMenuTriggerFor]="menuPeriod">
+          <p class="paragraph-600">Período</p>
+          <mat-icon class="material-symbols-outlined"
+            >keyboard_arrow_down</mat-icon
+          >
+        </div>
+        <mat-menu #menuPeriod="matMenu" class="filter-mat-menu">
+          <button
+            mat-menu-item
+            *ngFor="let period of periods"
+            (click)="onPeriodChange(period.value)"
+          >
+            {{ period.label }}
+          </button>
+        </mat-menu>
+        <div
+          class="rounded-box clickable"
+          (click)="onDownloadReport()"
+          [class.disabled]="generatingReport"
+        >
+          <p *ngIf="showLabel" class="download-label paragraph-600">
+            Suscripciones y rescates
+          </p>
+          <mat-icon *ngIf="!generatingReport" class="material-symbols-outlined"
+            >file_download</mat-icon
+          >
+          <mat-spinner
+            *ngIf="generatingReport"
+            class="search-spinner"
+          ></mat-spinner>
+        </div>
+      </div>
+    </span>
+
+    <ag-charts
+      *ngIf="!loading && !animating"
+      style="height: 100%"
+      [options]="chartOptions"
+      @fade
+    ></ag-charts>
+  </div>
+</div>

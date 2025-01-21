@@ -1,0 +1,85 @@
+$icon-button-size: 24px;
+
+.container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  width: 100%;
+  mat-spinner {
+    width: 50px !important; /* Ajustar el ancho del spinner */
+    height: 50px !important; /* Ajustar la altura del spinner */
+  }
+}
+
+.no-returns {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 43vh; //calc ccon botón Ver toda mi actividad
+}
+  .returns-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2em;
+
+
+
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1em;
+
+  .returns-info{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.5em;
+
+  }
+  .filters-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5em;
+
+
+      .download-label {
+        margin: 0;
+        padding: 8px;
+
+        @media (max-width: 600px) {
+          display: none;
+        }
+      }
+    }
+  }
+
+}
+.search-spinner {
+  margin-right: 0.5em;
+  circle {
+    stroke: #757575; /* Set your desired color here */
+  }
+  width: 24px !important; /* Ajustar el ancho del spinner */
+  height: 24px !important; /* Ajustar la altura del spinner */
+}
+h2 {
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+

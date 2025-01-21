@@ -1,0 +1,74 @@
+<div class="biometric-validation-container">
+  <div *ngIf="!isProcessing; else processing_status">
+    <div class="section-content">
+      <app-custom-header-onb
+        [isMobile]="isMobile"
+        [title]="'Necesitamos validar tu identidad'"
+        [description]="
+          'Esto lo hacemos para cuidar la seguridad de tu cuenta y evitar el robo de tus datos.'
+        "
+        (arrowBack)="returnToMail()"
+      ></app-custom-header-onb>
+      <div class="main-container">
+        <div class="recomendations-container">
+          <!-- <h3 class="paragraph-500">
+            Antes de continuar, tené en cuenta las siguientes recomendaciones:
+          </h3> -->
+
+          <div class="list-onboarding-elements">
+            <div class="list-element">
+              <mat-icon
+                color="primary"
+                class="material-symbols-outlined icon-list"
+                >add_photo_alternate</mat-icon
+              >
+              <span class="description-text paragraph-600">
+                Sacá las fotos con la cámara de tu celular y con buena
+                iluminación.
+              </span>
+            </div>
+            <div class="list-element">
+              <mat-icon
+                color="primary"
+                class="material-symbols-outlined icon-list"
+                >id_card</mat-icon
+              >
+              <span class="description-text paragraph-600">
+                Asegurate de tener en mano tu documento de identidad
+              </span>
+            </div>
+            <button
+              *ngIf="debugMode"
+              type="button"
+              (click)="onVerificationFinished()"
+            >
+              saltear
+            </button>
+          </div>
+        </div>
+        <div class="metamap-button-container">
+          <metamap-button
+            appBiometricValidation
+            (verificationFinished)="onVerificationFinished()"
+            (verificationStarted)="onVerificationStarted()"
+            class="custom-button"
+            clientid="6079d9a1483c3a001b1bb0e1"
+            flowId="6692be9aa8d43a001cdc9a74"
+            [metadata]="metadata"
+            [attr.textcolor]="isDarkMode ? '#000' : '#fff'"
+            [color]="primaryColor"
+            icon="none"
+            language="es"
+          ></metamap-button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #processing_status>
+    <app-waiting-results-screen></app-waiting-results-screen>
+    <div *ngIf="debugMode">
+      <button type="button" (click)="forceOK()">Validar</button>
+      <button type="button" (click)="forceFail()">Validación Falla</button>
+    </div>
+  </ng-template>
+</div>

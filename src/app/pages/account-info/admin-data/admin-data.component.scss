@@ -1,0 +1,147 @@
+@import "../../../../../@fe-treasury/styles/var";
+
+$icon-button-size: 24px;
+.personal-info-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1em;
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh; /* Altura específica y más pequeña para el spinner */
+    width: 100%;
+    mat-spinner {
+      width: 50px !important; /* Ajustar el ancho del spinner */
+      height: 50px !important; /* Ajustar la altura del spinner */
+    }
+  }
+  .admin-info {
+    height: 100%;
+    overflow-y: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: transparent;
+
+    .info-wrapper {
+      padding-top: 1em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+
+      gap: 1em;
+      width: 100%;
+      flex: 1;
+    }
+
+    .info-wrapper-edit {
+      width:100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      flex: 1;
+
+      .edit-info-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 1em;
+        width: 100%;
+        flex-grow: 1;
+        .address-form-edit {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 1em;
+        }
+        .input-data {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          .input-edit {
+            background-color: transparent;
+            display: flex;
+            width: 100%;
+            border: none;
+            outline: none;
+            flex: 1;
+            &:hover,
+            &:focus,
+            &:active {
+              border: none;
+              outline: none;
+              box-shadow: none;
+            }
+          }
+        }
+
+      }
+      .section-footer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1em;
+        text-align: center;
+        width: 100%;
+        //box-shadow: 0px 4px 24px 0px #16161629;
+        .btn {
+          height: 60px;
+          text-align: center;
+          justify-content: center;
+          width: 100%;
+        }
+      }
+    }
+
+    .info-box {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .input-box {
+      display: flex;
+      min-height: 56px;
+      gap: 1em;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #dbdbdb;
+
+      .input-data {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .actions-button {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5em;
+        .outline-button {
+          padding: 0;
+          margin: 0;
+          width: $icon-button-size;
+          height: $icon-button-size;
+          min-width: $icon-button-size;
+          min-height: $icon-button-size;
+          line-height: $icon-button-size;
+        }
+      }
+    }
+  }
+}

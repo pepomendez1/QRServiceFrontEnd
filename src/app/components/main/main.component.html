@@ -1,0 +1,42 @@
+<div *ngIf="isLoading; else on_hold_status">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<ng-template #on_hold_status>
+  <div>on hold</div>
+  <!-- <on-hold-screen *ngIf="onHoldStatus; else main_data"></on-hold-screen> -->
+</ng-template>
+<ng-template #main_data>
+  <div class="user-not-completed-main-container">
+    <div class="wrapper-container">
+      <div *ngIf="errorMessage" class="error-message">
+        <mat-icon>chat_error</mat-icon> {{ errorMessage }}
+      </div>
+      <div *ngIf="onboardingPartnerInput === 'PEYA'; else default_onb">
+        <app-onboarding-wrapper-peya
+          *ngIf="currentUserStatus === USER_STATUS.ONBOARDING"
+          (stageCompleted)="getUserStatus()"
+        ></app-onboarding-wrapper-peya>
+      </div>
+      <ng-template #default_onb>
+        <app-onboarding-wrapper
+          *ngIf="currentUserStatus === USER_STATUS.ONBOARDING"
+          (stageCompleted)="getUserStatus()"
+        ></app-onboarding-wrapper>
+      </ng-template>
+      <app-pin-code
+        *ngIf="currentUserStatus === USER_STATUS.PIN"
+        (stageCompleted)="getUserStatus()"
+        [onboardingPartner]="onboardingPartnerInput"
+      ></app-pin-code>
+      <app-treasury-pending
+        *ngIf="currentUserStatus === USER_STATUS.TREASURY"
+        (stageCompleted)="getUserStatus()"
+      >
+      </app-treasury-pending>
+    </div>
+  </div>
+
+  <div *ngIf="currentUserStatus === USER_STATUS.COMPLETED">
+    <router-outlet></router-outlet>
+  </div>
+</ng-template>

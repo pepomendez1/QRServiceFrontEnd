@@ -1,0 +1,54 @@
+.pop-over-content {
+  margin: 2.5em;
+  display: flex;
+  flex-direction: column;
+  color: #161616;
+  .pop-over-title {
+
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 31.92px;
+    text-align: left;
+  }
+
+  .pop-over-text {
+    color: #161616;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 24px;
+    text-align: left;
+  }
+  .mat-mdc-dialog-actions{
+    justify-content: center;
+  }
+  .buttons-container{
+    padding-left: 20px;
+    padding-top: 2em;
+    padding-bottom: 0em;
+    justify-content:center;
+    align-items: center;
+    button {
+      width: 100%;
+    }
+  }
+
+  @media screen and (max-width: 599px) {
+    margin: 1em; /* Adjust the margin for smaller screens */
+    .mat-mdc-dialog-content{
+      padding: 0;
+    }
+    .buttons-container {
+      padding-left: 10px; /* Reduce padding for mobile */
+      padding-top: 0.5em;
+      padding-bottom: 0.5em;
+    }
+
+    .pop-over-title {
+      font-size: 20px; /* Optional: Reduce title size for better fit */
+    }
+
+    .pop-over-text {
+      font-size: 12px; /* Optional: Adjust text size */
+    }
+  }
+}

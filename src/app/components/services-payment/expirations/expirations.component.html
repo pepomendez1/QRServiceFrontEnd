@@ -1,0 +1,178 @@
+<div class="container">
+
+
+  <mat-tab-group>
+    <mat-tab label="Vencimientos">
+
+      <!-- <div class="filters-wrapper">
+        <div class="rounded-box filter-button" (click)="openFiltersPanel()">
+          <p class="filter-label paragraph-600">Filtros</p>
+          <button class="arrow-button">
+            <mat-icon class="dark-arrow">keyboard_arrow_down</mat-icon>
+          </button>
+        </div>
+
+        <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
+          <mat-icon class="search-icon-light">search</mat-icon>
+          <input
+            class="input-search paragraph-500"
+            placeholder="Buscar"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="filterExpirations()"
+            (focus)="isFocused = true"
+            (blur)="isFocused = false"
+          />
+          <mat-spinner class="search-spinner" [class.show]="searching"></mat-spinner>
+        </div>
+      </div> -->
+
+      <!-- Contenido de la primera pestaña -->
+      <div class="activities-container">
+        <!-- Loader for the initial fetch -->
+        <div *ngIf="loading && !filteredExpirations.length" class="mat-spinner-container">
+          <mat-spinner mode="indeterminate" [diameter]="40"></mat-spinner>
+        </div>
+
+        <!-- No transactions message -->
+        <div *ngIf="!loading && !expirations.length" class="no-transactions">
+          <img src="../../../../assets/images/problem.svg" alt="No hay transacciones" />
+          <p class="secondary-500-light">Aún no tenés vencimientos.</p>
+        </div>
+
+        <!-- List of transactions -->
+        <div *ngIf="!loading && expirations.length" class="activities-container">
+          <div class="activity-item" *ngFor="let activity of expirations">
+            <mat-checkbox required [(ngModel)]="activity.checked"></mat-checkbox>
+
+            <div class="activity-info">
+
+
+
+              <div class="details">
+                <div class="paragraph-600">
+                  {{ activity.description ? activity.description : "Sin descripción" }}
+                </div>
+                <div class="secondary-500-light">
+                  {{ activity.merchant_name ? activity.merchant_name : "Comercio desconocido" }}
+                </div>
+              </div>
+
+            </div>
+            <div class="activity-amount">
+              <div class="paragraph-400"
+                [ngStyle]="{color: activity.transaction_type === 'cash_in' ? '#048A42' : '#000',}">
+                {{ activity.amount | currency : "ARS" : "symbol-narrow" }}
+              </div>
+              <div class="activity-date">
+
+                <div *ngIf="activity.vencido" class="vencimiento">
+                  <span class="texto-rojo">Vence hoy</span>
+                  <mat-icon color="warn" class="icono-warning">notifications</mat-icon>
+                </div>
+
+                <span *ngIf="!activity.vencido && activity.autodebito">Se autodebita el {{ activity.fechaAutodebito
+                  }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Show More Button with loader -->
+
+        <div class="btn-cta-ghost" (click)="showMoreTransactions()" *ngIf="expirations.length < totalItems">
+          <span *ngIf="!loadingMore" class="paragraph-600">Mostrar más consumos</span>
+          <mat-spinner *ngIf="loadingMore" mode="indeterminate" [diameter]="24"></mat-spinner>
+        </div>
+
+        <!-- <div *ngIf="activities.length < totalItems" class="show-more-container">
+          <button
+            class="btn-cta-ghost btn-md"
+            [disabled]="loadingMore"
+            (click)="showMoreTransactions()"
+          >
+            <span *ngIf="!loadingMore">Mostrar más consumos</span>
+            <mat-spinner
+              *ngIf="loadingMore"
+              mode="indeterminate"
+              [diameter]="24"
+            ></mat-spinner>
+          </button>
+        </div> -->
+
+
+      </div>
+
+      <!-- Sección inferior -->
+      <div class="footer">
+        <div class="total">
+          <span>Total a pagar <strong>{{ totalSeleccionado | currency:'ARS':'symbol':'1.0-0' }}</strong></span>
+        </div>
+        <button mat-flat-button class="transfer-btn button-l" [disabled]="cantidadSeleccionada === 0">
+          Pagar {{ cantidadSeleccionada }} seleccionado{{ cantidadSeleccionada > 1 ? 's' : '' }}
+        </button>
+      </div>
+    </mat-tab>
+    <mat-tab label="Historial">
+
+      <div class="filters-container ng-star-inserted">
+      <div class="filters-wrapper">
+        <div class="rounded-box filter-button" (click)="openFiltersPanel()">
+          <p class="filter-label paragraph-600">Filtros</p>
+          <button class="arrow-button">
+            <mat-icon class="dark-arrow">keyboard_arrow_down</mat-icon>
+          </button>
+        </div>
+
+        <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
+          <mat-icon class="search-icon-light">search</mat-icon>
+          <input
+            class="input-search paragraph-500"
+            placeholder="Buscar"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="filterHistory()"
+            (focus)="isFocused = true"
+            (blur)="isFocused = false"
+          />
+          <mat-spinner class="search-spinner" [class.show]="searching"></mat-spinner>
+        </div>
+      </div>
+    </div>
+    
+      <div class="activities-container">
+        <!-- Contenido de la segunda pestaña -->
+        <!-- List of history -->
+        <div *ngIf="!loading && filteredHistory.length" class="history-container">
+          <div class="activity-item" *ngFor="let activity of filteredHistory">
+
+            <div class="activity-info">
+
+              <div class="rounded-icon">
+                <mat-icon class="material-symbols-outlined">{{'arrow_back'}}</mat-icon>
+              </div>
+
+              <div class="details">
+                <div class="paragraph-600">
+                  {{ activity.description ? activity.description : "Sin descripción" }}
+                </div>
+                <div class="secondary-500-light">
+                  {{ activity.merchant_name ? activity.merchant_name : "Comercio desconocido" }}
+                </div>
+              </div>
+
+            </div>
+            <div class="activity-amount">
+              <div class="paragraph-400"
+                [ngStyle]="{color: activity.transaction_type === 'cash_in' ? '#048A42' : '#000',}">
+                -{{ activity.amount | currency : "ARS" : "symbol-narrow" }}
+              </div>
+              <div class="activity-date">
+                <span> {{ activity.date }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+</div>

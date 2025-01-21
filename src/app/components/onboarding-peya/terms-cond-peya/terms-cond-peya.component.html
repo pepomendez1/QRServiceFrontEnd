@@ -1,0 +1,76 @@
+<div *ngIf="!onboardingFinished">
+  <div class="auth-container">
+    <line-stepper [currentStep]="currentStep"></line-stepper>
+    <div class="return-arrow">
+      <mat-icon>arrow_back</mat-icon>
+    </div>
+    <div class="header">
+      <h1>Términos y condiciones</h1>
+      <p>
+        Al aceptar los siguientes Términos y condiciones, confirma que sus
+        fondos serán invertidos por Delta y que Wibond proporcionará el
+        financiamiento correspondiente.
+      </p>
+    </div>
+
+    <form [formGroup]="termsForm" (ngSubmit)="onSubmit()">
+      <div class="form-container">
+        <div class="accept-checkbox">
+          <mat-checkbox color="#EA044E" formControlName="terms">
+            <span>Aceptar</span>
+          </mat-checkbox>
+          <button
+            mat-button
+            class="text-button-type"
+            type="button"
+            (click)="openTermDialog()"
+          >
+            T&C de uso
+          </button>
+        </div>
+        <div class="accept-checkbox">
+          <mat-checkbox color="#EA044E" formControlName="inv_saldo">
+            <span>Aceptar</span>
+          </mat-checkbox>
+          <button
+            mat-button
+            class="text-button-type"
+            type="button"
+            (click)="openAccountTerms()"
+          >
+            T&C cuenta remunerada
+          </button>
+        </div>
+        <div class="accept-checkbox">
+          <mat-checkbox color="#EA044E" formControlName="disclaimer">
+            <span>Aceptar</span>
+          </mat-checkbox>
+          <button
+            mat-button
+            color="#EA044E"
+            class="text-button-type"
+            type="button"
+            (click)="openAffidavitDialog()"
+          >
+            Declaración Jurada
+          </button>
+        </div>
+      </div>
+      <div class="buttons">
+        <button
+          class="default-submit-button"
+          mat-raised-button
+          type="submit"
+          [disabled]="termsForm.invalid || isProcessing"
+        >
+          <span *ngIf="isProcessing; else buttonText">Procesando </span>
+          <ng-template #buttonText> Continuar</ng-template>
+        </button>
+      </div>
+    </form>
+
+    <div *ngIf="isProcessing">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  </div>
+</div>

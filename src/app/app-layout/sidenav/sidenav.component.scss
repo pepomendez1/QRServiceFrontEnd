@@ -1,0 +1,71 @@
+@use 'sass:math';
+@import '../../../../@fe-treasury/styles/var';
+
+// :host {
+//   display: flex;
+//   flex-direction: column;
+//   z-index: $sidenav-z-index;
+//   height: 100%;
+//   top: 0;
+//   bottom: 0;
+//   width: $sidenav-width;
+// }
+
+.sidenav {
+  height: 100%;
+
+  .sidenav-toolbar {
+    padding: 20px 40px;
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+  }
+
+  .sidenav-toolbar-logo {
+    cursor: pointer;
+    outline: none;
+    margin-bottom: -5px;
+  }
+
+  .sidenav-menu-list {
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px;
+    padding-left: 40px;
+
+    .sidenav-item {
+      height: 40px;
+      width: 200px;
+      font: var(--font-body-1);
+
+      .sidenav-item-link {
+        margin-bottom: 16px;
+        cursor: pointer;
+        outline: none;
+        user-select: none;
+        white-space: nowrap;
+        text-decoration: none;
+
+        .material-symbols-outlined {
+          width: 24px;
+          height: 24px;
+          font-size: 24px;
+          line-height: 24px;
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' -25, 'opsz' 20;
+        }
+
+        .name {
+          padding-left: 24px;
+        }
+      }
+
+      // Move the disabled-link styles here
+      .disabled-link {
+        color: rgb(218, 127, 127);
+        pointer-events: none;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+  }
+}

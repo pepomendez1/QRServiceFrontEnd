@@ -1,0 +1,55 @@
+<mat-card class="main-card">
+  <!-- Sección de balance y transferencia que se muestra cuando la sección actual es 'balance' o 'transfer' -->
+  <div class="balance-container" *ngIf="actualSection === 'balance' || actualSection === 'transfer'">
+    <div class="balance-header">
+      <h2 class="balance-title">
+        <button *ngIf="actualSection === 'transfer'" mat-icon-button (click)="showSection('balance')">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        {{ actualSection === 'balance' ? 'Dinero disponible' : 'Realizar transferencia' }}
+      </h2>
+    </div>
+    <!-- Monto disponible, solo se muestra si actualSection es 'balance' -->
+    <div class="balance-amount" *ngIf="actualSection === 'balance'">
+      <h1>$ {{ visibleBalance }}</h1>
+    </div>
+    <!-- Botones de 'Enviar' y 'Recibir' que se muestran solo en la sección de 'balance' -->
+    <div class="balance-buttons" *ngIf="actualSection === 'balance'">
+      <button mat-stroked-button color="primary" (click)="showSection('transfer')">Enviar</button>
+      <button mat-stroked-button color="primary" (click)="showSection('account')">Recibir</button>
+    </div>
+  </div>
+  <!-- Sección de transferencia que se muestra cuando la sección actual es 'transfer' -->
+  <div *ngIf="actualSection === 'transfer'">
+    <app-transfer></app-transfer>
+  </div>
+
+  <!-- Sección de cuenta que se muestra cuando la sección actual es 'account' -->
+  <div *ngIf="actualSection === 'account'">
+    <div class="account-details">
+      <h2>Datos de tu cuenta digital</h2>
+      <div>
+        <p>
+          <strong>CVU:</strong> {{ accountInfo.cvu }}
+          <!-- Botón para copiar el CVU al portapapeles -->
+          <button mat-icon-button (click)="copyToClipboard('CVU')">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+        </p>
+        <p>
+          <strong>Alias:</strong> {{ accountInfo.alias }}
+          <!-- Botón para copiar el alias al portapapeles -->
+          <button mat-icon-button (click)="copyToClipboard('Alias')">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+        </p>
+      </div>
+      <!-- Botón para volver a la sección de balance -->
+      <div class="balance-buttons">
+        <button mat-stroked-button color="primary" (click)="showSection('balance')">Volver</button>
+        <!-- Mensaje de copia al portapapeles -->
+        <div *ngIf="copyMessage" class="copy-message">{{ copyMessage }}</div>
+      </div>
+    </div>
+  </div>
+</mat-card>

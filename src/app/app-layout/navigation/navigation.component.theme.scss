@@ -1,0 +1,65 @@
+@use '@angular/material' as mat;
+
+app-navigation {
+  width: 100%;
+  display: block;
+  color: $sidenav-color;
+  padding: 20px 40px 20px 40px;
+.menu{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+
+}
+  .navigation-item-container {
+    .navigation-item {
+
+      color: $sidenav-color;
+        &.active {
+          border-bottom: 3px solid $theme-color-primary;
+          //background: $sidenav-item-background-active;
+          color: $sidenav-item-color-active;
+          .material-symbols-outlined {
+            color:  $theme-color-primary;
+          }
+          .name {
+            color: $theme-color-primary;
+            font-weight: 600;
+          }
+        }
+        &.disabled-link {
+          pointer-events: none;
+          cursor: not-allowed;
+          opacity: 0.6;
+        }
+
+    }
+
+    &:hover, &:focus {
+      .navigation-item {
+       // color: $sidenav-item-color-hover;
+        background: $sidenav-item-background-hover;
+      }
+    }
+  }
+
+}
+
+
+
+@media screen and (max-width: 650px) {
+  app-navigation {
+    padding: 0;
+    .menu{
+    margin: 0 auto;
+    flex: 1;
+      padding: 1em;
+      align-items: center;
+     justify-content: space-between;
+    }
+    .name {
+      display: none;
+    }
+  }
+
+}

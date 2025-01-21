@@ -1,0 +1,73 @@
+.pin-code-ready-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #E5EDFF;
+
+  .message-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    border: none;
+    background-color: #E5EDFF;
+    width: 90%;
+    height: 80vh;
+
+    .material-symbols-outlined {
+      width: 50px;
+      height: 48px;
+      font-size: 40px;
+      margin-right: 0;
+      color: #000000;
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+    }
+
+    h1 {
+      width: 80%;
+      color: #000000;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 37.24px;
+    }
+
+    p {
+      width: 90%;
+      color: #000000;
+      text-align:center;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 24px;
+    }
+  }
+
+  .button {
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 2rem;
+    background-color: #E5EDFF;
+
+    .default-filled-button {
+      width: 90%;
+      height: 48px;
+      border-color: #EA044E;
+      background-color: #EA044E;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: none;
+      position: fixed;
+      bottom: 4%;
+    }
+  }
+}

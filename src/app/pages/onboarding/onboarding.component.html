@@ -1,0 +1,32 @@
+<div class="onboarding-main-wrapper">
+  <div
+    *ngIf="logoUrl && !isMobile"
+    [innerHTML]="logoUrl"
+    class="svg-logo-container"
+  ></div>
+  <div *ngIf="isLoading$ | async">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+
+  <div *ngIf="!(isLoading$ | async)" class="onboarding-steps box-container">
+    <app-end-onb *ngIf="onboardingFinished$ | async"></app-end-onb>
+
+    <app-kyc-validation
+      [isMobile]="isMobile"
+      *ngIf="(currentStep$ | async) === ONBOARDING_STEPS.KYC"
+      (stepCompleted)="onboardingService.checkOnboardingStatus()"
+    ></app-kyc-validation>
+
+    <app-address-form
+      [isMobile]="isMobile"
+      *ngIf="(currentStep$ | async) === ONBOARDING_STEPS.ADDRESS"
+      (stepCompleted)="onboardingService.checkOnboardingStatus()"
+    ></app-address-form>
+
+    <app-affidavit-terms
+      *ngIf="(currentStep$ | async) === ONBOARDING_STEPS.AFFIDAVIT"
+      (stepCompleted)="onboardingService.checkOnboardingStatus()"
+    ></app-affidavit-terms>
+  </div>
+  <app-onb-footer></app-onb-footer>
+</div>

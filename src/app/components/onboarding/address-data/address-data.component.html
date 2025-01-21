@@ -1,0 +1,136 @@
+<div class="onboarding">
+  <mat-card class="onboarding-card">
+    <mat-card-header>
+      <mat-card-title>Ingresá los datos sobre tu domicilio</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="address-card-content">
+      <h3 *ngIf="onboardingType === 'JURIDICA'" class="light-centered-text">
+        Domicilio donde se encuentra inscripto tu negocio
+      </h3>
+      <div class="form-wrapper">
+        <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+          <div class="form-container" *ngIf="onboardingType === 'FISICA'">
+            <mat-form-field appearance="fill">
+              <mat-label>Estado Civil </mat-label>
+              <mat-select formControlName="maritalStatus">
+                <mat-option
+                  *ngFor="let status of maritalStatusList"
+                  [value]="status.value"
+                >
+                  {{ status.viewValue }}
+                </mat-option>
+              </mat-select>
+
+              <!-- <input matInput formControlName="maritalStatus" /> -->
+              <mat-error
+                *ngIf="addressForm.get('maritalStatus')?.hasError('required')"
+              >
+                Esta información es requerida para continuar
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-container">
+            <mat-form-field appearance="fill">
+              <mat-label>Calle </mat-label>
+              <input
+                matInput
+                id="street"
+                formControlName="street"
+                type="text"
+              />
+              <mat-error
+                *ngIf="addressForm.get('street')?.hasError('required')"
+              >
+                Este dato es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-container">
+            <mat-form-field appearance="fill">
+              <mat-label>Número </mat-label>
+              <input
+                matInput
+                id="streetNumber"
+                formControlName="streetNumber"
+                type="text"
+              />
+              <mat-error
+                *ngIf="addressForm.get('streetNumber')?.hasError('required')"
+              >
+                Este dato es requerido, puede ser S/N si no tiene número
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-container">
+            <mat-form-field appearance="fill">
+              <mat-label>Piso y Departamento </mat-label>
+              <input
+                matInput
+                id="flatNumber"
+                formControlName="flatNumber"
+                type="text"
+              />
+            </mat-form-field>
+          </div>
+          <div class="form-container">
+            <mat-form-field appearance="fill">
+              <mat-label>Localidad </mat-label>
+              <input matInput id="city" formControlName="city" type="text" />
+              <mat-error *ngIf="addressForm.get('city')?.hasError('required')">
+                Este dato es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-container">
+            <mat-form-field appearance="fill">
+              <mat-label>Provincia </mat-label>
+              <mat-select formControlName="state">
+                <mat-option
+                  *ngFor="let status of provinceList"
+                  [value]="status.value"
+                >
+                  {{ status.viewValue }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="addressForm.get('state')?.hasError('required')">
+                Este dato es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-container">
+            <mat-form-field appearance="fill">
+              <mat-label>Código Postal (CP) </mat-label>
+              <input
+                matInput
+                id="zipCode"
+                formControlName="zipCode"
+                type="text"
+              />
+              <mat-error
+                *ngIf="addressForm.get('zipCode')?.hasError('required')"
+              >
+                Este dato es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <mat-card-actions>
+            <button
+              class="default-submit-button"
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="addressForm.invalid || isProcessing"
+            >
+              <span *ngIf="isProcessing; else buttonText">Procesando </span>
+              <ng-template #buttonText> Enviar </ng-template>
+            </button>
+          </mat-card-actions>
+        </form>
+        <div *ngIf="isProcessing">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

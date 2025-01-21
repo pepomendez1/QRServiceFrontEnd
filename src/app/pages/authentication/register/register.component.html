@@ -1,0 +1,52 @@
+<div class="register-wrapper-container">
+  <ng-container [ngSwitch]="currentStep">
+    <div
+      *ngIf="!isMobile && logoUrl && currentStep !== RegisterSteps.START_AUTH"
+      [innerHTML]="logoUrl"
+      class="svg-logo-container"
+    ></div>
+    <!-- Step 1: Welcome Slider -->
+    <app-welcome-slider
+      *ngSwitchCase="RegisterSteps.START_AUTH"
+      (newPassword)="goToSetPassword()"
+      [debugMode]="debugMode"
+    ></app-welcome-slider>
+
+    <!-- Step 2: Expired Link Page -->
+    <div
+      *ngSwitchCase="RegisterSteps.EXPIRED_LINK"
+      class="expired-link-page-full"
+    >
+      <div class="expired-link-page box-container">
+        <div class="content">
+          <div class="main-content">
+            <div *ngIf="problemImg" [innerHTML]="problemImg"></div>
+            <h1 class="heading-4-700">El enlace venció o ya fue utilizado</h1>
+            <p class="paragraph-500">
+              Te enviamos un e-mail con un nuevo enlace para que puedas comenzar
+              a crear tu cuenta digital.
+            </p>
+            <div class="button-container">
+              <button
+                class="btn-cta-filled w-100"
+                (click)="goToLogin()"
+                type="button"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <app-onb-footer></app-onb-footer>
+    </div>
+
+    <!-- Step 3: New Password -->
+    <app-new-password
+      *ngSwitchCase="RegisterSteps.SET_PASSWORD"
+      (returnToWelcome)="gotToWelcomeSwiper()"
+      [debugMode]="debugMode"
+      [isMobile]="isMobile"
+    ></app-new-password>
+  </ng-container>
+</div>

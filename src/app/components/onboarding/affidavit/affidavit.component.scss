@@ -1,0 +1,75 @@
+@import '../../../custom-styles/onboarding.scss';
+
+.onboarding .onboarding-card .light-centered-text {
+  font-size: 18px;
+  font-weight: 300;
+  margin-bottom: 2rem;
+}
+
+.onboarding .onboarding-card .section-title {
+  text-align: left;
+  margin: 0 auto;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.onboarding .onboarding-card .hint-text {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+  margin: 0 auto;
+  color: #666666;
+}
+
+.onboarding .onboarding-card .form-wrapper {
+  width: 80%;
+  text-align: left;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0 auto;
+}
+
+.onboarding .onboarding-card .input-data {
+  width: 80%;
+  text-align: left;
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 0 ;
+}
+
+.onboarding .onboarding-card .pep-types {
+  width: 50%;
+  text-align: left;
+  background-color: #d4dce2;
+  gap: 1rem;
+  margin: 0 ;
+}
+
+.onboarding .onboarding-card .form-wrapper .radio-buttons{
+  text-align: left;
+  display: flex;
+}
+
+.onboarding .onboarding-card .warning-message {
+  display: flex;
+  align-items: center;
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 1px;
+  border-radius: 5px;
+  margin-top: 2px;
+  border: 1px solid #ffeeba;
+  font-size: 14px;
+}
+
+.onboarding .onboarding-card .warning-message mat-icon {
+  font-size: 24px;
+  margin-right: 8px;
+  color: #856404;
+}

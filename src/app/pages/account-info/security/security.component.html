@@ -1,0 +1,37 @@
+<div class="p-0 m-0" *ngIf="securityPanelMode === 'options'">
+  <app-side-panel-header
+    [title]="'Seguridad'"
+    [arrowBackEnabled]="true"
+    (arrowBack)="handleArrowBack()"
+  ></app-side-panel-header>
+  <div class="security-options">
+    <div
+      class="security-option-row clickable"
+      (click)="changeMode('credentials')"
+    >
+      <p class="paragraph-600 p-1 m-0">Métodos de verificación</p>
+
+      <div class="btn-ghost-black">
+        <mat-icon>chevron_right</mat-icon>
+      </div>
+    </div>
+    <div
+      class="security-option-row clickable last"
+      (click)="changeMode('devices')"
+    >
+      <p class="paragraph-600 p-1 m-0">Dispositivos vinculados</p>
+
+      <div class="btn-ghost-black">
+        <mat-icon>chevron_right</mat-icon>
+      </div>
+    </div>
+  </div>
+</div>
+<app-admin-credentials
+  *ngIf="securityPanelMode === 'credentials'"
+  (backToOptions)="changeMode('options')"
+></app-admin-credentials>
+<app-manage-devices
+  *ngIf="securityPanelMode === 'devices'"
+  (backToOptions)="changeMode('options')"
+></app-manage-devices>

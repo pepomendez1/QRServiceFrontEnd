@@ -1,0 +1,16 @@
+<div class="slider-page">
+  <div class="image-container">
+    <img
+      [src]="companyLogo"
+      class="overlay-logo"
+      width="136px"
+      height="30.7px"
+      alt="Company Logo"
+    />
+    <div class="background-image" [style.background-image]="'url(' + imageSource + ')'"></div>
+  </div>
+  <div class="content">
+    <h1>{{ slideTitle }}</h1>
+    <p [innerHTML]="slideMessage"></p>
+  </div>
+</div>

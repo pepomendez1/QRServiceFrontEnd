@@ -1,0 +1,8 @@
+app-header {
+  color: $toolbar-color;
+  .toolbar {
+    background: $theme-background;
+    box-shadow: $sidenav-box-shadow;
+    border-bottom:none;
+  }
+}

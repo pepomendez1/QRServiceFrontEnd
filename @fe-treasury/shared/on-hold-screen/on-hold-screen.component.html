@@ -1,0 +1,22 @@
+<div *ngIf="logoUrl" [innerHTML]="logoUrl" class="svg-logo-container"></div>
+<div class="on-hold-container">
+  <div class="on-hold-content box-container">
+    <div class="content">
+      <div class="main-content">
+        <div *ngIf="onHoldImg" [innerHTML]="onHoldImg" class="svg"></div>
+        <h1 class="heading-4-700">
+          Tu cuenta digital está en proceso de verificación
+        </h1>
+        <p class="paragraph-500">
+          Estamos verificando tus datos. Te enviaremos un e-mail cuando este
+          proceso finalice y puedas operar.
+        </p>
+      </div>
+      <div class="button-container">
+        <button class="btn-cta-filled" type="button" (click)="goToLogin()">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<div class="recovery-mail-container">
+  <app-custom-header-onb
+    [title]="'Ingresa tu mail'"
+    [description]="headerDescription"
+    [isMobile]="isMobile"
+    (arrowBack)="returnToOptions()"
+  ></app-custom-header-onb>
+  <div class="section-content">
+    <form [formGroup]="recoveryMail">
+      <div class="form-container">
+        <mat-form-field appearance="outline">
+          <mat-label>E-mail</mat-label>
+          <input
+            [ngClass]="{ error: mailError }"
+            class="input-email"
+            matInput
+            id="emailInput"
+            formControlName="emailInput"
+            type="text"
+          />
+          <mat-error
+            class="form-error"
+            *ngIf="recoveryMail.get('emailInput')?.hasError('required')"
+          >
+            <mat-icon class="material-symbols-outlined">error</mat-icon>
+            El email es obligatorio.
+          </mat-error>
+          <mat-error
+            class="form-error"
+            *ngIf="recoveryMail.get('emailInput')?.hasError('email')"
+          >
+            <mat-icon class="material-symbols-outlined">error</mat-icon>
+            El formato del e-mail es inválido.
+          </mat-error>
+        </mat-form-field>
+        <mat-error class="form-error" *ngIf="mailError">
+          <mat-icon class="material-symbols-outlined">error</mat-icon>
+          {{ errorMessage }}
+        </mat-error>
+      </div>
+      <div class="button-container">
+        <button
+          class="btn-cta-filled w-100"
+          type="button"
+          (click)="submitForm()"
+          [disabled]="recoveryMail.invalid || isProcessing"
+        >
+          Enviar email
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

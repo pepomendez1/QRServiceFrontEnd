@@ -1,0 +1,64 @@
+app-welcome-slider {
+
+  .welcome-container {
+    background-color: $theme-background;
+
+    swiper-container {
+      box-shadow: $theme-box-shadow;
+      .swiper-card-container {
+        .swiper-card {
+          background-color: $theme-card;
+          .content {
+            background-color: $theme-card;
+          }
+        }
+      }
+    }
+    swiper-container::part(bullet) {
+      background-color: $theme-swiper-bullet;
+    }
+    swiper-container::part(button-prev) {
+      padding-left: 1.5em;
+      height: 20px;
+      width: 20px;
+      color: $theme-swiper-button-prev;
+      transform: translateY(600%);
+
+    }
+    swiper-container::part(button-next) {
+      padding-right: 1.5em;
+      height: 20px;
+      width: 20px;
+      color: $theme-swiper-button-next;
+      transform: translateY(600%);
+    }
+    swiper-container::part(bullet-active) {
+      background-color: $theme-swiper-bullet-active;
+    }
+  }
+
+  @media screen and (max-width: 840px) {
+    .welcome-container {
+      swiper-container::part(bullet) {
+        background-color: $theme-swiper-bullet;
+        transform: translateY(-1300%);
+      }
+      swiper-container::part(button-prev) {
+        height: 20px;
+        width: 20px;
+        color: $theme-swiper-bullet-active;
+        transform: translateY(0%);
+      }
+      swiper-container::part(button-next) {
+        height: 20px;
+        width: 20px;
+        color: $theme-swiper-bullet-active;
+        transform: translateY(0%);
+      }
+      swiper-container::part(bullet-active) {
+        background-color: $theme-swiper-bullet-active;
+        transform: translateY(-1300%);
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+.onboarding-main-wrapper {
+  display: flex;
+  flex-direction: column; /* Stack content vertically */
+  align-items: center;
+  justify-content: space-between; /* Space between steps and footer */
+  height: 100vh; /* Full viewport height */
+}
+.onboarding-steps{
+  margin-top: 6em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media screen and (max-width: 840px) {
+  .onboarding-steps{
+    justify-content: flex-start;
+    //overflow-y: auto; /* Enable scrolling within onboarding steps */
+    flex: 1; /* Take up available space above the footer */
+    margin-top: 0; /* Remove extra spacing on mobile */
+    max-width: unset;
+    height: 100vh;
+    width: 100%; /* Full width */
+    padding: 0;
+    border-radius: 0; /* Remove rounded corners */
+    box-shadow: none; /* No shadow for mobile */
+  }
+}

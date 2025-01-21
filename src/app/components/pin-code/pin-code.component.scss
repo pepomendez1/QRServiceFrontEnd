@@ -1,0 +1,36 @@
+@import '../../custom-styles/onboarding.scss';
+
+.onboarding .onboarding-card .warning-message {
+    display: flex;
+    align-items: center;
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border: 1px solid #ffeeba;
+    font-size: 14px;
+  }
+
+  .onboarding .onboarding-card .warning-message mat-icon {
+    font-size: 24px;
+    margin-right: 8px;
+    color: #856404;
+  }
+  .onboarding .onboarding-card .pin-error-message {
+    display: flex;
+    align-items: center;
+    background-color: #dbbcb8;
+    color: #680707;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border: 1px solid #dbbcb8;
+    font-size: 14px;
+  }
+
+  .onboarding .onboarding-card .pin-error-message  mat-icon {
+    font-size: 24px;
+    margin-right: 8px;
+    color: #680707; /* Same color as text */
+  }

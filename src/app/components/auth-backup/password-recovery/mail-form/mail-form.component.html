@@ -1,0 +1,54 @@
+<div class="recovery-mail-container">
+  <div *ngIf="isMobile" class="return-arrow">
+    <mat-icon (click)="returnToOptions()">arrow_back</mat-icon>
+  </div>
+  <div class="header">
+    <h1>Ingresa tu mail</h1>
+    <p *ngIf="recoveryType === 'password'">
+      Te enviaremos un código a tu mail para que generes una nueva contraseña
+    </p>
+    <p *ngIf="recoveryType === 'pin'">
+      Te enviaremos un código a tu mail para que generes un nuevo PIN
+    </p>
+    <p *ngIf="recoveryType === 'password-pin'">
+      Te enviaremos un código a tu mail para que generes una nueva contraseña y
+      PIN, además tendrás que validar tu identidad.
+    </p>
+  </div>
+  <form [formGroup]="recoveryMail">
+    <div class="form-container">
+      <mat-form-field appearance="outline">
+        <mat-label>Mail </mat-label>
+        <input
+          matInput
+          id="emailInput"
+          formControlName="emailInput"
+          type="text"
+        />
+      </mat-form-field>
+    </div>
+    <div *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="button-container">
+      <button
+        *ngIf="!isMobile"
+        class="outline-button"
+        mat-stroked-button
+        type="button"
+        (click)="returnToOptions()"
+      >
+        Volver
+      </button>
+      <button
+        class="default-submit-button"
+        mat-raised-button
+        color="primary"
+        (click)="sendEmail()"
+        type="button"
+        [disabled]="recoveryMail.invalid"
+      >
+        Enviar código
+      </button>
+    </div>
+  </form>
+</div>

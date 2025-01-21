@@ -1,0 +1,57 @@
+@use 'sass:math';
+@import "../../../../@fe-treasury/styles/var";
+
+:host {
+  top: 0;
+  z-index: $toolbar-z-index;;
+}
+
+.toolbar {
+  padding: 40px 0px 36px 0px;
+  margin: 0px 40px;
+  height: $toolbar-height;
+  max-width: 100%;
+
+  h1 {
+    margin: 0;
+    flex-grow: 1;
+  }
+.header-buttons {
+  display: flex;
+  gap: 0.5em;
+  justify-content: space-between;
+  .rounded-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: 48px;
+    border: 1px solid #E6E6E6;
+  }
+
+}
+
+}
+@media screen and (max-width: 600px) {
+  .toolbar{
+    padding: 20px;
+    margin: 0;
+  }
+}
+@media screen and (max-width: 425px) {
+  .toolbar{
+    padding: 20px;
+    margin: 0;
+    .header-buttons{
+      .rounded-box, .rounded-button{
+        padding: 0px;
+        border:none;
+      }
+      p {
+        display: none;
+      }
+    }
+  }
+}
+
+

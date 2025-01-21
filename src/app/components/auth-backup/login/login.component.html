@@ -1,0 +1,82 @@
+<app-register *ngIf="needNewPassword; else common_login"></app-register>
+<ng-template #common_login>
+  <div class="w-100 h-100">
+    <div class="login-page">
+      <div class="header-container">
+        <img
+          src="assets/peya-logo.svg"
+          width="136px"
+          height="30.7px"
+          alt="Company Logo"
+        />
+        <span> Hola {{ userName }}, </span>
+        <h1>Te damos la bienvenida a tu cuenta digital</h1>
+      </div>
+      <div class="login-form">
+        <h2>Iniciar sesión</h2>
+        <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
+          <mat-form-field class="custom-mat-form-field" appearance="outline">
+            <mat-label>Usuario </mat-label>
+            <input
+              matInput
+              id="username"
+              formControlName="username"
+              type="text"
+            />
+          </mat-form-field>
+          <mat-form-field class="custom-mat-form-field" appearance="outline">
+            <mat-label>Contraseña </mat-label>
+            <input
+              matInput
+              id="password"
+              formControlName="password"
+              [type]="hide ? 'password' : 'text'"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              tabindex="-1"
+              (click)="hide = !hide"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hide"
+            >
+              <mat-icon>{{ hide ? "visibility_off" : "visibility" }}</mat-icon>
+            </button>
+          </mat-form-field>
+          <mat-form-field class="custom-mat-form-field" appearance="outline">
+            <mat-label>PIN </mat-label>
+            <input
+              matInput
+              id="pinCode"
+              maxLength="6"
+              formControlName="pinCode"
+              type="password"
+            />
+          </mat-form-field>
+          <div class="button-container">
+            <button
+              mat-flat-button
+              class="default-filled-button"
+              type="submit"
+              [disabled]="!isSubmitEnabled"
+            >
+              Ingresar
+            </button>
+            <button
+              mat-flat-button
+              type="button"
+              class="default-link-button"
+              (click)="navigateToRecoverPassword()"
+            >
+              Recuperar contraseña o PIN
+            </button>
+          </div>
+          <div *ngIf="errorMessage" class="pin-error-message">
+            <mat-icon>error</mat-icon> {{ errorMessage }}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

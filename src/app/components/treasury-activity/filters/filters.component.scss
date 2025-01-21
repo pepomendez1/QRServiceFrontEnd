@@ -1,0 +1,110 @@
+.filters-component-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1em;
+  overflow-x: hidden;
+  height: 100%;
+
+  .filter-container {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+
+      // h3 {
+      //   margin: 0;
+
+      // }
+
+      .container {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+
+        mat-checkbox {
+          margin: 0;
+          padding: 5px 10px;
+          border-bottom: 1px solid #ebebeb;
+
+          &:last-child {
+            border-bottom: none;
+          }
+        }
+
+        mat-radio-button {
+          width: 100%;
+          margin: 0;
+          padding: 5px 10px;
+          border-bottom: 1px solid #ebebeb;
+
+          &:last-child {
+            border-bottom: none;
+          }
+        }
+
+        .accordion-container {
+          width: 100%;
+
+          .accordion-header {
+            width: 100%;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            padding: 10px 0;
+
+            p {
+              margin: 0;
+              font-weight: 500;
+            }
+
+            .arrow {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              transition: transform 0.3s;
+              &.open {
+                transform: rotate(180deg);
+              }
+            }
+          }
+
+          .accordion-content {
+            display: flex;
+            flex: 1;
+          }
+        }
+      }
+
+      mat-checkbox,
+      mat-radio-button {
+        margin-left: 10px;
+      }
+
+      .custom-select {
+        margin-top: 10px;
+        width: 100%;
+      }
+    }
+  }
+
+  .buttons-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+
+    .btn {
+      flex: 1;
+      border-radius: 1em;
+    }
+  }
+}

@@ -1,0 +1,21 @@
+app-sidenav {
+  color: $sidenav-color;
+
+  .sidenav {
+    padding-top: 20px;
+    background: $sidenav-background;
+    transition-property: width, box-shadow;
+    transition-duration: 0.3s;
+    transition-timing-function: 0.3s;
+    width: $sidenav-width;
+    box-shadow: $sidenav-box-shadow;
+  }
+
+  .sidenav-toolbar {
+    background: $sidenav-background;
+  }
+
+  .sidenav-item-link.active {
+    border-right: 4px solid $theme-color-primary; // Right border with primary color
+  }
+}

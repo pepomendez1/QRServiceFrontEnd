@@ -1,0 +1,160 @@
+@import "../../../@fe-treasury/styles/var";
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures it covers the full viewport height */
+  width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box; /* Includes padding and border in size */
+}
+.content-container {
+  //background-color: white;
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Ensures it stretches to fill available space */
+  //min-height: 100vh;  /* Ensure full viewport height */
+  overflow-y: auto; /* Avoid double scrollbars */
+  overflow-x: hidden;
+  box-sizing: border-box; /* Includes padding and border in size */
+  .content-inner {
+    flex: 1; /* Pushes the footer to the bottom if content is short */
+    padding: 1.5em 2.5em;
+    max-width: 100%;
+    box-sizing: border-box; /* Include padding in height calculations */
+    @media screen and (max-width: 599px) {
+      padding: 0.8em 1em 1em 1em;
+    }
+  }
+  .footer {
+    text-align: left;
+    padding: 0.5em 2.5em;
+    //background-color: white;
+    box-sizing: border-box;
+  }
+}
+
+/* Style the mat-sidenav */
+.side-panel-sidenav {
+  width: $sidepanel-width;
+  height: 100vh; /* Full viewport height */
+  //background-color: white;
+  padding: 2em;
+  overflow: hidden;
+  box-shadow: none;
+  &.padding-zero {
+    padding: 0;
+  }
+
+  @media (max-width: 599px) {
+    width: 100%;
+    padding: 1em;
+    .side-panel-container {
+      padding: 1em;
+      overflow-y: auto;
+      border-radius: 0;
+    }
+  }
+}
+
+/* Apply border radius to the container div */
+.side-panel-container {
+  width: 100%;
+ // background-color: white; /* Set desired background color */
+  border-radius: 0px;
+  padding-bottom: 1em;
+  overflow: hidden; /* Hide any overflow to respect border radius */
+}
+
+.nav-sidebar {
+  height: 100vh;
+  overflow: hidden;
+  .sidenav-toolbar-mobile {
+    margin-bottom: 1em;
+  }
+  .sidenav-toolbar {
+    padding: 1.5em 2.5em;
+    margin-bottom: 2em;
+    height: 2.5em;
+  }
+
+  .sidenav-toolbar-logo {
+    cursor: pointer;
+    margin-bottom: -5px;
+  }
+  .sidenav-toolbar-profile {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em;
+    gap: 1em;
+    border-bottom: 1px solid #f4f4f4;
+    &:hover {
+      cursor: pointer;
+      background-color: #f5f5f5;
+    }
+    .item-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25em;
+      flex-grow: 1;
+    }
+    .btn-ghost-black {
+      background-color: transparent;
+      align-self: baseline;
+      padding: 0;
+      color: #161616;
+    }
+  }
+  .nav-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    mat-list-item {
+      padding: 0;
+    }
+  }
+
+  .nav-item-wrapper {
+    padding-left: 2em;
+    margin-left: 2px;
+    width: 208px;
+    height: 1.5em;
+  }
+
+  .sidenav-menu-list {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 3rem;
+    padding-left: 0px;
+
+    .sidenav-item-link {
+      height: 2.5em;
+      width: 100%;
+      padding: 0;
+      margin-bottom: 10px;
+      cursor: pointer;
+      user-select: none;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+
+      .material-symbols-outlined {
+        vertical-align: middle; // Align icon to middle
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+      }
+
+      .name {
+        padding-left: 24px;
+      }
+    }
+    .disabled-link {
+      color: rgb(218, 127, 127);
+      pointer-events: none;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}

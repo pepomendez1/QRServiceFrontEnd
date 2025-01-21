@@ -1,0 +1,386 @@
+@use '@angular/material' as mat;
+@import '../var';
+
+// @debug $theme-text;
+// --- Light Theme colors
+// text: #161616,              // Main text color
+// secondary-text: #4D4D4D,    // Secondary text color
+// hint-text: #A3A3A3,         // Hint or placeholder text
+// icon: #161616,              // Icon color
+// divider: #6B6B6B,           // Divider color
+
+//36px, 47.88px, 700
+.heading-2, h1 {
+  font: var(--font-display-3);
+}
+.display-3, h2 {
+  font: var(--font-display-2);
+}
+//16px, 24px, 600
+.paragraph-600, .body-2, h6 {
+  font: var(--font-body-2);
+}
+.paragraph-600-light {
+  font: var(--font-body-2);
+  color: $theme-divider;
+}
+//16px, 24px, 500
+.paragraph-500 {
+  font: var(--font-subheading-2);
+  color: $theme-text;
+}
+//16px, 24px, 500 light
+.paragraph-500-light {
+  font: var(--font-subheading-2);
+  color: $theme-divider;
+}
+//16px, 24px, 700
+.subheading-700 {
+  font: var(--font-body-2);
+  font-weight: 700;
+}
+
+.paragraph-400 {
+  font: var(--font-subheading-2);
+  font-weight: 400;
+}
+
+.paragraph-400-green {
+  font: var(--font-subheading-2);
+  font-weight: 400;
+  color: #048A42;
+}
+//14px, 20.3px, 400
+.secondary-400 {
+  font: var(--font-subheading-1);
+  font-weight: 400;
+}
+//14px, 20.3px, 500
+.secondary-500 {
+  font: var( --font-subheading-1);
+  color: $theme-text;
+}
+//14px, 20.3px, 500
+.secondary-500-light {
+  font: var( --font-subheading-1);
+  font-weight: 500;
+  color: $theme-secondary-text;
+}
+.secondary-600-primary {
+  font: var( --font-subheading-1);
+  font-weight: 600;
+  color: $theme-color-primary;
+}
+.secondary-600-light {
+  font: var( --font-subheading-1);
+  color: $theme-hint-text;
+  font-weight: 600;
+}
+//14px, 20.3px, 600
+.secondary-600 {
+  font: var( --font-subheading-1);
+  font-weight: 600;
+}
+// .secondary-500-light {
+//   font: var(--font-subheading-1);
+//   font-weight: 500;
+//   color: #6B6B6B;
+// }
+//16px, 20.3px, 400
+.secondary-400-dark {
+  font: var(--font-body-1);
+  font-weight: 400;
+  color: $theme-text;
+}
+//10px 16px 700
+.tag-700 {
+  font: var( --font-caption);
+  font-weight: 700;
+}
+.small-light {
+  font-size: 12px;
+  line-height: 17.4px;
+  font-weight: 500;
+  color: $theme-hint-text;
+}
+//heading-4
+.heading-4 {
+  font: var(--font-display-3);
+}
+
+//heading-4-700
+.heading-4-700 {
+  font: var(--font-display-1);
+  font-weight: 700;
+  color: $theme-text;
+}
+
+//heading-5-600
+.heading-5-600 {
+  font: var(--font-headline);
+  font-weight: 600;
+}
+
+//heading-5-700
+.heading-5-700 {
+  font: var(--font-headline);
+  font-weight: 700;
+}
+
+.heading-5-700-primary {
+  font: var(--font-headline);
+  font-weight: 700;
+  color: $theme-color-primary;
+}
+
+.button-l {
+  font: var(--font-body-2);
+  font-weight: 600;
+}
+
+.display-4 {
+  font: var(--font-display-4);
+}
+
+.display-3 {
+  font: var(--font-display-3);
+}
+
+.headline {
+  font: var(--font-headline);
+}
+
+.title, h3 {
+  font: var(--font-title);
+}
+
+.subheading-2, h4 {
+  font: var(--font-subheading-2);
+}
+
+.subheading-1, h5 {
+  font: var(--font-subheading-1);
+}
+
+
+
+.body-1, p, li {
+  font: var(--font-body-1);
+  line-height: 1.5;
+}
+
+.caption {
+  font: var(--font-caption);
+}
+.caption-500 {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: $theme-divider;
+}
+.caption-500-light {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: $theme-hint-text;
+}
+.caption-500-primary {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: $theme-color-primary;
+}
+.caption-light {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: $theme-divider;
+}
+.caption-400-light {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: $theme-hint-text;
+}
+.display-4, .display-3, .display-2, .display-1, .headline, h1, .title, h2 {
+  font-family: var(--font-family);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: $padding-sm 0;
+}
+
+a {
+  color: $theme-text
+}
+
+blockquote {
+  margin: 1em 0 1.5em;
+  padding: 0 1.5em;
+  border-left: 3px solid $theme-color-primary;
+  font-style: italic;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text {
+  color: $theme-text;
+}
+
+.secondary-text {
+  color: $theme-secondary-text;
+}
+
+.hint-text {
+  color: $theme-hint-text;
+}
+
+.color-icon {
+  color: $theme-icon;
+}
+
+.border-radius {
+  border-radius: $border-radius;
+}
+
+.card {
+  background: $theme-card;
+}
+
+.background {
+  background: $theme-background;
+}
+
+.app-bar {
+  background: $theme-app-bar;
+}
+
+.elevation {
+  @include mat.elevation(2);
+}
+
+.pointer {
+  cursor: pointer;
+  outline: none;
+}
+
+.vertical-align-super {
+  vertical-align: super;
+}
+
+.vertical-align-middle {
+  vertical-align: middle;
+}
+
+.relative {
+  position: relative;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.border-radius-round {
+  border-radius: 50%;
+}
+
+.display-block {
+  display: block;
+}
+
+.semi-bold {
+  font-weight: 500;
+}
+
+.margin-horizontal-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.button-sm {
+  height: 24px;
+  line-height: 24px;
+  width: 24px;
+}
+
+.wrap {
+  white-space: normal;
+}
+
+.fullheight {
+  height: 100%;
+}
+
+@each $property in (background, color, border-color, fill) {
+  @each $direction in (primary, accent, warn, primary-contrast, accent-contrast, warn-contrast) {
+    .#{$property}-#{$direction} {
+      @if $direction == primary {
+        #{$property}: $theme-color-primary;
+      }
+      @if $direction == primary-contrast {
+        #{$property}: $theme-color-primary-contrast;
+      }
+      @if $direction == accent {
+        #{$property}: $theme-color-accent;
+      }
+      @if $direction == accent-contrast {
+        #{$property}: $theme-color-accent-contrast;
+      }
+      @if $direction == warn {
+        #{$property}: $theme-color-warn;
+      }
+      @if $direction == warn-contrast {
+        #{$property}: $theme-color-warn-contrast;
+      }
+    }
+  }
+}
+
+@each $property in (border) {
+  @each $direction in ('', -left, -right, -top, -bottom) {
+    .#{$property}#{$direction} {
+      #{$property}#{$direction}: 1px solid $theme-divider;
+    }
+  }
+}
+
+@each $property in (margin, padding) {
+  @each $direction in ('', -left, -right, -top, -bottom, -vertical, -horizontal) {
+    @each $prefix, $value in $paddings {
+
+      @if ($direction == -vertical) {
+        .#{$property}#{$direction}#{$prefix} {
+          #{$property}-top: $value;
+          #{$property}-bottom: $value;
+        }
+      } @else if ($direction == -horizontal) {
+        .#{$property}#{$direction}#{$prefix} {
+          #{$property}-left: $value;
+          #{$property}-right: $value;
+        }
+      } @else {
+        .#{$property}#{$direction}#{$prefix} {
+          #{$property}#{$direction}: $value;
+        }
+      }
+    }
+  }
+}
+
+@each $prefix, $value in $icon-sizes {
+  .mat-icon.icon-size#{$prefix} {
+    height: $value;
+    width: $value;
+    font-size: $value;
+    line-height: $value;
+  }
+}
+
+.background-pattern {
+  background: linear-gradient(135deg, $theme-background 22px, $theme-background-hover 22px, $theme-background-hover 24px, transparent 24px, transparent 67px, $theme-background-hover 67px, $theme-background-hover 69px, transparent 69px),
+  linear-gradient(225deg, $theme-background 22px, $theme-background-hover 22px, $theme-background-hover 24px, transparent 24px, transparent 67px, $theme-background-hover 67px, $theme-background-hover 69px, transparent 69px) 0 64px;
+  background-color: $theme-background;
+  background-size: 64px 128px;
+}

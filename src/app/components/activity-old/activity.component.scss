@@ -1,0 +1,158 @@
+.main-card {
+  width: 100%;
+  //max-width: 1200px;
+  margin: 0 auto;
+  padding: 0px;
+}
+
+.main-card.loading {
+  position: relative;
+  opacity: 0.5;  /* Reduce la opacidad cuando está cargando */
+}
+
+.preloader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;  /* Asegura que esté sobre el contenido */
+}
+
+.activity-container {
+  display: flex;
+  flex-direction: column;
+  height: 96vh;
+  box-sizing: border-box;
+}
+
+.activity-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 15px;
+  margin-bottom: 5px;
+}
+
+.filters {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  margin-left: 15px;
+  gap: 16px;
+  margin-bottom: 16px;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 1;
+}
+
+.activity-list {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .activity-list {
+    max-height: none; /* En modo tablet, muestra el listado completo sin scroll */
+  }
+}
+
+@media (max-width: 768px) {
+  .activity-list {
+    max-height: none; /* En modo móvil, muestra el listado completo sin scroll */
+  }
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Mantiene la alineación de los elementos */
+  padding: 8px 0;
+  flex-wrap: nowrap; /* Evita que los elementos se muevan a una nueva línea */
+}
+
+.activity-avatar {
+  background-color: #e0e0e0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 16px; /* Separación del avatar con el texto */
+}
+
+.activity-details {
+  flex-grow: 1;
+  min-width: 0; /* Asegura que el contenido pueda encogerse */
+  margin-right: 16px; /* Espacio entre el detalle y el monto */
+}
+
+.activity-title {
+  font-weight: 500;
+}
+
+.activity-subtitle {
+  color: gray;
+}
+
+.activity-amount {
+  text-align: right;
+  font-size: 1.4em;
+  margin-right: 15px;
+  white-space: nowrap; /* Evita que el monto se divida en múltiples líneas */
+}
+
+.activity-balance {
+  font-size: 0.8em; /* Tamaño de fuente más pequeño */
+  color: gray;      /* Color de texto gris */
+  margin-top: 4px;  /* Espacio superior para separar del monto */
+}
+
+.activity-date {
+  font-size: 15px;
+  color: gray;
+  margin-left: 15px;
+  white-space: nowrap; /* Evita que la fecha se divida en múltiples líneas */
+}
+
+@media (min-width: 1024px) {
+  .filters {
+    justify-content: space-between;
+  }
+
+  .activity-item {
+    display: flex;
+    grid-template-columns: auto 1fr auto 120px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .filters {
+    flex-direction: row;
+  }
+
+  .activity-item {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .activity-item {
+    flex-direction: row;
+    flex-wrap: nowrap; /* Mantiene los elementos en una sola línea */
+  }
+
+  .activity-avatar {
+    margin-right: 8px;
+  }
+
+  .activity-details {
+    margin-right: 8px;
+  }
+}

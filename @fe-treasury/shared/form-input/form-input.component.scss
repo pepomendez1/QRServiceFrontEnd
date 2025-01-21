@@ -1,0 +1,61 @@
+.input-box {
+  display: flex;
+  flex: 1; // Ensures it takes all available width in the parent container
+  width: 100%; // Always spans the full width
+  max-width: 100%; // Prevents exceeding the parent width
+  height: 56px; // Maintain consistent input height
+  justify-content: space-between;
+  padding: 4px 16px;
+  border-radius: 8px;
+  border: 1px solid #dbdbdb;
+  position: relative;
+  &.error {
+    border-color: #E44B52;
+  }
+  .input-data {
+    width: 100%; // Input field container spans full width
+    display: flex;
+    flex-direction: column;
+    gap: 6px; // Space between input label and field
+    position: relative;
+
+    p {
+      font-size: 16px;
+      line-height: 24px;
+      margin: 0;
+      padding: 0;
+      transition: all 0.2s ease-in-out;
+      pointer-events: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    p.active {
+      font-size: 12px;
+      line-height: 18px;
+      margin-bottom: 4px;
+      transform: translateY(-100%);
+    }
+
+    .input-edit {
+      background-color: transparent;
+      width: 100%; // Input field takes full width
+      height: 100%; // Matches the height of `.input-box`
+      border: none;
+      outline: none;
+      padding: 1.5em 0 0;
+      font-size: 14px;
+
+      &:hover,
+      &:focus,
+      &:active {
+        border: none;
+        outline: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+}
+

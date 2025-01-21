@@ -1,0 +1,31 @@
+<div class="footer-container" *ngIf="buttonStyle !== 'two'">
+  <button
+    [ngClass]="{
+      'btn btn-ghost-color': buttonStyle === 'ghost',
+      'btn btn-cta-filled': buttonStyle === 'filled'
+    }"
+    type="button"
+    (click)="onButtonClicked()"
+    [disabled]="buttonDisabled"
+  >
+    {{ buttonText }}
+  </button>
+</div>
+<div class="footer-container-two" *ngIf="buttonStyle === 'two'">
+  <button
+    class="btn btn-ghost-color"
+    type="button"
+    (click)="onButtonLeftClicked()"
+    [disabled]="buttonDisabled"
+  >
+    {{ buttonLeftText }}
+  </button>
+  <button
+    class="btn btn-cta-filled"
+    type="button"
+    (click)="onButtonRightClicked()"
+    [disabled]="buttonDisabled"
+  >
+    {{ buttonRightText }}
+  </button>
+</div>

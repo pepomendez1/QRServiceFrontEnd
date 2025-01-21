@@ -1,0 +1,42 @@
+.end-page {
+  display: flex;
+  align-items: space-between;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+
+  .message-container {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    display: flex;
+    gap:1em;
+    flex:1;
+  }
+
+  .button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding-top: 2em;
+    button{
+      width: 50%;
+    }
+   }
+}
+
+@media screen and (max-width: 840px) {
+  .end-page {
+    height: 100vh;
+    padding: 2em;
+    .button-container {
+      button{
+        width: 100%;
+      }
+    }
+  }
+
+}

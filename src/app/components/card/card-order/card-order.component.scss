@@ -1,0 +1,34 @@
+.order-card {
+  height: auto;
+  display: flex;
+  padding-bottom: 0px;
+  .order-card-content{
+    display:flex;
+    flex-direction: column;
+  }
+  .order-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    //margin-bottom: 32px;
+    p {
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+    h2 {
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  .order-card-btn {
+    margin-top: 32px;
+    display: flex;
+    align-items: flex-end;
+    button {
+      padding: 8px 12px;
+      margin-bottom: 1em;
+    }
+  }
+}

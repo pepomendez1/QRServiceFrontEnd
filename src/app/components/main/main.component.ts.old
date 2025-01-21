@@ -1,0 +1,298 @@
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, Sort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { Activity } from 'src/app/consts/Activity.interface';
+import { UserAccount } from 'src/app/consts/UserAccount.interface';
+import { AuthService } from 'src/app/services/auth.service';
+
+
+@Component({
+  selector: 'app-main',
+  templateUrl: '',
+  styleUrls: ['./main.component.scss']
+})
+export class MainComponent implements AfterViewInit {
+  // Variables de estado para controlar la visualización de diferentes secciones
+  isClicked = 'Treasury';
+  showBankData = false;
+  showActivity = false;
+  showTransfer = false;
+  showPeriodOption = false;
+  showStatusOption = false;
+  showTypeOption = false;
+
+  // Columnas que se mostrarán en la tabla de actividades
+  displayedColumns: string[] = ['description', 'amount', 'options'];
+
+  // Filtros seleccionados por defecto
+  periodSelected = 'last_month';
+  typeSelected = 'all';
+  statusSelected = 'all';
+  actualSection = '';
+
+  // Lista de actividades filtradas según los filtros seleccionados
+  activitiesFiltered: Activity[] = [];
+
+  // Usuario y monto seleccionados para transferencia directa
+  userSelected: any;
+  amountSelected: string = '';
+
+  balance: number | null = null;
+  accountInfo: any = {};
+
+  // Lista de cuentas de usuario para demostración
+  userAccounts: UserAccount[] = [
+    { name: 'Proveedor A', bank: 'Uala', cvu: '0000007900203932496503', cuit: '20391767387' },
+    { name: 'Martín Strada', bank: 'Santander', cvu: '0000007900203932496503', cuit: '20391767387' },
+    { name: 'Alicia Strada', bank: 'Uala', cvu: '0000007900203932496503', cuit: '20391767387' },
+    { name: 'Manuel Carlos', bank: 'Uala', cvu: '0000007900203932496503', cuit: '20393456387' },
+    { name: 'Renzo Calvo', bank: 'Uala', cvu: '0000007900203932496503', cuit: '20391762387' },
+    { name: 'Franco Strada', bank: 'Santander', cvu: '0000007900203932496503', cuit: '20371767387' },
+  ];
+
+  // Lista de actividades para demostración
+  activities: Activity[] = [
+    { name: 'Proveedor A', description: 'Transferencia', amount: '46.000', date: '2024-01-26', status: 'approved', type: 'transfer', userAccount: this.userAccounts[0] },
+    { name: 'Martín Strada', description: 'Pago con débito', amount: '12.000', date: '2024-02-21', status: 'approved', type: 'debit', userAccount: this.userAccounts[1] },
+    { name: 'Alicia Strada', description: 'Pago con débito', amount: '2.000', date: '2024-02-18', status: 'approved', type: 'debit', userAccount: this.userAccounts[2] },
+    { name: 'Manuel Carlos', description: 'Transferencia', amount: '2.000', date: '2024-01-12', status: 'approved', type: 'transfer', userAccount: this.userAccounts[3] },
+    { name: 'Renzo Calvo', description: 'Pago con débito', amount: '32.000', date: '2024-02-12', status: 'approved', type: 'debit', userAccount: this.userAccounts[4] },
+    { name: 'Franco Strada', description: 'Pago con débito', amount: '32.000', date: '2024-02-12', status: 'approved', type: 'debit', userAccount: this.userAccounts[5] },
+    // Agrega más actividades según sea necesario
+  ];
+
+  // Períodos disponibles para el filtro de actividades
+  periods = [
+    { value: 'today', label: 'Hoy' },
+    { value: 'yesterday', label: 'Ayer' },
+    { value: 'last_week', label: 'Última semana' },
+    { value: 'last_15', label: 'Últimos 15 días' },
+    { value: 'last_month', label: 'Últimos mes' },
+    { value: 'last_year', label: 'Últimos año' },
+  ];
+
+  // Tipos de actividades disponibles para el filtro
+  types = [
+    { value: 'debit', label: 'Débito' },
+    { value: 'transfer', label: 'Transferencia' },
+  ];
+
+  // Estados de actividades disponibles para el filtro
+  statuses = [
+    { value: 'approved', label: 'Aprobados' },
+    { value: 'rejected', label: 'Rechazados' },
+  ];
+
+  // Fuente de datos para la tabla de actividades
+  dataSource = new MatTableDataSource(this.activities);
+
+  // ViewChild para los componentes de ordenación y paginación de la tabla
+  @ViewChild(MatSort) sort: MatSort | null = null;
+  @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
+
+  constructor(
+    private _liveAnnouncer: LiveAnnouncer,
+    private authService: AuthService
+  ) { }
+
+  ngOnInit(): void {
+   // Inicializar la autenticación
+   this.authService.initializeAuth();
+  }
+
+  // Método que se ejecuta después de la inicialización de la vista
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+
+    this.resetFilters();
+
+    if (this.isflexStyled()) {
+      this.activitiesFiltered = this.activities.slice(0, 6);
+      this.dataSource = new MatTableDataSource(this.activitiesFiltered);
+    }
+
+    // Send message to parent window to request token
+    window.parent.postMessage({ action: 'requestToken' }, '*');
+  }
+
+  receiveMessage(event: MessageEvent) {
+    console.log(event)
+    if (event.data.action === 'deliverToken') {
+      const authData = event.data.authData;
+      console.log('Auth data received:', authData);
+      this.authService.setAuthData(authData);
+    }
+  }
+
+  // Método para verificar si el dispositivo es móvil
+  isMobile() {
+    return window.screen.width <= 600;
+  }
+
+  // Método para verificar si el dispositivo tiene un diseño flexible
+  isflexStyled() {
+    return window.screen.width <= 1280;
+  }
+
+  // Método para cambiar el menú seleccionado
+  clickMenu(menu: string) {
+    this.isClicked = menu;
+  }
+
+  // Método para anunciar cambios en el ordenamiento de la tabla
+  announceSortChange(sortState: Sort) {
+    if (sortState.direction) {
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+    } else {
+      this._liveAnnouncer.announce('Sorting cleared');
+    }
+  }
+
+  // Métodos para mostrar y ocultar secciones específicas
+  showAndHideSection() {
+    this.showBankData = !this.showBankData;
+  }
+
+  showAndHide(section: string, isTransferActivity?: boolean) {
+    if (section === 'Transferir dinero') {
+      if (isTransferActivity) {
+        this.showTransfer = true;
+      } else {
+        this.showTransfer = !this.showTransfer;
+      }
+      this.actualSection = 'Transferir dinero';
+    } else {
+      this.showActivity = !this.showActivity;
+      this.actualSection = 'Movimientos';
+      if (this.showActivity) {
+        this.activitiesFiltered = this.activities;
+      } else {
+        this.activitiesFiltered = this.activities.slice(0, 6);
+      }
+      this.dataSource = new MatTableDataSource(this.activitiesFiltered);
+    }
+  }
+
+  // Métodos para mostrar y ocultar menús de filtros
+  showPeriodMenu() {
+    this.showPeriodOption = !this.showPeriodOption;
+  }
+
+  showStatusMenu() {
+    this.showStatusOption = !this.showStatusOption;
+  }
+
+  showTypeMenu() {
+    this.showTypeOption = !this.showTypeOption;
+  }
+
+  // Método para ir directamente a la transferencia desde una actividad
+  goToDirectTransfer(activity: Activity) {
+    this.userSelected = activity.userAccount;
+    this.amountSelected = activity.amount;
+    this.showAndHide('Transferir dinero', true);
+  }
+
+  // Método para aplicar filtros a las actividades
+  applyFilterActivities() {
+    this.activitiesFiltered = this.activities;
+
+    let startDate = new Date();
+    let endDate = new Date();
+
+    switch (this.periodSelected) {
+      case 'today':
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case 'yesterday':
+        startDate.setDate(startDate.getDate() - 1);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setDate(endDate.getDate() - 1);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case 'last_week':
+        startDate.setDate(startDate.getDate() - 7);
+        break;
+      case 'last_15':
+        startDate.setDate(startDate.getDate() - 15);
+        break;
+      case 'last_month':
+        startDate.setMonth(startDate.getMonth() - 1);
+        break;
+      case 'last_year':
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        break;
+      default:
+        break;
+    }
+
+    this.activitiesFiltered = this.activities.filter(activity => {
+      const activityDate = new Date(activity.date + 'T00:00:00');
+      return activityDate >= startDate && activityDate <= endDate;
+    });
+
+    if (this.typeSelected !== 'all') {
+      this.activitiesFiltered = this.activitiesFiltered.filter(activity => {
+        return activity.type.toLowerCase() === this.typeSelected.toLowerCase();
+      });
+    }
+
+    if (this.statusSelected !== 'all') {
+      this.activitiesFiltered = this.activitiesFiltered.filter(activity => {
+        return activity.status.toLowerCase() === this.statusSelected.toLowerCase();
+      });
+    }
+
+    this.dataSource = new MatTableDataSource(this.activitiesFiltered);
+  }
+
+  // Método para ordenar las actividades por fecha
+  sortByDate(array: Activity[]) {
+    array.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      if (dateA < dateB) return -1;
+      if (dateA > dateB) return 1;
+      return 0;
+    });
+  }
+
+  // Método para verificar si algún filtro está aplicado
+  filterApplied() {
+    return this.periodSelected !== 'last_month' || this.typeSelected !== 'all' || this.statusSelected !== 'all';
+  }
+
+  // Método para resetear los filtros a sus valores por defecto
+  resetFilters() {
+    this.periodSelected = 'last_month';
+    this.typeSelected = 'all';
+    this.statusSelected = 'all';
+    this.applyFilterActivities();
+    this.sortByDate(this.activitiesFiltered);
+  }
+
+  // Métodos para manejar la selección de filtros
+  onSelectPeriod(event: any) {
+    event.stopPropagation();
+  }
+
+  onSelectStatus(event: any) {
+    event.stopPropagation();
+  }
+
+  onSelectType(event: any) {
+    event.stopPropagation();
+  }
+
+  // Método para formatear la fecha en un formato legible
+  formatDate(date: string) {
+    const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const [year, monthIndex, day] = date.split('-');
+    const month = months[parseInt(monthIndex) - 1];
+    return `${day} de ${month}`;
+  }
+}

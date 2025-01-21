@@ -1,0 +1,25 @@
+<div class="onboarding">
+  <mat-card class="onboarding-card" *ngIf="isProcessing">
+    <mat-card-header>
+      <mat-card-title> Creación de cuenta </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <h3>Estamos terminando de generar tu cuenta</h3>
+      <h4>este proceso puede demorar unos minutos ...</h4>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </mat-card-content>
+  </mat-card>
+  <!-- <ng-template #done>
+    <mat-card class="onboarding-card done-card" @fadeIn>
+      <mat-card-header>
+        <div mat-card-avatar class="done-card-avatar">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <mat-card-title>Creación de cuenta completado!</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>El proceso se completó con éxito !</p>
+      </mat-card-content>
+    </mat-card>
+  </ng-template> -->
+</div>

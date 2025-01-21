@@ -1,0 +1,19 @@
+@import '../../../custom-styles/onboarding.scss';
+
+.onboarding .onboarding-card mat-card-title {
+  margin-bottom: 3rem;
+}
+.onboarding .onboarding-card .accept-checkbox-group {
+  width: 80%;
+  max-width: 50%;
+  flex-direction: column;
+  text-align: left;
+  margin: 0 auto;
+  .accept-checkbox {
+    margin-bottom: 2rem;
+  }
+}
+.onboarding .onboarding-card .text-button-type {
+  display: inline;
+  max-width: 600px;
+}

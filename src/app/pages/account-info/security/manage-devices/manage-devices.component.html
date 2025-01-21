@@ -1,0 +1,73 @@
+<div class="manage-devices-wrapper">
+  <app-side-panel-header
+    [title]="'Dispositivos vinculados'"
+    [arrowBackEnabled]="true"
+    (arrowBack)="handleArrowBack()"
+  ></app-side-panel-header>
+
+  @if (loading) {
+  <div class="loading-container">
+    <mat-spinner class="center-spinner"></mat-spinner>
+  </div>
+  } @else {
+  <div class="manage-devices-content">
+    <div class="devices-list">
+      <div class="device-item-row" *ngFor="let device of devices">
+        <div class="item-text">
+          <p class="paragraph-600 p-1 m-0">
+            {{ getDeviceAttribute(device, "device_name", "os") }}
+          </p>
+          <div class="device-subtitle">
+            <span class="secondary-500-light p-0 m-0">
+              {{ getDeviceAttribute(device, "device_name", "browser") }}
+            </span>
+            <span
+              class="secondary-500-light p-0 m-0"
+              [ngClass]="{ current: isCurrentDevice(device) }"
+              >-
+              {{
+                isCurrentDevice(device)
+                  ? " Este dispositivo"
+                  : (device.DeviceLastAuthenticatedDate | relativeTime)
+              }}</span
+            >
+          </div>
+        </div>
+        <div class="close-session">
+          <p
+            class="caption-500-primary p-0 m-0"
+            (click)="
+              openConfirmationDialog(
+                'device',
+                getDeviceAttribute(device, 'device_name', 'os'),
+                device.DeviceKey
+              )
+            "
+          >
+            Olvidar dispositivo
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-message-box">
+      <mat-icon class="material-symbols-outlined">error_outline</mat-icon>
+      <div class="message-box-content">
+        <h1 class="paragraph-600 p-0 m-0">Seguridad de tu cuenta</h1>
+        <span class="secondary-500"
+          >Si no reconocés algún dispositivo, te recomendamos cerrar sesión en
+          todos los dispositivos mantener tu cuenta segura.</span
+        >
+      </div>
+    </div>
+  </div>
+  }
+
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="'Cerrar sesión en todos los dispositivos'"
+    buttonStyle="ghost"
+    (click)="openConfirmationDialog('all', '')"
+    [buttonDisabled]="false"
+  ></app-side-panel-footer>
+</div>

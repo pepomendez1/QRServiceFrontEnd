@@ -1,0 +1,22 @@
+<div class="custom-header">
+  <div class="side-panel-title">
+    <button
+      *ngIf="arrowBackEnabled"
+      mat-button
+      (click)="onArrowBack()"
+      class="arrow-back-button"
+      aria-label="Back"
+      [matTooltip]="toolTip"
+    >
+      <mat-icon>arrow_back</mat-icon>
+      <span *ngIf="!isMobile" class="secondary-600">Atrás</span>
+    </button>
+    <h2 class="heading-3-700">{{ title }}</h2>
+    <p
+      [hidden]="!description"
+      [ngClass]="isMobile ? 'paragraph-500-light' : 'paragraph-500'"
+    >
+      {{ description }}
+    </p>
+  </div>
+</div>

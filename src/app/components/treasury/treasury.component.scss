@@ -1,0 +1,80 @@
+/* Estilo del contenedor principal de la tarjeta */
+.main-card {
+  width: 100%;
+  margin: 0 auto;
+  padding: 2%;
+}
+
+/* Estilo para los contenedores de balance y detalles de cuenta */
+.balance-container,
+.account-details {
+  font-size: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilo para los párrafos dentro de los detalles de cuenta */
+.account-details p {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 15px;
+}
+
+.account-details button {
+  font-size: 15px;
+}
+
+/* Color del icono dentro de los detalles de cuenta */
+.account-details mat-icon {
+  color: #507CDD;
+}
+
+/* Estilo para el título de balance */
+.balance-title {
+  font-size: 24px;
+  display: flex;
+  font-weight: bold;
+}
+
+/* Margen y posición del botón de retroceso */
+.balance-title button {
+  margin-right: 10px; /* Ajusta el margen según sea necesario */
+  margin-top: -8px; /* Ajusta este valor para centrar el botón verticalmente */
+}
+
+/* Estilo para la cantidad de balance */
+.balance-amount h1 {
+  font-size: 32px;
+
+}
+
+/* Estilo para los botones dentro del contenedor de balance */
+.balance-buttons {
+  font-size: 20px;
+  display: flex;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+/* Estilo para los botones con borde */
+.mat-stroked-button {
+  border: 1px solid rgba(0, 0, 0, 0.23);
+}
+
+/* Estilo para el título de los detalles de cuenta */
+.account-details h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Estilo para el mensaje de copia al portapapeles */
+.copy-message {
+  margin-left: 20px;
+  color: green;
+  font-weight: bold;
+  align-self: center;
+}
+
+.balance-amount.small-text h1 {
+  font-size: 1em; /* Ajusta este tamaño según sea necesario */
+}

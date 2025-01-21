@@ -1,0 +1,11 @@
+<div class="custom-snackbar">
+  <span class="message">{{ data.message }}</span>
+  <button
+    *ngIf="data.showClose"
+    mat-icon-button
+    aria-label="Close"
+    (click)="snackBarRef.dismiss()"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</div>

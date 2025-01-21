@@ -1,0 +1,48 @@
+<div class="auth-wrapper-container">
+  <router-outlet></router-outlet>
+
+  <div *ngIf="startAuth" class="auth-wrapper">
+    <swiper-container pagination="true" navigation="true" space-between="30">
+      <swiper-slide *ngFor="let slide of slides">
+        <swiper-slide-custom
+          [companyLogo]="slide.companyLogo"
+          [imageSource]="slide.imageSource"
+          [slideTitle]="slide.slideTitle"
+          [slideMessage]="slide.slideMessage"
+        >
+        </swiper-slide-custom>
+      </swiper-slide>
+    </swiper-container>
+
+    <div class="button-container">
+      <button
+        mat-button
+        class="default-filled-button"
+        (click)="goToSetPassword()"
+      >
+        Crear cuenta
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!startAuth" class="onboarding-container">
+    <app-register class="w-100" *ngIf="firstLogin"></app-register>
+  </div>
+
+  <!-- Accede por ruta -->
+  <!-- <app-login-peya
+    class="w-100 h-100"
+    *ngIf="commonLogin && !startAuth"
+  ></app-login-peya> -->
+
+  <div *ngIf="expiredLink" class="expired-link-page">
+    <div class="message-container">
+      <mat-icon>link_off</mat-icon>
+      <h1>El link expiró o ya fue utilizado</h1>
+      <p>
+        Te enviamos un mail con un nuevo link <br />
+        para que puedas comenzar a crear tu cuenta
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+app-layout {
+
+  .content-container {
+    background-color: $theme-background;
+  }
+  .nav-sidebar {
+    color: $sidenav-color;
+    padding-top: 1.5em;
+    background: $sidenav-background;
+    transition-property: width, box-shadow;
+    transition-duration: 0.3s;
+    transition-timing-function: 0.3s;
+    width: $sidenav-width;
+    box-shadow: $sidenav-box-shadow;
+  }
+
+  .sidenav-toolbar {
+    background: $sidenav-background;
+  }
+
+  .sidenav-item-link.active {
+    .name {
+      color: $theme-color-primary;
+      font-weight: 600;
+    }
+    .material-symbols-outlined {
+      color:  $theme-color-primary;
+    }
+    .nav-item-wrapper{
+      border-left: 3px solid $theme-color-primary; // Right border with primary color
+    }
+
+  }
+
+
+  .side-panel-sidenav {
+    background-color: $sidenav-background;
+  }
+}

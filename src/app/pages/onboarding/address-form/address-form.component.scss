@@ -1,0 +1,130 @@
+.address-container {
+  width: 100%;
+}
+
+.section-content {
+  padding-top: 0.5em;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  justify-content: space-between;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    flex:1;
+  }
+
+  .form-container {
+    max-width: none; // Remove max-width constraint
+    display: flex;
+    flex-direction: column;
+    flex:1;
+    gap: 0.5em;
+
+    mat-form-field {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .phone-input-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: left;
+      margin-bottom: 0.5em;
+      mat-form-field {
+        width: 100%;
+      }
+      .flag-container {
+        display: flex;
+        align-items: center;
+        margin-right: 8px;
+      }
+      .flag-icon {
+        margin-left: 8px;
+        margin-right: 4px;
+      }
+    }
+    .divider-container {
+      width: 100%;
+
+      .responsive-divider {
+        width: 100%;
+        background-color: #ebebeb;
+        height: 1px;
+      }
+    }
+    .use-id-address {
+      display: flex;
+      flex-direction: column;
+      justify-content: left;
+
+      .custom-radio-group-col {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+    .addr-form-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 2px;
+      height: 100%; /* Take full available height of the parent */
+      overflow-y: auto; /* Enable vertical scrolling */
+      padding-right: 0.5em; /* Optional: Add padding for better scrolling appearance */
+      .street-form {
+        padding-bottom: 0; /* Reduce padding inside the parent */
+        margin-bottom: 0; /* Adjust margin */
+        width: 100%;
+        flex-grow: 1;
+      }
+      .form-group-cols {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5em;
+        .address-inputs {
+          padding-bottom: 0; /* Reduce padding inside the parent */
+          margin-bottom: 0; /* Adjust margin */
+          width: 100%;
+        }
+      }
+    }
+  }
+  .button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    button {
+      width: 100%;
+      flex-grow: 1;
+    }
+  }
+}
+
+@media screen and (max-width: 840px) {
+  .address-container {
+    width: 100vw;
+    height: 100vh;
+    padding: 1em;
+    flex:1;
+    .section-content {
+      height: 80vh;
+    }
+    .form-container {
+      overflow-y: auto;
+    }
+    .addr-form-container {
+      overflow-y: auto;
+    }
+    .button-container {
+      position: sticky; /* Stick the button to the bottom */
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
+  }
+}
