@@ -34,11 +34,6 @@ export class DynamicRoutesService {
     //   DynamicRoutesService.featureFlags
     // );
     const featureFlags = this.featureFlagsService.getFeatureFlags();
-    console.log(
-      '🛠 Generating dynamic routes with feature flags:',
-      featureFlags
-    );
-
     const routes: Routes = [
       {
         path: '',

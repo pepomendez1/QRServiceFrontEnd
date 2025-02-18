@@ -64,11 +64,7 @@ export class SidenavService {
   toggleCollapsed() {
     this._collapsedSubject.next(!this._collapsedSubject.getValue());
   }
-  addItems(items: SidenavItem[]): void {
-    // Clear existing items before adding new ones
-    this._items.next([]);
-
-    // Add new items
+  addItems(items: SidenavItem[]) {
     items.forEach((item) => this.addItem(item));
   }
 

@@ -196,7 +196,7 @@ export class PaymentCardsService {
           switchMap((response: any) => {
             console.log(response);
             const POMELO_BASE_CARD_TOKEN_URL =
-              'https://secure-data-web-stage.pomelo.la/v1/';
+              'https://secure-data-web.pomelo.la/v1/';
 
             const webViewUrl =
               POMELO_BASE_CARD_TOKEN_URL +

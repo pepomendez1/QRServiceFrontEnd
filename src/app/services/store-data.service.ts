@@ -14,9 +14,7 @@ export interface StorageData {
     user_pool: string;
     terms_and_conditions: string;
     faq_investments: string;
-    help_content_doc: string;
     privacy_policy: string;
-    select_module_enable: string;
     max_physical_cards_on_account: number;
     max_virtual_cards_on_account: number;
     primary_color: string;
@@ -31,8 +29,7 @@ export interface StorageData {
     bar_chart_color: string;
     favicon_url: string;
     metamap_flow_id: string;
-    toggle_mode_enable: string;
-    iframe_help_url: string;
+    toggle_mode_enable: boolean;
     number_of_slides: string | number;
     slide1Title: string;
     slide1Description: string;

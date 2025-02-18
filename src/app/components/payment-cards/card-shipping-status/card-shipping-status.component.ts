@@ -5,7 +5,6 @@ import { SidePanelHeaderComponent } from '../../../../../@fe-treasury/shared/sid
 import { MatIconModule } from '@angular/material/icon';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { HelpSectionComponent } from '../../help-section/help-section.component';
 import { SidePanelFooterComponent } from '@fe-treasury/shared/side-panel/side-panel-footer/side-panel-footer.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
@@ -19,7 +18,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     ClipboardModule,
     MatTooltipModule,
     MatProgressBarModule,
-    HelpSectionComponent,
     MatProgressSpinnerModule,
     SidePanelFooterComponent,
     SidePanelHeaderComponent,
