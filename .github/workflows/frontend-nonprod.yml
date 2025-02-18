@@ -3,7 +3,7 @@ name: Deploy Angular to S3 - Nonprod
 on:
   push:
     branches:
-      - frontend-nonprod
+      - nonprod
 
 permissions:
   id-token: write
