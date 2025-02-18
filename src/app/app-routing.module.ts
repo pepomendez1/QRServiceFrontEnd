@@ -125,31 +125,16 @@ export function initializeApp(
   router: Router
 ): () => Promise<void> {
   return async () => {
-    console.log('⏳ Loading feature flags...');
     await featureFlagsService.loadFeatureFlags(); // Load feature flags
-
-    console.log('🛠 Generating initial routes...');
     const appChildren = dynamicRoutesService.getAppRoutes(); // Get dynamic routes
-
     console.log('🔄 Updating routes with:', appChildren);
+
     // Update the `app` children dynamically
     router.resetConfig(
       routes.map((r) =>
         r.path === 'app' ? { ...r, children: appChildren } : r
       )
     );
-
-    // Subscribe to feature flag changes
-    featureFlagsService.featureFlags$.subscribe(() => {
-      console.log('🛠 Feature flags changed, regenerating routes...');
-      const updatedRoutes = dynamicRoutesService.getAppRoutes();
-      router.resetConfig(
-        routes.map((r) =>
-          r.path === 'app' ? { ...r, children: updatedRoutes } : r
-        )
-      );
-      console.log('🔄 Routes updated due to feature flag change');
-    });
   };
 }
 

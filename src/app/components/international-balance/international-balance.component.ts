@@ -4,8 +4,9 @@ import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.serv
 import { SnackbarService } from '@fe-treasury/shared/snack-bar/snackbar.service';
 import { InternationalAccountService } from 'src/app/services/international-account.service';
 import { InternationalTransferComponent } from '../international-transfer/international-transfer.component';
+import { InternationalAccountInfoComponent } from '../international-account-info/international-account-info.component';
 import { catchError, of, tap } from 'rxjs';
-import { TreasuryAccountInfoComponent } from '../treasury-account-info/treasury-account-info.component';
+
 @Component({
   selector: 'app-international-balance',
   templateUrl: './international-balance.component.html',
@@ -103,7 +104,7 @@ export class InternationalBalanceComponent implements OnInit {
 
   showAccountInfo(): void {
     this.sidePanelService.open(
-      TreasuryAccountInfoComponent,
+      InternationalAccountInfoComponent,
       'Datos de la cuenta',
       {},
       false

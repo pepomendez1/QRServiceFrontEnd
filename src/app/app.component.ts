@@ -20,14 +20,11 @@ import { FeatureFlagsService } from './services/modules.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
-  private featureFlagsSubscription!: Subscription;
-  private routeSubscription!: Subscription;
-
-  private currentRoute: string = '';
   title = 'fe-treasury';
   isInIframe = false; // Determina si estamos en un iframe
   isLoading = false; // Bandera para manejar el estado de carga
   private focusListener: any; // Reference to the focus event listener
+  private routeSubscription!: Subscription;
 
   private featureFlags = {
     international_account: false,
@@ -134,17 +131,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.authService.logoutUser();
   }
   async ngOnInit(): Promise<void> {
-    // Subscribe to feature flag changes
-    this.featureFlagsSubscription =
-      this.featureFlagsService.featureFlags$.subscribe(() => {
-        this.buildNavigationMenu(); // Rebuild menu when flags change
-
-        this.router
-          .navigateByUrl('/app/home', { skipLocationChange: true })
-          .then(() => {
-            this.router.navigate([this.router.url]); // Force a navigation to the same route
-          });
-      });
+    await this.featureFlagsService.loadFeatureFlags();
 
     this.buildNavigationMenu(); // ✅ Dynamically build the menu
 
@@ -307,6 +294,7 @@ export class AppComponent implements OnInit, OnDestroy {
         enabled: false,
       },
     ];
+
     this.sidenavService.addItems(menuItems);
   }
 
@@ -314,9 +302,6 @@ export class AppComponent implements OnInit, OnDestroy {
     // Unsubscribe to avoid memory leaks
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
-    }
-    if (this.featureFlagsSubscription) {
-      this.featureFlagsSubscription.unsubscribe();
     }
     this.sessionManagementService.stopMonitoring();
   }
