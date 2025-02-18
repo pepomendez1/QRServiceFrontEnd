@@ -1,0 +1,32 @@
+<div class="international-balance-card custom-card">
+  <!-- Contenedor de título y botón "Datos de cuenta" -->
+  <div class="balance-header">
+    <h2 class="secondary-500-light">Dinero disponible</h2>
+    <button class="btn-ghost-color btn-md" (click)="showAccountInfo()">
+      <span class="body-2">Datos de tu cuenta</span>
+    </button>
+  </div>
+
+  <!-- Mostrar preloader solo en la sección de balance y rendimientos -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <!-- Spinner de Material -->
+  </div>
+
+  <!-- Mostrar el contenido de balance solo si los datos han sido cargados -->
+  <div *ngIf="!isLoading">
+    <!-- Monto disponible (formateado con parte entera y decimales separados) -->
+    <app-amount-display [amount]="availableAmount"></app-amount-display>
+
+    <!-- Botón de Transferir -->
+    <div class="balance-actions">
+      <button
+        (click)="startTransfer()"
+        class="btn-cta-filled w-100 btn-lg"
+        [disabled]="availableAmount <= 0"
+      >
+        Enviar dinero
+      </button>
+    </div>
+  </div>
+</div>

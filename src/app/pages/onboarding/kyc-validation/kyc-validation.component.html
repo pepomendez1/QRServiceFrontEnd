@@ -39,7 +39,7 @@
         class="custom-button"
         [ngClass]="{ disabled: isProcessing === true }"
         clientid="6079d9a1483c3a001b1bb0e1"
-        flowId="6692be9aa8d43a001cdc9a74"
+        [flowId]="flowId"
         [metadata]="metadata"
         [attr.textcolor]="isDarkMode ? '#000' : '#fff'"
         [color]="isProcessing ? '#cccccc' : primaryColor"

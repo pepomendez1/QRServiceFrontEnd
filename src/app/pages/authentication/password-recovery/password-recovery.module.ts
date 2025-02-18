@@ -17,11 +17,13 @@ import { NotificationScreenComponent } from './notification-screen/notification-
 import { InsertOtpScreenComponent } from './insert-otp-screen/insert-otp-screen.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { ResetPinComponent } from './reset-pin/reset-pin.component';
+import { OnbFooterComponent } from '@fe-treasury/shared/onb-footer/onb-footer.component';
 import { PasswordValidationComponent } from './password-validation/password-validation.component';
 import { PinCodeValidationComponent } from './pin-code-validation/pin-code-validation.component';
 @NgModule({
   imports: [
     CommonModule,
+    OnbFooterComponent,
     OtpFormModule,
     FormsModule,
     PasswordRecoveryRoutingModule,

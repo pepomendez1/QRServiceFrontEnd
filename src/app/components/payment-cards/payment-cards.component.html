@@ -4,7 +4,15 @@
 
 <div class="content">
   <span class="left-side">
-    <app-my-cards (generalFailure)="getFailureStatus($event)"></app-my-cards>
+    <app-my-cards
+      (generalFailure)="getFailureStatus($event)"
+      (shippingCard)="getShippingCard($event)"
+      (shippingData)="getShippingData($event)"
+    ></app-my-cards>
+    <app-card-shipping-banner
+      *ngIf="oderedPhysicalCard"
+      [shippingCardData]="cardData"
+    ></app-card-shipping-banner>
   </span>
 
   <span class="right-side">

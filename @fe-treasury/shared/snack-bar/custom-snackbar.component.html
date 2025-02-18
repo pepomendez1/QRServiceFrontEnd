@@ -1,10 +1,18 @@
 <div class="custom-snackbar">
   <span class="message">{{ data.message }}</span>
   <button
+    *ngIf="data.actionButton"
+    class="btn-cta-filled btn-md"
+    (click)="handleAction()"
+  >
+    {{ data.actionButton }}
+  </button>
+  <button
+    class="cross-button"
     *ngIf="data.showClose"
     mat-icon-button
     aria-label="Close"
-    (click)="snackBarRef.dismiss()"
+    (click)="closeSnackbar()"
   >
     <mat-icon>close</mat-icon>
   </button>

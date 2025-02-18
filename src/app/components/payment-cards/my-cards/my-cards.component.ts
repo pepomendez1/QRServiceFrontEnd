@@ -18,6 +18,7 @@ import { ViewCardComponent } from '../view-card/view-card.component';
 import { CreateCardComponent } from '../create-card/create-card.component';
 import { CardSettingsComponent } from '../card-settings/card-settings.component';
 import { BehaviorSubject, max, switchMap } from 'rxjs';
+import { CardConfigService } from 'src/app/services/card-config.service';
 import { OnboardingService } from 'src/app/services/onboarding.service';
 import { StoreDataService } from 'src/app/services/store-data.service';
 import { SnackbarService } from '@fe-treasury/shared/snack-bar/snackbar.service';
@@ -58,6 +59,8 @@ export class MyCardsComponent implements OnInit {
   @ViewChild('fallbackTemplate', { static: true })
   fallbackTemplate!: TemplateRef<any>;
   @Output() cardSelected = new EventEmitter<Card>();
+  @Output() shippingData = new EventEmitter<any>();
+  @Output() shippingCard = new EventEmitter<boolean>();
   @Output() generalFailure = new EventEmitter<boolean>();
 
   public loading = true;
@@ -65,7 +68,7 @@ export class MyCardsComponent implements OnInit {
   public activeCards: Cards | null = null;
   public selectedCard: Card | null = null;
   public cardTypes: string[] = ['VIRTUAL', 'PHYSICAL'];
-
+  public oderedPhysicalCard: boolean = false;
   public primaryColor: string = '#0000CC'; // Default color or get from the theme
   public strokeColor: string = '#0000CC'; // Default stroke color
 
@@ -81,63 +84,35 @@ export class MyCardsComponent implements OnInit {
     private sidepanelService: SidePanelService,
     private myCardsService: MyCardsService,
     private snackBarService: SnackbarService,
+    private cardConfigService: CardConfigService,
     private storeDataService: StoreDataService
   ) {}
 
   ngOnInit(): void {
     this.storeDataService.getStore().subscribe((data) => {
       if (data.init_config) {
-        this.maxPhysicalCardsOnAccount =
-          data.init_config.max_physical_cards_on_account;
-        this.maxVirtualCardsOnAccount =
-          data.init_config.max_virtual_cards_on_account;
         this.primaryColor = data.init_config.primary_color || '#0000CC';
         this.strokeColor = data.init_config.primary_color || '#0000CC';
       }
     });
-    this.getCards();
-  }
-
-  checkCanAddNewCard(cards: Cards) {
-    console.log('canAddNewCard start');
-    // Count existing cards
-    const activeVirtualCards = cards.filter(
-      (card) => card.type === 'VIRTUAL' && card.status !== 'DISABLED'
-    );
-    const activePhysicalCards = cards.filter(
-      (card) => card.type === 'PHYSICAL' && card.status !== 'DISABLED'
-    );
-    // Count existing active cards
-    const currentVirtualCards = activeVirtualCards.length;
-    const currentPhysicalCards = activePhysicalCards.length;
-    // Determine if user can create more virtual cards
-    if (
-      this.maxVirtualCardsOnAccount === null ||
-      currentVirtualCards < this.maxVirtualCardsOnAccount
-    ) {
-      this.canCreateVirtual = true;
-    } else {
-      this.canCreateVirtual = false;
-    }
-
-    // Determine if user can create more physical cards
-    if (
-      this.maxPhysicalCardsOnAccount === null ||
-      currentPhysicalCards < this.maxPhysicalCardsOnAccount
-    ) {
-      this.canCreatePhysical = true;
-    } else {
-      this.canCreatePhysical = false;
-    }
-
-    console.table({
-      currentVirtualCards,
-      currentPhysicalCards,
-      maxVirtualCardsOnAccount: this.maxVirtualCardsOnAccount,
-      maxPhysicalCardsOnAccount: this.maxPhysicalCardsOnAccount,
-      canCreateVirtual: this.canCreateVirtual,
-      canCreatePhysical: this.canCreatePhysical,
+    this.cardConfigService.getCanCreatePhysical$().subscribe((canCreate) => {
+      console.log('canCreatePhysical updated:', canCreate);
+      setTimeout(() => {
+        this.canCreatePhysical = canCreate;
+      });
     });
+
+    this.cardConfigService.getCanCreateVirtual$().subscribe((canCreate) => {
+      console.log('canCreateVirtual updated:', canCreate);
+      setTimeout(() => {
+        this.canCreateVirtual = canCreate;
+      });
+    });
+
+    this.cardConfigService.checkCanAddNewCard();
+
+    this.getCards();
+    this.getShippings();
   }
 
   getCards() {
@@ -149,7 +124,7 @@ export class MyCardsComponent implements OnInit {
       next: (data: Cards | null) => {
         if (data) {
           console.log('cards: ', data);
-          this.checkCanAddNewCard(data);
+          //this.checkCanAddNewCard(data);
           this.setDisplayNames(data);
           this.loading = false;
           this.activeCards = data;
@@ -166,6 +141,31 @@ export class MyCardsComponent implements OnInit {
         this.loading = false;
         this.errors.push(error.message);
         this.generalFailure.emit(true);
+        this.handleError(error);
+      },
+    });
+  }
+
+  getShippings() {
+    console.log('GET shippings');
+    this.selectedCard = null;
+    this.loading = true;
+    this.cardService.getShipping().subscribe({
+      next: (data: any) => {
+        console.log('shipping data in get shippings () ... ', data);
+        if (data) {
+          console.log('shippings: ', data);
+          this.oderedPhysicalCard = true;
+          this.shippingData.emit(data);
+          this.shippingCard.emit(true);
+        } else {
+          console.log('no hay shippings');
+          this.oderedPhysicalCard = false;
+          this.shippingCard.emit(false);
+        }
+      },
+      error: (error: any) => {
+        this.loading = false;
         this.handleError(error);
       },
     });

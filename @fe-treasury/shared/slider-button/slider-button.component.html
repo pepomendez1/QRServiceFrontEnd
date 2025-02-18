@@ -1,0 +1,38 @@
+<div
+  class="slider-button"
+  [style.width]="sizeWidth"
+  [style.height]="sizeHeight"
+>
+  <!-- The slider for background animation -->
+  <div
+    class="slider"
+    [ngClass]="{
+      right: typeDestination === 'right',
+      left: typeDestination === 'left'
+    }"
+  ></div>
+  <div
+    class="option body-2"
+    [class.active]="typeDestination === 'left'"
+    (click)="selectOption('left')"
+  >
+    <ng-container *ngIf="iconOptions; else textLeft">
+      <mat-icon class="material-symbols-outlined slider-icons">{{
+        iconLeft
+      }}</mat-icon>
+    </ng-container>
+    <ng-template #textLeft>{{ sliderLeft }}</ng-template>
+  </div>
+  <div
+    class="option body-2"
+    [class.active]="typeDestination === 'right'"
+    (click)="selectOption('right')"
+  >
+    <ng-container *ngIf="iconOptions; else textRight">
+      <mat-icon class="material-symbols-outlined slider-icons">{{
+        iconRight
+      }}</mat-icon>
+    </ng-container>
+    <ng-template #textRight>{{ sliderRight }}</ng-template>
+  </div>
+</div>

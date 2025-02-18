@@ -1,0 +1,10 @@
+app-reactive-input {
+  .input-box {
+    &:hover{
+      border-color: $form-input-hover-color;
+    }
+    &.error {
+      border-color: $theme-text-error;
+    }
+  }
+}

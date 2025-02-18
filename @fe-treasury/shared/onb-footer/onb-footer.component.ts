@@ -4,10 +4,17 @@ import {
   OnDestroy,
   Output,
   EventEmitter,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
+import {
+  BreakpointObserver,
+  Breakpoints,
+  BreakpointState,
+} from '@angular/cdk/layout';
 import { HelpDialogComponent } from 'src/app/utils/help-dialog';
+import { TermsDialogComponent } from 'src/app/utils/terms-dialog';
+import { StoreDataService } from 'src/app/services/store-data.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -21,8 +28,15 @@ export class OnbFooterComponent {
   @Output() showHelp = new EventEmitter<boolean>();
   dialogRef!: MatDialogRef<HelpDialogComponent> | null;
   breakpointSubscription!: Subscription;
+  private termsDialogSubscription!: Subscription;
+  private privacyDialogSubscription!: Subscription;
+
+  fileContent: string = '';
+  privacyContent: string = '';
   isMobile: boolean = false;
   constructor(
+    private cdr: ChangeDetectorRef,
+    private storeDataService: StoreDataService,
     private breakpointObserver: BreakpointObserver,
     private dialog: MatDialog
   ) {}
@@ -40,6 +54,9 @@ export class OnbFooterComponent {
           );
         }
       });
+    this.loadTermsAndConditions();
+    this.loadPrivacy();
+    this.cdr.detectChanges(); // Trigger change detection manually
   }
   public goToHelp() {
     this.showHelp.emit(true);
@@ -57,5 +74,92 @@ export class OnbFooterComponent {
     this.dialogRef.afterClosed().subscribe(() => {
       this.dialogRef = null; // Reset dialogRef when dialog is closed
     });
+  }
+
+  public goToTerms() {
+    const dialogWidth = this.breakpointObserver.isMatched('(max-width: 840px)')
+      ? '100%'
+      : '65%';
+
+    this.dialog.open(TermsDialogComponent, {
+      width: dialogWidth,
+      hasBackdrop: true,
+      disableClose: false,
+      data: {
+        title: 'Términos y Condiciones Generales de Uso',
+        content: this.fileContent,
+      },
+    });
+  }
+
+  public goToPrivacy() {
+    const dialogWidth = this.breakpointObserver.isMatched('(max-width: 840px)')
+      ? '100%'
+      : '65%';
+
+    this.dialog.open(TermsDialogComponent, {
+      width: dialogWidth,
+      hasBackdrop: true,
+      disableClose: false,
+      data: {
+        title: 'Política de privacidad',
+        content: this.privacyContent,
+      },
+    });
+  }
+  private loadTermsAndConditions(): void {
+    this.storeDataService.getStore().subscribe((storeData) => {
+      const termsUrl =
+        storeData.init_config?.terms_and_conditions ||
+        '/assets/docs/terms_and_conditions.docx';
+
+      this.fetchDocxContent(
+        termsUrl,
+        (content) => (this.fileContent = content),
+        'Error loading terms and conditions.'
+      );
+    });
+  }
+
+  private loadPrivacy(): void {
+    this.storeDataService.getStore().subscribe((storeData) => {
+      const privacyUrl =
+        storeData.init_config?.privacy_policy ||
+        '/assets/docs/privacy_policy.docx';
+
+      this.fetchDocxContent(
+        privacyUrl,
+        (content) => (this.privacyContent = content),
+        'Error loading privacy policy.'
+      );
+    });
+  }
+
+  private async fetchDocxContent(
+    url: string,
+    contentUpdater: (content: string) => void,
+    errorMessage: string
+  ) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const arrayBuffer = await response.arrayBuffer();
+
+      // Lazy load Mammoth
+      const Mammoth = await import('mammoth');
+      const result = await Mammoth.extractRawText({ arrayBuffer });
+      contentUpdater(result.value);
+    } catch (error) {
+      console.error('Error fetching or parsing document:', error);
+      contentUpdater(errorMessage);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.breakpointSubscription) {
+      this.breakpointSubscription.unsubscribe();
+    }
   }
 }

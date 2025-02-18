@@ -1,0 +1,19 @@
+app-slider-button {
+  .slider-button {
+    background-color: $light-background-color-hover;
+    .option {
+      color: $theme-secondary-text;
+      .option.active {
+        color: $theme-text;
+      }
+      .option:not(.active):hover {
+        color: darken($theme-secondary-text, 10%); // Slight color change on hover for non-active options
+      }
+    }
+    .slider{
+      background-color: $theme-card;
+    }
+
+  }
+
+}

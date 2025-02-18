@@ -1,0 +1,97 @@
+<app-side-panel-header title="Pagar cuentas y servicios" [arrowBackEnabled]="false"></app-side-panel-header>
+
+<h2 class="paragraph-500 p-0 m-0">Agregar nueva cuenta o servicio</h2>
+
+<div class="filter-container">
+
+  <form class="filters-component-container" (ngSubmit)="onSubmit()" [formGroup]="filtersForm">
+    <div *ngIf="!selectedService; else serviceSelected">
+      <!-- <div > -->
+      <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
+        <mat-icon class="search-icon-light">search</mat-icon>
+
+        <input class="input-search paragraph-500 search" placeholder="Buscar" formControlName="searchQuery"
+          (focus)="isFocused = true" (blur)="isFocused = false" />
+        <mat-spinner class="search-spinner" [class.show]="searching"></mat-spinner>
+      </div>
+
+      <div *ngFor="let service of getKeys(filteredServices)" class="service-section">
+        <h3 class="paragraph-500-light m-1">{{ capitalize(service) }}</h3>
+        <mat-card class="service-card">
+          <div *ngFor="let company of filteredServices[service]" class="service-item"
+            (click)="onCompanyClick(company, service)">
+            <img [src]="company.companyLogo" alt="{{ company.companyName }}" class="service-logo" />
+            <span class="service-name">{{ company.companyName }}</span>
+            <mat-icon class="chevron-icon">chevron_right</mat-icon>
+          </div>
+          <a class="view-all" (click)="onViewAll(service)">Ver todos ({{ filteredServices[service].length }})</a>
+        </mat-card>
+      </div>
+
+    </div>
+
+    <ng-template #serviceSelected>
+      <div>
+        <!-- Imagen del servicio -->
+        <div class="service-info">
+          <img src="{{selectedService.companyLogo}}" alt="personal" class="service-logo-selected" />
+          <h3 class="service-name-selected">{{selectedService.companyName}}</h3>
+          <p class="service-category-selected">{{selectedService.companyCategory}}</p>
+        </div>
+
+        <!-- Campo de número de cliente -->
+        <!-- <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Número de cliente</mat-label>
+        <input matInput formControlName="clientNumber" placeholder="Número de cliente" />
+        <mat-hint>
+          <a href="#">¿Dónde encuentro mi número de cliente?</a>
+        </mat-hint>
+      </mat-form-field> -->
+
+        <!-- <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Agregar alias</mat-label>
+        <input matInput formControlName="alias" placeholder="Agregar alias" />
+      </mat-form-field> -->
+
+
+
+
+
+      </div>
+    </ng-template>
+
+
+  </form>
+
+  <div class="info-wrapper" *ngIf="selectedService">
+
+    <div class="account-info">
+      <div class="info-box">
+        <div class="input-box" id="nroCuenta-input">
+          <div class="input-data">
+            <p class="caption-500-light">Número de cuenta</p>
+            <input class="input-alias paragraph-500" [(ngModel)]="accountInfo.nroCuenta" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="account-info input-margin-top">
+      <div class="info-box">
+        <div class="input-box" id="alias-input">
+          <div class="input-data">
+            <p class="caption-500-light">Alias</p>
+            <input class="input-alias paragraph-500 " [(ngModel)]="accountInfo.alias" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button [disabled]="accountInfo.nroCuenta.length==0 || accountInfo.alias.length==0" class="btn-cta-filled w-100 btn-lg btn-margin-top" (click)="addService()">
+      Continuar
+    </button>
+
+  </div>
+  <!--  -->
+
+</div><!--  -->

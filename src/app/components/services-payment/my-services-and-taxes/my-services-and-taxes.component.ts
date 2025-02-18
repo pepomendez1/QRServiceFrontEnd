@@ -23,6 +23,8 @@ import { StoreDataService } from 'src/app/services/store-data.service';
 import { SnackbarService } from '@fe-treasury/shared/snack-bar/snackbar.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { NewServiceComponent } from './new-services/new-services.component';
+
 // Service to share the selected card between components
 @Injectable({
   providedIn: 'root',
@@ -90,6 +92,57 @@ export class MyCardsComponent implements OnInit {
   totalItems = 0;
   activities: any[] = [];
 
+  typesList: string[] = [
+    'SERVICIO DE GAS',
+    'SERVICIO DE LUZ',
+    'CREDITOS',
+    'FINANCIERO'
+  ];
+
+  popularServices: any = {
+    "SERVICIO DE GAS":[
+    {"companyCode":"AR-S-02603",
+     "companyName":"TAPI- TEST 2",
+     "companyLogo":"https://public-logo.prod.tapila.cloud/ar/tapi.png"},
+
+    {"companyCode":"AR-S-0033",
+     "companyName":"CAMUZZI GAS PAMPEANA - GAS DEL SUR",
+     "companyLogo":"https://public-logo.prod.tapila.cloud/ar/tapi.png"},
+
+    {"companyCode":"AR-S-02610",
+     "companyName":"TAPI Sandbox 1",
+     "companyLogo":"https://public-logo.prod.tapila.cloud/ar/tapi.png"},
+
+    {"companyCode":"AR-S-02611",
+     "companyName":"TAPI Sandbox 2",
+     "companyLogo":"https://public-logo.prod.tapila.cloud/mx/TELMEX.png"}
+    ],
+    "SERVICIO DE LUZ":[
+    {"companyCode":"AR-S-0035",
+     "companyName":"EDESUR",
+     "companyLogo":"https://public-logo.prod.tapila.cloud/ar/tapi.png"},
+
+    {"companyCode":"AR-S-0003",
+     "companyName":"EDENOR",
+     "companyLogo":"https://public-logo.prod.tapila.cloud/ar/Edenor.png"},
+
+    {"companyCode":"AR-S-02602",
+     "companyName":"TAPI- TEST 1",
+     "companyLogo":"https://public-logo.prod.tapila.cloud/ar/tapi.png"}
+    ],
+    "CREDITOS":[
+    {"companyCode":"AR-S-04160",
+     "companyName":"PLAN CHERY",
+     "companyLogo":""}
+     ],
+    "FINANCIERO":[
+    {"companyCode":"AR-S-0024",
+     "companyName":"SANTANDER - PRESTAMOS",
+     "companyLogo":"https://public-logo.prod.tapila.cloud/tags_common/tag_PrestamosYServiciosFinancieros.png"}
+     ]
+    }    ;
+
+  selectedTypes = ['Todas'];
   cardSelected: Card | null = null;
 
   readonly transactionTypeMapping: Record<
@@ -120,7 +173,7 @@ export class MyCardsComponent implements OnInit {
 
   constructor(
     private cardService: ServicesPaymentService,
-    private sidepanelService: SidePanelService,
+    private sidePanelService: SidePanelService,
     private myCardsService: MyCardsService,
     private snackBarService: SnackbarService,
     private storeDataService: StoreDataService,
@@ -227,7 +280,7 @@ export class MyCardsComponent implements OnInit {
     if (!selectedCard) {
       return;
     }
-    this.sidepanelService.open(
+    this.sidePanelService.open(
       ViewCardComponent,
       'Información de la tarjeta',
       selectedCard
@@ -303,7 +356,7 @@ export class MyCardsComponent implements OnInit {
   }
 
   public createServicesAndTaxes() {
-    const componentRef = this.sidepanelService.open(
+    const componentRef = this.sidePanelService.open(
       CreateCardComponent,
       'Pedir tarjeta',
       {
@@ -338,7 +391,7 @@ export class MyCardsComponent implements OnInit {
     this.selectedCard = card; // Update the selected card in the component
   }
   public openCardSettings(card: Card) {
-    const componentRef = this.sidepanelService.open(
+    const componentRef = this.sidePanelService.open(
       CardSettingsComponent,
       'Ajustes',
       card
@@ -499,4 +552,32 @@ export class MyCardsComponent implements OnInit {
     ];
       this.loading = false;
   }
+
+  openFiltersPanel() {
+        const filtersPanelRef = this.sidePanelService.open(
+          NewServiceComponent,
+          'Filtros',
+          {
+            //periodsList: this.periodsList,
+            selectedPeriod: this.selectedPeriod,
+            typesList: this.typesList,
+            selectedTypes: this.selectedTypes,
+            popularServices: this.popularServices
+          }
+        );
+
+        filtersPanelRef?.instance.applyFilters.subscribe(
+          (data: {
+            selectedPeriod: string;
+            selectedTypes: string[];
+            selectedStates: string[];
+          }) => {
+            console.log('Filters Applied:', data);
+            this.selectedPeriod = data.selectedPeriod;
+            //this.selectedTypes = data.selectedTypes;
+
+            //this.loadHistory();
+          }
+        );
+      }
 }

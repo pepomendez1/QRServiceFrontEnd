@@ -77,17 +77,14 @@
               {{
                 transaction.description
                   ? transaction.description
-                  : transaction.type === "cash_in"
-                  ? "Transferencia Recibida"
-                  : "Sin descripción"
+                  : descriptionTable.getDescription(
+                      transaction.type,
+                      transaction.source
+                    )
               }}
             </div>
-            <div class="secondary-500-light">
-              {{
-                transaction.contact_name
-                  ? transform(transaction.contact_name)
-                  : "Sin contacto"
-              }}
+            <div class="secondary-500-light" *ngIf="transaction.contact_name">
+              {{ transaction.contact_name }}
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 1em;
-  background-color: white;
+  //background-color: white;
   padding: 1em;
 
   .mat-spinner-container {
@@ -249,7 +249,17 @@ button[mat-icon-button] {
   cursor: pointer;
   display: inline-flex; /* Alinea los elementos horizontalmente */
   align-items: center; /* Alinea los elementos verticalmente */
+  justify-content: center; /* Centra el contenido horizontalmente */
+  gap: 8px; /* Espaciado entre el ícono y el texto */
+  text-align: center; /* Asegura que el texto se alinee bien */
 }
+
+.custom-button svg,
+.custom-button img {
+  width: 16px; /* Ajusta el tamaño del ícono si es necesario */
+  height: 16px;
+}
+
 
 .plus-sign {
   font-size: 30px; /* Tamaño específico para el signo "+" */

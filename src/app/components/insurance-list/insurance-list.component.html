@@ -1,0 +1,24 @@
+<div class="insurance-list">
+  <div class="insurance-list-container custom-card">
+    <div class="card-title heading-5-700">Mis seguros</div>
+    <div class="insurance-utilities">
+      <div class="utilities-wrapper">
+        <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
+          <mat-icon class="search-icon-light">search</mat-icon>
+          <input
+            class="input-search paragraph-500"
+            placeholder="Buscar"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="filterInsuranceContracts()"
+            (focus)="isFocused = true"
+            (blur)="isFocused = false"
+          />
+          <mat-spinner
+            class="search-spinner"
+            [class.show]="searching"
+          ></mat-spinner>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

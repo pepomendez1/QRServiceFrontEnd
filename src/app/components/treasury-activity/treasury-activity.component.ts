@@ -11,6 +11,7 @@ import createFuzzySearch from '@nozbe/microfuzz';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
 import { SafeHtml } from '@angular/platform-browser';
 import { IconLookupService } from 'src/app/services/layout/transactionIcon.service';
+import { DescriptionTable } from './treasury-activity-utils/description-table';
 import { map } from 'rxjs';
 import { stat } from 'fs';
 import { combineLatestInit } from 'rxjs/internal/observable/combineLatest';
@@ -41,29 +42,37 @@ export class TreasuryActivityComponent {
   ];
   typesList: string[] = [
     // 'Todas',
-    'Transferencias realizadas',
+    'Transferencias enviadas',
     'Transferencias recibidas',
+    'Rendimientos',
+    'Pagos con tarjeta',
+    'Pagos recibidos',
   ];
   typesMap: any = {
-    'Transferencias realizadas': 'cash_out',
-    'Transferencias recibidas': 'cash_in',
+    'Transferencias enviadas': { source: 'transfer', type: 'cash_out' },
+    'Transferencias recibidas': { source: 'transfer*', type: 'cash_in' },
+    Rendimientos: { source: 'balance-investments', type: 'cash_in' },
+    'Pagos con tarjeta': { source: 'cards', type: null },
+    'Pagos recibidos': { source: 'payout', type: 'cash_in' },
   };
   statesList: string[] = [
-    // 'Todos',
-    'Aprobados',
-    'Rechazados',
-    'Cancelados',
+    //'Todas',
+    'Aprobadas',
+    'Pendientes',
+    'Rechazadas',
+    'Canceladas',
   ];
   statesMap: any = {
-    Todos: 'Todos',
-    Aprobados: 'processed',
-    Rechazados: 'rejected',
-    Cancelados: 'cancelled',
+    //Todas: 'Todas',
+    Aprobadas: 'processed',
+    Pendientes: 'processing',
+    Rechazadas: 'rejected',
+    Canceladas: 'cancelled',
   };
 
   selectedPeriod = 'Último mes';
   selectedTypes = ['Todas'];
-  selectedStates = ['Todos'];
+  selectedStates = ['Todas'];
   searchQuery: string = '';
   problemImg: SafeHtml | null = null;
   accountBalance: any;
@@ -74,6 +83,7 @@ export class TreasuryActivityComponent {
   fuzzySearch: any;
   searching: boolean = false; // Controlador del estado spinner de búsqueda
   constructor(
+    public descriptionTable: DescriptionTable,
     private svgLibrary: SvgLibraryService,
     private treasuryService: TreasuryService,
     private router: Router,
@@ -101,12 +111,23 @@ export class TreasuryActivityComponent {
     this.filteredTransactions = this.transactions.filter((transaction) => {
       const matchesType =
         this.selectedTypes.includes('Todas') ||
-        this.selectedTypes.some(
-          (type) => this.typesMap[type] === transaction.type
-        );
+        this.selectedTypes.some((selectedType) => {
+          const filterCriteria = this.typesMap[selectedType];
+          if (!filterCriteria) {
+            return false;
+          }
+          const matchesSource = filterCriteria.source.includes('*')
+            ? transaction.source.startsWith(
+                filterCriteria.source.replace('*', '')
+              )
+            : transaction.source === filterCriteria.source;
+          const matchesType =
+            !filterCriteria.type || transaction.type === filterCriteria.type;
+          return matchesSource && matchesType;
+        });
 
       const matchesState =
-        this.selectedStates.includes('Todos') ||
+        this.selectedStates.includes('Todas') ||
         this.selectedStates.some(
           (state) => this.statesMap[state] === transaction.status
         );
@@ -119,7 +140,7 @@ export class TreasuryActivityComponent {
       this.filteredTransactions
     );
 
-    // Only proceed with search if there is a search term
+    // Proceed with fuzzy search if there is a search query
     if (this.searchQuery.trim().length > 0) {
       this.searching = true;
       console.log('searching...');
@@ -135,18 +156,12 @@ export class TreasuryActivityComponent {
           'Transactions match query:',
           this.filteredTransactions.length
         );
-        setTimeout(() => {
-          this.searching = false;
-        }, 1000);
       } else {
         console.log('No search results');
-        this.noTransactions = this.filteredTransactions.length === 0;
-        setTimeout(() => {
-          this.searching = false;
-        }, 1000);
+        this.noTransactions = true;
       }
+      this.searching = false;
     } else {
-      // If no search term, simply set noTransactions based on filtered transactions
       this.noTransactions = this.filteredTransactions.length === 0;
     }
 
@@ -158,7 +173,6 @@ export class TreasuryActivityComponent {
     'Transferencias realizadas',
     'Transferencias recibidas',
     'Todas',
-    'Todos',
     'Aprobados',
     'Cancelados',
     'Rechazados',

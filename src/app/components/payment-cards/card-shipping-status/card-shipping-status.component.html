@@ -1,0 +1,128 @@
+<div class="shipping-details-container">
+  <app-side-panel-header
+    [arrowBackEnabled]="openHelpIframe"
+    (arrowBack)="backToShippingInfo()"
+    [title]="openHelpIframe ? 'Ayuda' : 'Seguimiento tarjeta'"
+  ></app-side-panel-header>
+
+  <div class="activity-details">
+    @if (isLoading) {
+    <div class="spinner-container">
+      <mat-spinner></mat-spinner>
+    </div>
+    } @else if (!openHelpIframe) {
+
+    <div class="details-list">
+      <div class="status-badge">
+        <span class="status {{ statusPill?.type }}">
+          {{ statusPill.text }}
+        </span>
+      </div>
+
+      <div *ngIf="data.external_tracking_id" class="item">
+        <h2 class="paragraph-500-light">Número de seguimiento</h2>
+        <div class="text">
+          <span
+            class="paragraph-600"
+            [ngClass]="{ clickable: data?.tracking_url }"
+            matTooltip="Ir a la web de seguimiento"
+            matTooltipPosition="above"
+            (click)="openTrackingUrl()"
+          >
+            #{{ data?.external_tracking_id }}
+          </span>
+          <mat-icon
+            class="copy-icon"
+            matTooltip="Copiar código de seguimiento"
+            matTooltipPosition="above"
+            [cdkCopyToClipboard]="data?.external_tracking_id"
+          >
+            content_copy
+          </mat-icon>
+        </div>
+      </div>
+
+      <div *ngIf="data.due_delivery_date" class="item">
+        <h1 class="paragraph-500-light">Fecha estimada de entrega</h1>
+        <p class="paragraph-600">
+          {{ data?.due_delivery_date | date : "dd/MM/yyyy - HH:mm" }}
+        </p>
+      </div>
+
+      <div *ngIf="data.status == 'CREATED'" class="warning-message-box">
+        <mat-icon class="material-symbols-outlined">error_outline</mat-icon>
+        <div class="message-box-content">
+          <h1 class="paragraph-600 m-0 p-0">Solicitud de tarjeta física</h1>
+          <span class="secondary-500">
+            La solicitud de tu tarjeta física está siendo procesada. Dentro de
+            las próximas 48hs, vamos a proporcionarte un número de seguimiento
+            para que puedas ver el estado de tu envío.
+          </span>
+        </div>
+      </div>
+
+      <div *ngIf="data.status == 'CREATED'" class="item">
+        <h1 class="paragraph-500-light">Fecha de solicitud</h1>
+        <p class="paragraph-600">
+          {{ data?.created_at | date : "dd/MM/yyyy - HH:mm" }}
+        </p>
+      </div>
+
+      <div *ngIf="data.status !== 'CREATED'" class="item">
+        <h1 class="paragraph-500-light">Detalle del envío</h1>
+        <div class="stepper">
+          <div *ngFor="let step of steps; let i = index" class="step-row">
+            <!-- Left Column: Icon + Line -->
+            <div class="icon-column">
+              <mat-icon
+                class="material-symbols-outlined icon"
+                [class.completed]="step.completed"
+                [class.error]="step.error"
+              >
+                {{
+                  step.error
+                    ? "cancel"
+                    : step.completed
+                    ? "check_circle"
+                    : "radio_button_unchecked"
+                }}
+              </mat-icon>
+
+              <!-- Vertical line (not for last step) -->
+              <div
+                *ngIf="i !== steps.length - 1"
+                class="step-line"
+                [class.completed]="step.completed && steps[i + 1]?.completed"
+              ></div>
+            </div>
+
+            <!-- Right Column: Title + Date -->
+            <div class="content-column">
+              <span class="step-title">{{ step.title }}</span>
+              <span class="step-date" [class.hidden]="!step.date">
+                {{ step.date }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span class="paragraph-500-light">
+      La actualización del estado del envío puede sufrir demoras ocasionadas por
+      la empresa de logística. Remitirse a Correo Andreani para más información.
+    </span>
+
+    <app-side-panel-footer
+      class="w-100"
+      [buttonText]="'Ayuda'"
+      buttonStyle="ghost"
+      [buttonDisabled]="isLoading"
+      (buttonClicked)="openHelp()"
+    ></app-side-panel-footer>
+
+    } @else if (openHelpIframe) {
+    <app-help-section></app-help-section>
+
+    }
+  </div>
+</div>

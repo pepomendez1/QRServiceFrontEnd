@@ -6,6 +6,7 @@
     position="start"
     [mode]="isMobile ? 'over' : 'side'"
     [opened]="isMobile ? false : true"
+    [disableClose]="!isMobile"
     *ngIf="sideNavigation$ | async"
     #menuenav
   >

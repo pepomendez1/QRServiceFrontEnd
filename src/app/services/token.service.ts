@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthResponse } from './auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { CookieService } from './cookie.service';
+import { AuthDataOTP } from './otp.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,12 +15,32 @@ export class TokenService {
    * Stores authentication data in cookies
    */
   setAuthData(authData: AuthResponse): void {
+    console.log('auth data : ', authData);
     // Store tokens in cookies with appropriate expiration
-    this.cookieService.setCookie('access_token', authData.access_token, 1); // 1 day
-    this.cookieService.setCookie('id_token', authData.id_token, 1); // 1 day
-    this.cookieService.setCookie('refresh_token', authData.refresh_token, 7); // 7 days
+    this.cookieService.setCookieWithTokenExpiration(
+      'access_token',
+      authData.access_token
+    ); // 1 day
+    this.cookieService.setCookieWithTokenExpiration(
+      'id_token',
+      authData.id_token
+    ); // 1 day
+    this.cookieService.setCookie('refresh_token', authData.refresh_token, 1); // 1 days expiration
 
     this.cleanUrl();
+  }
+
+  setAuthDataOtp(authData: AuthDataOTP): void {
+    console.log('auth data : ', authData);
+    // Store tokens in cookies with appropriate expiration
+    this.cookieService.setCookieWithTokenExpiration(
+      'access_token_otp',
+      authData.access_token_otp
+    );
+    this.cookieService.setCookieWithTokenExpiration(
+      'id_token_otp',
+      authData.id_token_otp
+    );
   }
 
   /**
@@ -56,6 +77,20 @@ export class TokenService {
 
     return null;
   }
+
+  /**
+   * Retrieves a specific token from cookies.
+   * @param name The name of the token to retrieve (e.g., 'access_token', 'id_token', 'refresh_token').
+   * @returns The token value or null if not found.
+   */
+  getToken(name: string): string | null {
+    const token = this.cookieService.getCookie(name);
+    if (!token) {
+      console.warn(`Token "${name}" not found in cookies.`);
+    }
+    return token;
+  }
+
   /**
    * Decodes a JWT token.
    */
@@ -104,5 +139,10 @@ export class TokenService {
    */
   getStoredAuthData(): AuthResponse | null {
     return this.getAuthData();
+  }
+
+  removeOTPcookies(): void {
+    this.cookieService.deleteCookie('access_token_otp');
+    this.cookieService.deleteCookie('id_token_otp');
   }
 }

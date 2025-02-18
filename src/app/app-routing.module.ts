@@ -1,18 +1,21 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { TreasuryActivityComponent } from './components/treasury-activity/treasury-activity.component';
-import { MainComponent } from './components/main/main.component';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { RouterModule, Routes, Router } from '@angular/router';
 import { AppLayoutComponent } from './app-layout/app-layout.component';
 import { authGuard } from './services/route-guards/auth.guard';
 import { iframeGuard } from './services/route-guards/iframe.guard';
-import { PaymentCardsComponent } from './components/payment-cards/payment-cards.component';
+import { DynamicRoutesService } from './services/dynamic-routes';
 import { VoucherComponent } from './components/treasury/voucher/voucher.component';
-import { InvestmentComponent } from './components/investment/investment.component';
-import { appGuard } from './services/route-guards/app.guard';
-import { pinCodeGuard } from './services/route-guards/pin-code.guard';
-import { HelpSectionComponent } from './components/help-section/help-section.component';
 import { OnHoldScreenComponent } from '@fe-treasury/shared/on-hold-screen/on-hold-screen.component';
+import { pinCodeGuard } from './services/route-guards/pin-code.guard';
+import { appGuard } from './services/route-guards/app.guard';
+import { PaymentCardsComponent } from './components/payment-cards/payment-cards.component';
+import { InvestmentComponent } from './components/investment/investment.component';
+import { HelpSectionComponent } from './components/help-section/help-section.component';
 import { ServicesPaymentComponent } from './components/services-payment/services-payment.component';
+import { TreasuryActivityComponent } from './components/treasury-activity/treasury-activity.component';
+import { FeatureFlagsService } from './services/modules.service';
+
+//  Define initial static routes
 const routes: Routes = [
   {
     path: 'voucher',
@@ -47,73 +50,13 @@ const routes: Routes = [
   {
     path: '',
     redirectTo: 'app',
-    pathMatch: 'full', // Redirect the root path ('/') to '/app'
+    pathMatch: 'full',
   },
   {
     path: 'app',
-    component: AppLayoutComponent, // This will load the main app layout after onboarding is completed
+    component: AppLayoutComponent,
     canActivate: [appGuard],
-    children: [
-      {
-        path: '', // Empty path for default child route
-        redirectTo: 'home', // Redirect to 'home' inside the 'app' route
-        pathMatch: 'full',
-      },
-      {
-        path: 'home',
-        loadChildren: () =>
-          import('./pages/dashboard/dashboard.module').then(
-            (m) => m.DashboardModule
-          ),
-        pathMatch: 'full',
-      },
-      {
-        path: 'multiple-payments',
-        loadChildren: () =>
-          import('./pages/dashboard/dashboard.module').then(
-            (m) => m.DashboardModule
-          ),
-      },
-      {
-        path: 'investments',
-        component: InvestmentComponent,
-      },
-      // {
-      //   path: 'services-payment',
-      //   component: ServicesPaymentComponent,
-      // },
-      {
-        path: 'cards',
-        component: PaymentCardsComponent,
-      },
-      {
-        path: 'activity',
-        component: TreasuryActivityComponent,
-      },
-      {
-        path: 'transfer',
-        component: InvestmentComponent,
-      },
-      {
-        path: 'help',
-        component: HelpSectionComponent,
-      },
-      {
-        path: 'lending',
-        loadChildren: () =>
-          import('./pages/dashboard/dashboard.module').then(
-            (m) => m.DashboardModule
-          ),
-      },
-      {
-        path: 'account-info',
-        loadChildren: () =>
-          import('./pages/account-info/account-info.module').then(
-            (m) => m.AccountInfoModule
-          ),
-        pathMatch: 'full',
-      },
-    ],
+    children: [], // Initially empty, dynamically filled
   },
   {
     path: 'i',
@@ -175,8 +118,51 @@ const routes: Routes = [
   { path: '**', redirectTo: '' }, // Catch-all route
 ];
 
+// APP_INITIALIZER to Load Feature Flags and Routes Before Routing
+export function initializeApp(
+  featureFlagsService: FeatureFlagsService,
+  dynamicRoutesService: DynamicRoutesService,
+  router: Router
+): () => Promise<void> {
+  return async () => {
+    console.log('⏳ Loading feature flags...');
+    await featureFlagsService.loadFeatureFlags(); // Load feature flags
+
+    console.log('🛠 Generating initial routes...');
+    const appChildren = dynamicRoutesService.getAppRoutes(); // Get dynamic routes
+
+    console.log('🔄 Updating routes with:', appChildren);
+    // Update the `app` children dynamically
+    router.resetConfig(
+      routes.map((r) =>
+        r.path === 'app' ? { ...r, children: appChildren } : r
+      )
+    );
+
+    // Subscribe to feature flag changes
+    featureFlagsService.featureFlags$.subscribe(() => {
+      console.log('🛠 Feature flags changed, regenerating routes...');
+      const updatedRoutes = dynamicRoutesService.getAppRoutes();
+      router.resetConfig(
+        routes.map((r) =>
+          r.path === 'app' ? { ...r, children: updatedRoutes } : r
+        )
+      );
+      console.log('🔄 Routes updated due to feature flag change');
+    });
+  };
+}
+
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
+  providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeApp,
+      deps: [FeatureFlagsService, DynamicRoutesService, Router],
+      multi: true,
+    },
+  ],
 })
 export class AppRoutingModule {}

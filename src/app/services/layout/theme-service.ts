@@ -1,6 +1,6 @@
 import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { StoreDataService } from '../store-data.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export type Theme = '' | 'app-default' | 'app-dark' | 'app-light';
@@ -40,7 +40,10 @@ export class ThemeService {
         this.barChartColor = initConfig?.bar_chart_color;
       }
       if (initConfig?.primary_color) {
-        this.updatePrimaryColor(initConfig.primary_color);
+        this.updatePrimaryColor(
+          initConfig.primary_color,
+          initConfig.default_mode || 'light'
+        ); // Use default_mode if available);
       }
 
       if (initConfig?.accent_color) {
@@ -49,16 +52,19 @@ export class ThemeService {
     });
   }
 
-  updatePrimaryColor(primaryColor: string): void {
+  updatePrimaryColor(primaryColor: string, defaultMode: any): void {
     const root = document.documentElement;
 
-    // Determine if dark mode should be used based on contrast
-    const isDarkMode = this.checkContrast(primaryColor, '#FFFFFF') < 4.2; // WCAG threshold
+    // Determine dark mode based on default_mode or contrast
+    let isDarkMode = defaultMode === 'dark';
+
     const theme = isDarkMode ? 'dark' : 'default';
 
     // Apply the calculated theme
     this.setStyle(theme);
-    console.log('theme after contrast check for primary color: ', theme);
+    console.log(
+      `Applied theme after contrast check and default_mode: ${theme}`
+    );
 
     // Set primary color properties
     this.setColorProperties(root, '--primary-color', primaryColor);
@@ -70,7 +76,12 @@ export class ThemeService {
     // Set accent color properties
     this.setColorProperties(root, '--accent-color', accentColor);
   }
-
+  getPrimaryColor(): string {
+    const primaryColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--primary-color')
+      .trim();
+    return primaryColor || '#4876DB'; // Default fallback color
+  }
   private getLuminance(hex: string): number {
     const rgb = this.hexToRgb(hex).split(', ').map(Number);
     return rgb
@@ -102,7 +113,17 @@ export class ThemeService {
     return `${r}, ${g}, ${b}`;
   }
   setTheme(theme: Theme) {
-    this._themeSubject.next([this._themeSubject.getValue()[1], theme]);
+    const [_, currentTheme] = this._themeSubject.getValue();
+
+    if (currentTheme !== theme) {
+      this._themeSubject.next([currentTheme, theme]);
+      const body = document.body;
+
+      // Add the new theme class
+      body.classList.add(theme);
+
+      console.log('Theme updated to:', theme);
+    }
   }
 
   /**
@@ -166,41 +187,34 @@ export class ThemeService {
     });
   }
 
-  setStyle(style: 'default' | 'dark' | 'light' | 'top') {
+  setStyle(style: 'default' | 'dark') {
+    const body = document.body;
+
+    // Remove existing theme classes
+    body.classList.remove('app-dark', 'app-default');
+
+    // Add the new theme class
     switch (style) {
-      case 'dark': {
-        this.setTheme('app-dark');
+      case 'dark':
+        console.log('Switching to Dark Theme');
+        body.classList.add('app-dark');
         break;
-      }
-
-      case 'light': {
-        this._configSubject.next({
-          navigation: 'side',
-          sidenavUserVisible: false,
-          toolbarVisible: true,
-          toolbarPosition: 'static',
-        });
-
-        this.setTheme('app-light');
+      case 'default':
+        console.log('Switching to Light Theme');
+        body.classList.add('app-default');
         break;
-      }
-
-      case 'top': {
-        this._configSubject.next({
-          navigation: 'top',
-          sidenavUserVisible: false,
-          toolbarVisible: true,
-          toolbarPosition: 'static',
-        });
+      default:
+        console.log('Switching to Default Theme');
+        body.classList.add('app-default');
         break;
-      }
-      default: {
-        this.setTheme('app-default'); // Ensure default theme is set
-        break;
-      }
     }
-  }
 
+    // Delay broadcasting the theme update to allow DOM changes
+    setTimeout(() => {
+      console.log('Theme updated to:', style);
+      this._themeSubject.next(['app-default', `app-${style}`]); // Notify listeners
+    }, 10); // Small delay to ensure the DOM is updated
+  }
   private setColorProperties(
     root: HTMLElement,
     basePropertyName: string,
@@ -258,7 +272,12 @@ export class ThemeService {
     }
     return null; // No theme detected
   }
-
+  getCurrentThemeObservable(): Observable<
+    'app-dark' | 'app-default' | 'light'
+  > {
+    const theme = this.getCurrentTheme(); // Reuse the existing method
+    return of(theme ?? 'app-default'); // Ensure a default value to avoid null issues
+  }
   // Utility function to calculate contrast
   checkContrast(hex1: string, hex2: string): number {
     const lum1 = this.getLuminance(hex1);

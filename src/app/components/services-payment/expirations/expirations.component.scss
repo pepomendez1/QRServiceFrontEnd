@@ -6,7 +6,7 @@ $icon-button-size: 24px;
   //align-items: center;
   justify-content: space-between;
   gap: 1em;
-  background-color: white;
+  //background-color: white;
   padding: 1em;
   width: 100%;
 
@@ -229,6 +229,7 @@ button {
     width: 100%;
     border: none;
     outline: none;
+    background-color: transparent;
 
     &:hover,
     &:focus,

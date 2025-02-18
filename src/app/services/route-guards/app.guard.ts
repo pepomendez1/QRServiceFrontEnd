@@ -10,8 +10,14 @@ import { inject } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { UserService } from '../user.service';
 import { OnboardingService } from '../onboarding.service';
-import { Observable, EMPTY, of, forkJoin } from 'rxjs';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { Observable, EMPTY, of, forkJoin, BehaviorSubject } from 'rxjs';
+import { switchMap, map, catchError, finalize } from 'rxjs/operators';
+
+const isGuardProcessing$ = new BehaviorSubject<boolean>(false); // Observable to track guard status
+
+export const getGuardProcessingState = (): Observable<boolean> => {
+  return isGuardProcessing$.asObservable();
+};
 
 export const appGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
@@ -20,10 +26,11 @@ export const appGuard: CanActivateFn = (route, state) => {
   const onboardingService = inject(OnboardingService);
 
   console.log('App Guard Triggered for Route:', state.url);
-
+  isGuardProcessing$.next(true); // Notify that guard is processing
   // Check if on /on-hold page; if so, redirect to login on refresh
   if (state.url === '/on-hold') {
     console.log('Page reloaded on /on-hold, redirecting to /auth/login');
+    isGuardProcessing$.next(false);
     return of(true); //
   }
 
@@ -33,6 +40,7 @@ export const appGuard: CanActivateFn = (route, state) => {
 
       if (!isAuthenticated) {
         console.log('User not authenticated, redirecting to /auth/login');
+        isGuardProcessing$.next(false);
         router.navigate(['/auth/login']);
         return of(false);
       }
@@ -70,8 +78,36 @@ export const appGuard: CanActivateFn = (route, state) => {
             }
           }
 
+          if (userStatus === USER_STATUS.TREASURY) {
+            if (metamapStatus == 'Pending') {
+              if (currentRoute.startsWith('/onboarding')) {
+                return true; // Allow access to '/on-hold'
+              } else {
+                console.log('Metamap is InProgress, redirecting to /on-hold');
+                router.navigate(['/onboarding']);
+                return false;
+              }
+            } else {
+              if (currentRoute.startsWith('/on-hold')) {
+                return true; // Allow access to '/on-hold'
+              } else {
+                console.log('Metamap is InProgress, redirecting to /on-hold');
+                router.navigate(['/on-hold']);
+                return false;
+              }
+            }
+          }
+
           if (userStatus === USER_STATUS.COMPLETED) {
-            if (metamapStatus !== 'Completed') {
+            if (metamapStatus == 'Pending') {
+              if (currentRoute.startsWith('/onboarding')) {
+                return true; // Allow access to '/on-hold'
+              } else {
+                console.log('Metamap is InProgress, redirecting to /on-hold');
+                router.navigate(['/onboarding']);
+                return false;
+              }
+            } else if (metamapStatus !== 'Completed') {
               if (currentRoute.startsWith('/on-hold')) {
                 return true; // Allow access to '/on-hold'
               } else {
@@ -96,12 +132,12 @@ export const appGuard: CanActivateFn = (route, state) => {
           return false;
         }),
         catchError((error) => {
-          console.error(
-            'Error obtaining user status or metamap status:',
-            error
-          );
+          console.error('Error obtaining user status:', error);
           router.navigate(['/auth/login']);
           return of(false);
+        }),
+        finalize(() => {
+          isGuardProcessing$.next(false); // Notify that guard processing is done
         })
       );
     })

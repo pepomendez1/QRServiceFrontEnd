@@ -13,6 +13,11 @@ import {
   AuthenticationDetails,
 } from 'amazon-cognito-identity-js';
 
+export interface AuthDataOTP {
+  access_token_otp: string;
+  id_token_otp: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -37,7 +42,7 @@ export class OTPService {
     const body: { [key: string]: any } = {};
 
     body.email = email;
-    
+
     const endpoint =
       environment.apiUrl + '/public/wibond-connect/user/auth/challenge';
 
@@ -58,7 +63,6 @@ export class OTPService {
     session: string | null,
     challengeName: string
   ): Observable<any> {
-    
     if (!email) {
       email = this.authService.getEmail();
     }
@@ -68,8 +72,7 @@ export class OTPService {
     }
 
     const endpoint =
-      environment.apiUrl +
-      '/public/wibond-connect/user/auth/challenge/verify';
+      environment.apiUrl + '/public/wibond-connect/user/auth/challenge/verify';
     const body: { [key: string]: any } = {
       session: session,
       challengeAnswer: otp,
@@ -84,16 +87,13 @@ export class OTPService {
       tap((response) => {
         console.log('OTP Verification successful:', response);
 
-        const authData: AuthResponse = {
-          access_token: response.AccessToken,
-          id_token: response.IdToken,
-          refresh_token: response.RefreshToken,
-          expires_in: response.ExpiresIn,
-          token_type: response.TokenType || 'Bearer',
+        const authData: AuthDataOTP = {
+          access_token_otp: response.AccessToken,
+          id_token_otp: response.IdToken,
         };
-        console.log('Authentication data:', authData);
+        console.log('Authentication data for OTP:', authData);
         // Store the token data using TokenService or similar
-        this.tokenService.setAuthData(authData);
+        this.tokenService.setAuthDataOtp(authData);
         return response;
       }),
       catchError((error) => {

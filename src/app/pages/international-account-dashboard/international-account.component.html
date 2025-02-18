@@ -1,0 +1,22 @@
+@if(accountFailure){
+<app-general-failure [backToStartEnable]="false"></app-general-failure>
+}@else{
+<div class="layout-container">
+  <div class="left-column">
+    <app-international-balance
+      (generalFailure)="getFailureStatus($event)"
+    ></app-international-balance>
+    <app-invoice-sign-info></app-invoice-sign-info>
+  </div>
+  <div class="right-column">
+    <app-international-operations
+      headerTitle="Últimas operaciones"
+      [hideTitle]="false"
+      [hideFilters]="true"
+      [activityShortcut]="true"
+      [limitOperations]="true"
+      [operationsLimit]="5"
+    ></app-international-operations>
+  </div>
+</div>
+}

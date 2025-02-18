@@ -22,12 +22,12 @@
       <div class="item">
         <div class="subtitle">Número de operación</div>
         <div class="text">
-          <strong>#{{ detail?.id }}</strong>
+          <strong>#{{ detail?.transaction_reference }}</strong>
           <mat-icon
             class="copy-icon"
             matTooltip="Copiar número de operación"
             matTooltipPosition="above"
-            [cdkCopyToClipboard]="detail?.id"
+            [cdkCopyToClipboard]="detail?.transaction_reference"
           >
             content_copy
           </mat-icon>
@@ -49,7 +49,7 @@
           </strong>
         </div>
       </div>
-      <div class="item">
+      <div class="item" *ngIf="detail?.contact_name">
         <div class="subtitle">Destinatario</div>
         <div class="text contact-details">
           <strong class="name">{{ detail?.contact_name }}</strong>
@@ -57,7 +57,7 @@
           <p class="cbu">CBU: {{ detail?.destination }}</p>
         </div>
       </div>
-      <div class="item">
+      <div class="item" *ngIf="detail?.description">
         <div class="subtitle">Motivo</div>
         <div class="text">
           <strong>{{ detail?.description }}</strong>

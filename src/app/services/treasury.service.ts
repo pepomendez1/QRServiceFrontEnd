@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { map, Observable, throwError } from 'rxjs';
+import { catchError, finalize, map, Observable, throwError } from 'rxjs';
 import { ApiService } from './api.service';
+import { CookieService } from './cookie.service';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +11,10 @@ export class TreasuryService {
   private endpoint = '/public/wibond-connect/treasury';
   private bankAccountEndpoint = '/public/wibond-connect/bank-account';
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private tokenService: TokenService,
+    private apiService: ApiService
+  ) {}
 
   /**
    * Método para obtener el saldo de la cuenta
@@ -79,8 +84,24 @@ export class TreasuryService {
   // }
 
   makeTransfer(data: any): Observable<any> {
-    console.log('transfiendo .... ', data);
-    return this.apiService.post<any>(`${this.endpoint}/cash-out`, data);
+    console.log('Transfiriendo .... ', data);
+
+    return this.apiService
+      .post<any>(`${this.endpoint}/cash-out`, data, false, true)
+      .pipe(
+        catchError((error) => {
+          console.error('Error en la transferencia:', error);
+
+          // Return a formatted error response
+          return throwError(
+            () => new Error('Error al realizar la transferencia.')
+          );
+        }),
+        finalize(() => {
+          console.log('Finalizando transferencia: Eliminando cookies OTP');
+          this.tokenService.removeOTPcookies(); // Ensures OTP cookies are always removed
+        })
+      );
   }
 
   /**

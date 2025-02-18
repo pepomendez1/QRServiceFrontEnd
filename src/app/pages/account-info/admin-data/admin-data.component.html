@@ -28,7 +28,7 @@
             accountInfo?.email || "Cargando..."
           }}</span>
         </div>
-        <div class="actions-button">
+        <!-- <div class="actions-button">
           <button
             mat-icon-button
             class="outline-button"
@@ -38,7 +38,7 @@
               >mode_edit_outline</mat-icon
             >
           </button>
-        </div>
+        </div> -->
       </div>
 
       <div class="input-box" id="name-input">
@@ -168,7 +168,22 @@
           <div class="input-box">
             <div class="input-data">
               <p class="caption-500-light m-0 p-0">{{ dataToEdit.label }}</p>
+              <div
+                *ngIf="dataToEdit.value === 'phone'"
+                class="phone-input-container"
+              >
+                <div matPrefix class="flag-container">
+                  <span class="flag-icon flag-icon-ar"></span>
+                  <span class="secondary-500-light"> +54</span>
+                </div>
+                <input
+                  class="input-edit paragraph-500"
+                  [(ngModel)]="editedValue"
+                  (ngModelChange)="resetMessages()"
+                />
+              </div>
               <input
+                *ngIf="dataToEdit.value !== 'phone'"
                 class="input-edit paragraph-500"
                 [(ngModel)]="editedValue"
                 (ngModelChange)="resetMessages()"

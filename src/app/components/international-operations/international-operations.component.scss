@@ -1,0 +1,223 @@
+$icon-button-size: 24px;
+
+.international-operations {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.filters-container {
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 16px;
+  justify-content: space-between;
+  z-index: 10; /* Asegura que los filtros se mantengan en la parte superior */
+}
+
+.filters-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+
+
+.search-box {
+  height: 40px;
+  .search-icon-light {
+    color: #a3a3a3;
+    font-size: 24px;
+    padding-right: 8px;
+  }
+  .input-search {
+    background-color: transparent;
+    width: 100%;
+    border: none;
+    outline: none;
+
+    &:hover,
+    &:focus,
+    &:active {
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+  .search-spinner {
+    margin-right: 0.5em;
+    circle {
+      stroke: #757575; /* Set your desired color here */
+    }
+    width: 24px !important; /* Ajustar el ancho del spinner */
+    height: 24px !important; /* Ajustar la altura del spinner */
+    visibility: hidden;
+   &.show {
+    visibility: visible;
+   }
+  }
+  &.focused {
+    border-color: #7e7c7c; /* Border color on focus */
+    .search-icon-light {
+       color: #7e7c7c;
+    }
+  }
+}
+
+.download-label {
+  margin: 0;
+  padding: 8px;
+
+  @media (max-width: 500px) {
+    display: none;
+  }
+}
+
+
+.filter-menu-button {
+  font: var(--font-caption);
+  border: none;
+  background: none;
+  margin-right: 24px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.clear-filters-button {
+  font: var(--font-caption);
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.clear-filters-button:hover {
+  text-decoration: none;
+}
+
+.card-title {
+  margin-bottom: 16px;
+}
+.international-operations-container  {
+  max-height: 70vh;
+}
+
+.operations-list {
+  //flex: 1; /* El contenedor crecerá para ocupar el espacio disponible */
+  overflow-y: auto; /* Habilita el scroll vertical cuando sea necesario */
+  max-height: 65vh;
+}
+
+.operation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em 0;
+  gap: 1em;
+  border-bottom: 1px solid #f4f4f4;
+  &.last{
+    border-bottom: none;
+  }
+}
+
+.operations-info {
+  display: flex;
+  align-items: center;
+  .rounded-icon {
+    margin-right: 1em;
+  }
+}
+
+
+.mat-menu-panel {
+  background-color: white;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  border: 1px solid #cccccc;
+  padding: 8px;
+}
+
+.filter-radio-button {
+  color: red;
+}
+
+.mat-radio-label {
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
+  color: black;
+}
+
+mat-radio-group {
+  display: flex;
+  flex-direction: column; /* Asegura que los items se alineen verticalmente */
+}
+
+.mat-internal-form-field {
+  margin-right: 20px;
+}
+
+mat-radio-button {
+  line-height: 10px;
+  margin-bottom: 0px; /* Añade un pequeño margen debajo de cada radio */
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+}
+.operation-header{
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+}
+.operation-amount {
+  display: flex;
+  flex-direction: column; /* Alineamos los elementos en una columna (verticalmente) */
+  align-items: flex-end; /* Alineamos todo el contenido a la derecha */
+  gap: 4px;
+  width: Hug (98px) px;
+  height: Fill (48px) px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  width: 100%;
+  mat-spinner {
+    width: 50px !important; /* Ajustar el ancho del spinner */
+    height: 50px !important; /* Ajustar la altura del spinner */
+  }
+}
+
+.no-operations {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 43vh; //calc ccon botón Ver toda mi actividad
+}
+
+.disabled-option {
+  color: gray; /* Cambia el color del texto */
+  opacity: 0.5; /* Reduce la opacidad */
+  pointer-events: none; /* Evita que el usuario pueda seleccionar la opción */
+}
+
+
+
+.go-to-operation {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  mat-icon {
+    font-size: 20px;
+  }
+}

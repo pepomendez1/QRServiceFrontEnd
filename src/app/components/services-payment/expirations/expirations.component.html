@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container custom-card">
 
 
   <mat-tab-group>
@@ -42,7 +42,7 @@
         <!-- List of transactions -->
         <div *ngIf="!loading && expirations.length" class="activities-container">
           <div class="activity-item" *ngFor="let activity of expirations">
-            <mat-checkbox required [(ngModel)]="activity.checked"></mat-checkbox>
+            <mat-checkbox color="primary" required [(ngModel)]="activity.checked"></mat-checkbox>
 
             <div class="activity-info">
 
@@ -59,15 +59,14 @@
 
             </div>
             <div class="activity-amount">
-              <div class="paragraph-400"
-                [ngStyle]="{color: activity.transaction_type === 'cash_in' ? '#048A42' : '#000',}">
+              <div class="paragraph-400"                >
                 {{ activity.amount | currency : "ARS" : "symbol-narrow" }}
               </div>
               <div class="activity-date">
 
                 <div *ngIf="activity.vencido" class="vencimiento">
-                  <span class="texto-rojo">Vence hoy</span>
-                  <mat-icon color="warn" class="icono-warning">notifications</mat-icon>
+                  <span class="hightlight-text">Vence hoy</span>
+                  <mat-icon color="primary">notifications</mat-icon>
                 </div>
 
                 <span *ngIf="!activity.vencido && activity.autodebito">Se autodebita el {{ activity.fechaAutodebito
@@ -107,7 +106,7 @@
         <div class="total">
           <span>Total a pagar <strong>{{ totalSeleccionado | currency:'ARS':'symbol':'1.0-0' }}</strong></span>
         </div>
-        <button mat-flat-button class="transfer-btn button-l" [disabled]="cantidadSeleccionada === 0">
+        <button mat-flat-button class="btn-cta-filled w-100 btn-lg" [disabled]="cantidadSeleccionada === 0">
           Pagar {{ cantidadSeleccionada }} seleccionado{{ cantidadSeleccionada > 1 ? 's' : '' }}
         </button>
       </div>
@@ -126,7 +125,7 @@
         <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
           <mat-icon class="search-icon-light">search</mat-icon>
           <input
-            class="input-search paragraph-500"
+            class="input-search paragraph-500 search"
             placeholder="Buscar"
             [(ngModel)]="searchQuery"
             (ngModelChange)="filterHistory()"
@@ -137,7 +136,7 @@
         </div>
       </div>
     </div>
-    
+
       <div class="activities-container">
         <!-- Contenido de la segunda pestaña -->
         <!-- List of history -->
@@ -161,8 +160,7 @@
 
             </div>
             <div class="activity-amount">
-              <div class="paragraph-400"
-                [ngStyle]="{color: activity.transaction_type === 'cash_in' ? '#048A42' : '#000',}">
+              <div class="paragraph-400">
                 -{{ activity.amount | currency : "ARS" : "symbol-narrow" }}
               </div>
               <div class="activity-date">

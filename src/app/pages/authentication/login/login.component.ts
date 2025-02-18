@@ -4,13 +4,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { PinCodeService } from 'src/app/services/pin-code.service';
 import { ConfigService } from 'src/app/services/config.service';
-import { ErrorStateMatcher } from '@angular/material/core';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
+import { SafeUrl } from '@angular/platform-browser';
+import { FormControl } from '@angular/forms';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { getGuardProcessingState } from 'src/app/services/route-guards/app.guard';
 import { StoreDataService } from 'src/app/services/store-data.service';
+import { SessionManagementService } from 'src/app/services/session.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -38,9 +39,12 @@ export class LoginComponent {
   usernameErrors: string[] = [];
   passwordErrors: string[] = [];
   pinCodeErrors: string[] = [];
+  timeoutLogout: boolean = false;
+
+  isGuardProcessing: boolean = false;
 
   constructor(
-    private sanitizer: DomSanitizer,
+    private sessionManagementService: SessionManagementService,
     private storeService: StoreDataService,
     private svgLibrary: SvgLibraryService,
     private router: Router,
@@ -122,6 +126,18 @@ export class LoginComponent {
         this.isMobile = result.matches;
         console.log('mobile mode: ', this.isMobile);
       });
+
+    this.sessionManagementService.getLogoutReason().subscribe((reason) => {
+      if (reason === 'timeout') {
+        console.log('Session expired due to inactivity.');
+        this.timeoutLogout = true;
+        // Display a message to the user
+      }
+    });
+
+    getGuardProcessingState().subscribe((processing) => {
+      this.isGuardProcessing = processing;
+    });
   }
 
   getFormControl(controlName: string): FormControl {

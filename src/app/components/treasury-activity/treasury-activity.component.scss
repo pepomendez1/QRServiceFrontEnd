@@ -108,9 +108,10 @@ $icon-button-size: 24px;
 .card-title {
   margin-bottom: 16px;
 }
-.treasury-activity-container{
+.treasury-activity-container  {
   max-height: 70vh;
 }
+
 .transaction-list {
   //flex: 1; /* El contenedor crecerá para ocupar el espacio disponible */
   overflow-y: auto; /* Habilita el scroll vertical cuando sea necesario */

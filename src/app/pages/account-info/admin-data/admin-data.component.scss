@@ -48,7 +48,11 @@ $icon-button-size: 24px;
       align-items: center;
       justify-content: space-between;
       flex: 1;
-
+.phone-input-container{
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
       .edit-info-wrapper {
         display: flex;
         flex-direction: column;
@@ -61,6 +65,7 @@ $icon-button-size: 24px;
           display: flex;
           flex-direction: column;
           gap: 1em;
+          padding-bottom: 1em;
         }
         .input-data {
           width: 100%;

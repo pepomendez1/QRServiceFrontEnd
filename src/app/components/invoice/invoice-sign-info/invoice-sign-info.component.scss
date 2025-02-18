@@ -1,0 +1,41 @@
+.invoice-sign {
+  height: auto;
+  display: flex;
+  padding-bottom: 0px;
+
+  .invoice-sign-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%; // Ensure the content fills the parent height
+  }
+
+  .invoice-sign-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end; // Ensure children align at the bottom
+    justify-content: space-between; //  Keeps spacing between text and image
+  }
+
+  .invoice-sign-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; // Ensures message fills available space
+    flex: 1; // Allow message to grow and take available space
+
+    .invoice-sign-btn {
+      margin-top: 32px;
+      display: flex;
+      align-items: flex-end;
+      button {
+        padding: 8px 12px;
+        margin-bottom: 1em;
+      }
+    }
+  }
+
+  // Make sure the image is always at the bottom
+  [innerHTML] {
+    align-self: flex-end; // Forces the image to be at the bottom
+    display: flex;
+  }
+}

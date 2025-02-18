@@ -75,7 +75,7 @@ export class FiltersComponent implements OnInit {
   ngOnInit(): void {
     console.log('data', this.data);
     const selectAllTypes = this.data.selectedTypes.includes('Todas');
-    const selectAllStates = this.data.selectedStates.includes('Todos');
+    const selectAllStates = this.data.selectedStates.includes('Todas');
     this.filtersForm = this.fb.group({
       selectAllTypes: selectAllTypes,
       selectAllStates: selectAllStates,
@@ -124,7 +124,7 @@ export class FiltersComponent implements OnInit {
   }
 
   private disableAndResetStates(): void {
-    this.filtersForm.get('selectedStates')?.setValue(['Todos']);
+    this.filtersForm.get('selectedStates')?.setValue(['Todas']);
     this.data.statesList.forEach((state) => {
       this.filtersForm.get(state)?.disable();
     });
@@ -162,12 +162,12 @@ export class FiltersComponent implements OnInit {
   onStateChange(state: string): void {
     let selectedStates = this.filtersForm.value.selectedStates;
 
-    if (state === 'Todos') {
+    if (state === 'Todas') {
       // Select only 'Todos' and clear all other selections
-      selectedStates = ['Todos'];
+      selectedStates = ['Todas'];
     } else {
       // Deselect 'Todos' if other options are selected
-      selectedStates = selectedStates.filter((s: string) => s !== 'Todos');
+      selectedStates = selectedStates.filter((s: string) => s !== 'Todas');
 
       // Toggle the selection of the clicked checkbox
       const index = selectedStates.indexOf(state);
@@ -191,8 +191,8 @@ export class FiltersComponent implements OnInit {
   isStateDisabled(state: string): boolean {
     // Disable other options if 'Todos' is selected
     return (
-      this.filtersForm.value.selectedStates.includes('Todos') &&
-      state !== 'Todos'
+      this.filtersForm.value.selectedStates.includes('Todas') &&
+      state !== 'Todas'
     );
   }
 
@@ -212,7 +212,7 @@ export class FiltersComponent implements OnInit {
       selectAllStates: true,
       selectedPeriod: 'Último mes',
       selectedTypes: ['Todas'],
-      selectedStates: ['Todos'],
+      selectedStates: ['Todas'],
     });
     setTimeout(() => {
       this.sidePanelService.close();

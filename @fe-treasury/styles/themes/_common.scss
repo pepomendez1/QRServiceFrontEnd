@@ -6,6 +6,8 @@
 @import "../partials/containers";
 
 @import "../partials/messages";
+
+@import "../partials/snackbars";
 // Side-panel
 @import "../partials/forms";
 $sidebar-width: 480px !default;
@@ -73,8 +75,16 @@ $button-hover: $theme-background-hover;
 @import '../../shared/side-panel/side-panel-footer/side-panel-footer.component.scss';
 
 @import '../../shared/otp-form/otp-form.theme.scss';
+@import '../../shared/form-input/form-input.theme.scss';
 
 //Onboarding
 
 //welcome - swiper
 @import '../../../src/app/pages/authentication/register/welcome-slider/welcome-slider.theme.scss';
+
+@import '../../shared/slider-button/slider-button.theme.scss';
+// Solves bug in progress bar assigning the same color to both active and track
+// in indeterminate progress bar
+.mdc-linear-progress__buffer-bar {
+  opacity: 0.5;
+}

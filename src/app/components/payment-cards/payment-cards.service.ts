@@ -1,8 +1,22 @@
 import { Injectable } from '@angular/core';
 import { catchError, Observable, of, switchMap, map, throwError } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
-
+import { StoreDataService } from 'src/app/services/store-data.service';
+import { ThemeService } from 'src/app/services/layout/theme-service';
 export interface Card {
+  id: string;
+  provider_id: string;
+  type: 'VIRTUAL' | 'PHYSICAL';
+  product_type: string;
+  status: 'ACTIVE' | 'BLOCKED' | 'DISABLED';
+  last_four: string;
+  provider: string;
+  activated_at: string;
+  affinity_group_id: string;
+  alias: string;
+}
+
+export interface Shipping {
   id: string;
   provider_id: string;
   type: 'VIRTUAL' | 'PHYSICAL';
@@ -52,16 +66,20 @@ export class PaymentCardsService {
     },
   ];
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private themeService: ThemeService,
+    private storeService: StoreDataService
+  ) {}
 
   public getCards(): Observable<Cards> {
     console.log('getCards()');
 
     if (this.useMockData) {
       //MOCK DATA
-      if (Math.random() > 0.9) {
-        return throwError(() => new Error('Error obteniendo tarjetas'));
-      }
+      // if (Math.random() > 0.9) {
+      //   return throwError(() => new Error('Error obteniendo tarjetas'));
+      // }
 
       return new Observable<Cards>((subscriber) => {
         setTimeout(() => {
@@ -148,8 +166,8 @@ export class PaymentCardsService {
     }
   }
 
-  getCardToken(cardId: string): Observable<string> {
-    console.log(`getCardToken(${cardId})`);
+  getCardToken(): Observable<string> {
+    // console.log(`getCardToken(${cardId})`);
     if (this.useMockData) {
       // MOCK DATA
       return new Observable<string>((subscriber) => {
@@ -168,28 +186,35 @@ export class PaymentCardsService {
   public getCardIframeUrl(cardId: string): Observable<string> {
     console.log(`getCardIframeUrl(${cardId})`);
 
-    return this.getCardToken(cardId).pipe(
-      switchMap((response: any) => {
-        console.log(response);
-        const POMELO_BASE_CARD_TOKEN_URL =
-          'https://secure-data-web-stage.pomelo.la/v1/';
+    return this.storeService.getStore().pipe(
+      switchMap((store) => {
         const styles =
-          'https://gist.githubusercontent.com/llosio/eb5cb5e4b2ec0b288f08a98b5d5eee86/raw/1caac8e05b4f3d9366d682626a2ad7a47c4e72b9/pomeloGenerico.css';
-        const webViewUrl =
-          POMELO_BASE_CARD_TOKEN_URL +
-          cardId +
-          '?auth=' +
-          response.access_token +
-          '&styles=' +
-          styles +
-          '&field_list=pan%2Ccode%2Cname%2Cexpiration' +
-          '&locale=es';
+          store.init_config?.card_iframe_styles ||
+          window.location.origin + '/assets/styles/iframe-card.css'; // Absolute URL// Local fallback
 
-        return new Observable<string>((subscriber) => {
-          console.log(webViewUrl);
-          subscriber.next(webViewUrl);
-          subscriber.complete();
-        });
+        return this.getCardToken().pipe(
+          switchMap((response: any) => {
+            console.log(response);
+            const POMELO_BASE_CARD_TOKEN_URL =
+              'https://secure-data-web-stage.pomelo.la/v1/';
+
+            const webViewUrl =
+              POMELO_BASE_CARD_TOKEN_URL +
+              cardId +
+              '?auth=' +
+              response.access_token +
+              '&styles=' +
+              encodeURIComponent(styles) + // Ensure proper encoding
+              '&field_list=pan%2Ccode%2Cname%2Cexpiration' +
+              '&locale=es';
+
+            return new Observable<string>((subscriber) => {
+              console.log(webViewUrl);
+              subscriber.next(webViewUrl);
+              subscriber.complete();
+            });
+          })
+        );
       }),
       catchError((error: any) => {
         console.log(error);
@@ -501,5 +526,213 @@ export class PaymentCardsService {
         })
       );
     }
+  }
+
+  public getShipping(): Observable<any> {
+    console.log('getShippings()');
+    // CREATED
+    // TRACKED / REJECTED
+    // IN_TRANSIT / FAILED_DELIVERY_ATTEMPT
+    // DELIVERED / NOT_DELIVERED
+    let status = 'IN_TRANSIT';
+
+    const mockShippingData: {
+      address_street_name: string;
+      address_street_number: string;
+      address_floor: string;
+      address_apartment: string;
+      address_city: string;
+      address_region: string;
+      address_country: string;
+      address_zip_code: string;
+      address_neighborhood: string;
+      address_additional_info: string;
+      status: string;
+      status_detail: string;
+      due_delivery_date: string | null;
+      tracking_url: string | null;
+      external_tracking_id: string | null;
+      created_at: string;
+      modified_at: string;
+    } = {
+      address_street_name: 'Velez Sarsfield',
+      address_street_number: '1025',
+      address_floor: '3',
+      address_apartment: 'B',
+      address_city: 'Cordoba Capital',
+      address_region: 'Córdoba',
+      address_country: 'ARG',
+      address_zip_code: '5000',
+      address_neighborhood: 'CORDOBA CAPITAL',
+      address_additional_info: '',
+      status: status,
+      status_detail: status,
+      due_delivery_date: null, // Initially null
+      tracking_url: null,
+      external_tracking_id: null,
+      created_at: '2025-01-31T18:03:00Z',
+      modified_at: '2025-01-31T18:03:00Z',
+    };
+
+    if (status !== 'CREATED') {
+      mockShippingData.due_delivery_date = '2025-02-15T12:00:00Z';
+      mockShippingData.tracking_url = 'https://tracking.example.com/123456';
+      mockShippingData.external_tracking_id = 'TRACK123456';
+    }
+
+    //const mockShippingData = null;
+
+    if (this.useMockData) {
+      return new Observable((subscriber) => {
+        setTimeout(() => {
+          subscriber.next(mockShippingData);
+          subscriber.complete();
+        }, 1000);
+      });
+    }
+    // response can be null...
+    return this.apiService.get<any>(`${this.cardsEndpoint}/shippings`).pipe(
+      map((response) => {
+        console.log('response: ', response);
+        return response;
+      }),
+      catchError((error: any) => {
+        console.log(error);
+        return throwError(
+          () => new Error('Error obteniendo datos de envíos de tarjeta ')
+        );
+      })
+    );
+  }
+
+  public getActivationFormIframe(): Observable<string> {
+    //console.log(`getCardIframeUrl(${cardId})`);
+
+    return this.themeService.getCurrentThemeObservable().pipe(
+      map((theme) => {
+        //  Map theme values to "dark" or "light"
+        if (theme === 'app-dark') return 'dark';
+        if (theme === 'app-default') return 'light';
+        return 'light'; // Default fallback
+      }),
+      switchMap((theme) => {
+        // ✅ Dynamically select the correct CSS file based on the theme
+        const styles =
+          window.location.origin +
+          `/assets/styles/iframe-activation-${theme}.css`;
+        const textColor = theme === 'light' ? '#161616' : '#ffffff';
+        const buttonTextColor = theme === 'light' ? '#ffffff' : '#1a1a1a';
+        const formBorder = theme === 'light' ? '#DBDBDB' : '#c5c5c5';
+        const primaryColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--primary-color-200')
+          .trim();
+
+        const primaryColorHover = getComputedStyle(document.documentElement)
+          .getPropertyValue('--primary-color-300')
+          .trim();
+
+        const primaryColorPressed = getComputedStyle(document.documentElement)
+          .getPropertyValue('--primary-color-600')
+          .trim();
+
+        return this.getCardToken().pipe(
+          switchMap((response: any) => {
+            console.log(' response: -- token pomelo ', response);
+            const POMELO_ACTIVATION_CARD_URL =
+              'https://secure-data-web.pomelo.la/v1/activate-card';
+
+            const customStyles = encodeURIComponent(`
+
+             html, body, .activation-form {
+                height: 92vh !important;
+                width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden !important;
+}
+                .activation-form {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: flex-start;
+                  align-items: center;
+                  gap: 1em;
+                  overflow-y: hidden !important;
+                  overflow-x: hidden !important;
+                  background-color: transparent;
+                  padding: 0px;
+                }
+                .activation-form .pan-input,
+                .activation-form .pin-input {
+                  color: ${textColor};
+                  height: 56px;
+                  border: 1px solid ${formBorder};
+                  background-color: transparent;
+                  width: 100%;
+                  padding: 4px 16px;
+
+                  border-radius: 8px;
+                }
+                  .activation-form .pan-input::placeholder,
+                  .activation-form .pin-input::placeholder {
+                      color: #A3A3A3;
+                      opacity: 1;
+                      font-size: 14px;
+                      font-weight: 400;
+
+                }
+                .activation-form .error-field {
+                  color: #E44B52;
+                  font-weight: 500;
+                  font-size: 14px;
+                  line-height: 20.3px;
+                  text-align: left;
+                  align-self: flex-start;
+                }
+                .activation-form .submit-button {
+                 font-size: 16px;
+               line-height: 24px;
+                font-weight: 600;
+                  border: none;
+                padding: 1em;
+  box-shadow: none;
+  border-radius: 0.5em;
+               background-color: ${primaryColor} !important;
+               color: ${buttonTextColor};
+              width: 100%;
+              margin-top: auto;
+               &:hover {
+    background-color: ${primaryColorHover} !important;
+    cursor: pointer;
+  }
+
+  &:active {
+    background-color:${primaryColorPressed} !important;
+    cursor: pointer;
+  }
+                }
+              `);
+
+            // append the token as a query param
+            const webViewUrl =
+              `${POMELO_ACTIVATION_CARD_URL}?token=${encodeURIComponent(
+                response.access_token
+              )}` +
+              `&locale=es` +
+              `&styles_string=${customStyles}`;
+
+            console.log(' web view url: ', POMELO_ACTIVATION_CARD_URL);
+            return new Observable<string>((subscriber) => {
+              console.log(webViewUrl);
+              subscriber.next(webViewUrl);
+              subscriber.complete();
+            });
+          })
+        );
+      }),
+      catchError((error: any) => {
+        console.log(error);
+        return throwError(() => new Error('Error obteniendo token'));
+      })
+    );
   }
 }

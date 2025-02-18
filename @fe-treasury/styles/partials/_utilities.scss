@@ -48,7 +48,7 @@
 .paragraph-400-green {
   font: var(--font-subheading-2);
   font-weight: 400;
-  color: #048A42;
+  color: $theme-green-cash-in;
 }
 //14px, 20.3px, 400
 .secondary-400 {
@@ -235,6 +235,14 @@ blockquote {
 
 .hint-text {
   color: $theme-hint-text;
+}
+
+.alert-text {
+  color: $theme-color-warn;
+}
+
+.hightlight-text {
+  color: $theme-color-primary;
 }
 
 .color-icon {

@@ -1,0 +1,43 @@
+.layout-container {
+  display: flex;
+  //align-items: baseline;
+  gap: 2em;
+
+  .left-column {
+    width: 26em; /* Fixed width for the left column */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    .insurance-card{
+      .insurance-actions{
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        justify-content: space-between;
+      }
+    }
+  }
+
+  .right-column {
+    flex-grow: 1; /* Take the remaining space */
+    display: flex;
+    flex-direction: column; /* Ensure content is vertically aligned */
+   // gap: 1em;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .layout-container {
+    flex-direction: column;
+    gap: 1em;
+
+    .left-column {
+      width: 100%;
+    }
+
+    .right-column {
+      width: 100%;
+    }
+  }
+
+}

@@ -1,0 +1,107 @@
+<form
+  class="filters-component-container"
+  (ngSubmit)="onSubmit()"
+  [formGroup]="filtersForm"
+>
+  <app-side-panel-header
+    title="Filtros"
+    [arrowBackEnabled]="false"
+  ></app-side-panel-header>
+
+  <div class="filter-container">
+    <div class="filter-section">
+      <h3 class="paragraph-500-light m-1">Categoría</h3>
+      <div class="container">
+        <mat-checkbox color="primary" formControlName="selectAllTypes"
+          >Todas</mat-checkbox
+        >
+        <mat-checkbox
+          color="primary"
+          *ngFor="let type of data.typesList"
+          [value]="type"
+          (change)="onTypeChange(type)"
+          [checked]="filtersForm.value.selectedTypes.includes(type)"
+          [disabled]="filtersForm.get('selectAllTypes')?.value"
+        >
+          {{ type }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h3 class="paragraph-500-light m-1">Período</h3>
+      <div class="container">
+        <mat-radio-group formControlName="selectedPeriod">
+          <mat-radio-button
+            color="primary"
+            *ngFor="let period of data.periodsList"
+            [value]="period"
+          >
+            {{ period }}
+          </mat-radio-button>
+          <!-- <mat-radio-button class="accordion-container">
+          <div class="accordion-header" (click)="toggleAccordion()">
+            <p>Otro período</p>
+            <span class="arrow" [class.open]="isAccordionOpen">
+              <mat-icon>keyboard_arrow_down</mat-icon>
+            </span>
+          </div>
+
+          <div class="accordion-content" [@toggleContent]="isAccordionOpen ? 'open' : 'closed'">
+            <mat-form-field>
+              <mat-label>Período</mat-label>
+              <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate placeholder="Desde">
+                <input matEndDate placeholder="Hasta">
+              </mat-date-range-input>
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+            </mat-form-field>
+          </div>
+        </mat-radio-button> -->
+        </mat-radio-group>
+      </div>
+    </div>
+
+    <!-- <div class="filter-section">
+      <h3 class="paragraph-500-light m-1">Estados</h3>
+      <div class="container">
+        <mat-checkbox color="primary" formControlName="selectAllStates"
+          >Todos</mat-checkbox
+        >
+        <mat-checkbox
+          color="primary"
+          *ngFor="let state of data.statesList"
+          [value]="state"
+          (change)="onStateChange(state)"
+          [checked]="filtersForm.value.selectedStates.includes(state)"
+          [disabled]="filtersForm.get('selectAllStates')?.value"
+        >
+          {{ state }}
+        </mat-checkbox>
+      </div>
+    </div> -->
+
+  </div>
+  <app-side-panel-footer
+    class="w-100"
+    [buttonText]="'Finalizar'"
+    [buttonStyle]="'two'"
+    buttonLeftText="Borrar filtros"
+    buttonRightText="Aplicar"
+    [buttonDisabled]="false"
+    (buttonLeftClicked)="clearFilters()"
+    (buttonRightClicked)="onSubmit()"
+  ></app-side-panel-footer>
+  <!-- <div class="buttons-container">
+    <button
+      mat-button
+      class="btn btn-ghost"
+      type="button"
+      (click)="clearFilters()"
+    >
+      Borrar filtros
+    </button>
+    <button mat-button class="btn btn-cta" type="submit">Aplicar</button>
+  </div> -->
+</form>

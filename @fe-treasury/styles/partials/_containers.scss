@@ -6,6 +6,15 @@
   border-radius: 12px;
   border: 1px solid #ebebeb;
 }
+
+.custom-card-p0 {
+  background-color: $theme-card;
+  box-shadow: none;
+  gap: 1em;
+  border-radius: 12px;
+  border: 1px solid #ebebeb;
+}
+
 .container {
   border-radius: 1em;
   background-color:  $theme-card;

@@ -4,45 +4,119 @@ import {
   MatSnackBarConfig,
   MatSnackBarRef,
 } from '@angular/material/snack-bar';
+import { EventEmitter } from '@angular/core';
 import { CustomSnackbarComponent } from './custom-snackbar.component'; // Adjust the path accordingly
 
 @Injectable({
   providedIn: 'root',
 })
 export class SnackbarService {
+  private activeSnackbarRef?: MatSnackBarRef<CustomSnackbarComponent>;
   constructor(private snackBar: MatSnackBar) {}
 
-  openSuccess(message: string, showClose: boolean = false, duration?: number) {
-    this.openCustomSnackbar(message, 'success', showClose, duration);
+  openSuccess(
+    message: string,
+    showClose: boolean = false,
+    duration?: number,
+    actionButton?: string,
+    actionCallback?: () => void
+  ) {
+    this.openCustomSnackbar(
+      message,
+      'success',
+      showClose,
+      duration,
+      actionButton,
+      actionCallback
+    );
   }
 
-  openError(message: string, showClose: boolean = false, duration?: number) {
-    this.openCustomSnackbar(message, 'error', showClose, duration);
+  openError(
+    message: string,
+    showClose: boolean = false,
+    duration?: number,
+    actionButton?: string,
+    actionCallback?: () => void
+  ) {
+    this.openCustomSnackbar(
+      message,
+      'error',
+      showClose,
+      duration,
+      actionButton,
+      actionCallback
+    );
   }
 
-  openInfo(message: string, showClose: boolean = false, duration?: number) {
-    this.openCustomSnackbar(message, 'info', showClose, duration);
+  openInfo(
+    message: string,
+    showClose: boolean = false,
+    duration?: number,
+    actionButton?: string,
+    actionCallback?: () => void
+  ) {
+    this.openCustomSnackbar(
+      message,
+      'info',
+      showClose,
+      duration,
+      actionButton,
+      actionCallback
+    );
+  }
+
+  openWarning(
+    message: string,
+    showClose: boolean = false,
+    duration?: number,
+    actionButton?: string,
+    actionCallback?: () => void
+  ) {
+    this.openCustomSnackbar(
+      message,
+      'warning',
+      showClose,
+      duration,
+      actionButton,
+      actionCallback
+    );
   }
 
   private openCustomSnackbar(
     message: string,
-    type: 'success' | 'error' | 'info',
+    type: 'success' | 'error' | 'info' | 'warning',
     showClose: boolean,
-    duration?: number
+    duration?: number,
+    actionButton?: string,
+    actionCallback?: () => void
   ) {
-    const config: MatSnackBarConfig = {
-      duration: duration ?? (showClose ? undefined : 3000),
-      data: { message, showClose },
-      panelClass: [`snackbar-${type}`],
-    };
+    const actionEmitter = new EventEmitter<void>();
 
-    const snackBarRef: MatSnackBarRef<CustomSnackbarComponent> =
-      this.snackBar.openFromComponent(CustomSnackbarComponent, config);
-
-    if (showClose) {
-      snackBarRef.instance.snackBarRef = snackBarRef;
+    if (actionCallback) {
+      actionEmitter.subscribe(() => actionCallback());
     }
 
-    //this.snackBar.openFromComponent(CustomSnackbarComponent, config);
+    const config: MatSnackBarConfig = {
+      duration: duration ?? (showClose ? undefined : 3000),
+      data: { message, showClose, actionButton, actionEmitter },
+      panelClass: [`snackbar-${type}`, 'custom-snackbar-panel'],
+    };
+
+    // Store reference to the active snackbar
+    this.activeSnackbarRef = this.snackBar.openFromComponent(
+      CustomSnackbarComponent,
+      config
+    );
+
+    if (showClose) {
+      this.activeSnackbarRef.instance.snackBarRef = this.activeSnackbarRef;
+    }
+  }
+
+  close(): void {
+    if (this.activeSnackbarRef) {
+      this.activeSnackbarRef.dismiss();
+      this.activeSnackbarRef = undefined; // Reset reference after closing
+    }
   }
 }

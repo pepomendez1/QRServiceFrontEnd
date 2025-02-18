@@ -1,0 +1,126 @@
+<div class="international-operations">
+  <div class="international-operations-filters">
+    <!-- Contenedor de los filtros y el botón de borrar -->
+    <div *ngIf="!hideFilters" class="filters-container">
+      <!-- Filtros alineados a la izquierda -->
+      <div class="filters-wrapper">
+        <div class="rounded-box clickable" (click)="openFiltersPanel()">
+          <p class="paragraph-600">Filtros</p>
+          <mat-icon class="material-symbols-outlined"
+            >keyboard_arrow_down</mat-icon
+          >
+        </div>
+
+        <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
+          <mat-icon class="search-icon-light">search</mat-icon>
+          <input
+            class="input-search paragraph-500"
+            placeholder="Buscar"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="filterOperations()"
+            (focus)="isFocused = true"
+            (blur)="isFocused = false"
+          />
+          <mat-spinner
+            class="search-spinner"
+            [class.show]="searching"
+          ></mat-spinner>
+        </div>
+      </div>
+      <div
+        class="rounded-box clickable"
+        (click)="exportToCSV()"
+        [class.disabled]="noOperations"
+      >
+        <p class="paragraph-600 download-label">Descargar</p>
+        <mat-icon class="material-symbols-outlined">file_download</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <div class="international-operations-container custom-card">
+    <!-- Mensaje de sin resultados -->
+    <div *ngIf="!hideTitle" class="card-title heading-5-700">
+      {{ headerTitle }}
+    </div>
+    <div *ngIf="noOperations && !loading" class="no-operations">
+      <div *ngIf="problemImg" [innerHTML]="problemImg"></div>
+
+      <p class="paragraph-500" *ngIf="hideFilters">
+        No tenés ninguna operación aún
+      </p>
+      <p class="paragraph-500" *ngIf="!hideFilters">
+        No hay operaciones disponibles.
+      </p>
+    </div>
+    <!-- Loader -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner></mat-spinner>
+      <!-- O cualquier otro tipo de loader que prefieras -->
+    </div>
+    <!-- Lista de operaciones -->
+    <div *ngIf="!loading && !noOperations" class="operations-list">
+      <div
+        *ngFor="let operation of filteredOperations; let isLast = last"
+        class="operation-item clickable"
+        [ngClass]="{ last: isLast }"
+        (click)="viewOperation(operation.id)"
+      >
+        <div class="operations-info">
+          <div class="rounded-icon">
+            <mat-icon class="material-symbols-outlined">{{
+              operation.icon
+            }}</mat-icon>
+          </div>
+          <div class="details">
+            <div class="operation-header">
+              <div class="paragraph-600">
+                {{
+                  operation.description
+                    ? operation.description
+                    : "Sin descripción"
+                }}
+              </div>
+              <div *ngIf="operation.type == 'cash_out'" class="status-badge">
+                <span
+                  class="status {{ operation.status | statusPill : 'type' }}"
+                >
+                  {{ operation.status | statusPill : "text" }}
+                </span>
+              </div>
+            </div>
+            <div class="secondary-500-light" *ngIf="operation.contact_name">
+              {{ operation.contact_name }}
+            </div>
+          </div>
+        </div>
+        <div class="operation-amount">
+          <div
+            class="paragraph-400"
+            [ngClass]="{
+              'paragraph-400': true,
+              'paragraph-400-green': operation.type === 'cash_in'
+            }"
+          >
+            {{
+              operation.type === "cash_in"
+                ? "+" + (operation.amount | currency : "USD" : "symbol-narrow")
+                : "-" + (operation.amount | currency : "USD" : "symbol-narrow")
+            }}
+          </div>
+          <div class="caption-light">
+            {{ operation.created_at | date : "dd/MMM" }}
+          </div>
+        </div>
+      </div>
+      <div
+        class="btn-cta-ghost go-to-operation"
+        (click)="goToOperations()"
+        *ngIf="activityShortcut"
+      >
+        <span class="paragraph-600">Ver historial de operaciones</span>
+        <mat-icon>chevron_right</mat-icon>
+      </div>
+    </div>
+  </div>
+</div>

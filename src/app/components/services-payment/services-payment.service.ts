@@ -35,8 +35,19 @@ export interface Expiration {
   checked: boolean;
 }
 
+export interface History {
+  description: string;
+  merchant_name: string;
+  vencido: boolean;
+  autodebito: boolean;
+  fechaAutodebito: string;
+  amount: number;
+  date: string
+}
+
 export interface Cards extends Array<Card> {}
 export interface Expirations extends Array<Expiration> {}
+export interface Histories extends Array<History> {}
 export interface MyServicesAndTaxes extends Array<MyServicesAndTaxes> {}
 
 @Injectable({
@@ -44,7 +55,8 @@ export interface MyServicesAndTaxes extends Array<MyServicesAndTaxes> {}
 })
 export class ServicesPaymentService {
   private useMockData: boolean = true;
-  private cardsEndpoint = '/public/public/wibond-connect/cards';
+  //private cardsEndpoint = '/public/public/wibond-connect/cards';
+  private servicePaymentEndpoint = '/public/public/wibond-connect/services-payment';
   currentCards: Cards = [];
 
   mockCards: Cards = [
@@ -170,7 +182,7 @@ export class ServicesPaymentService {
     }*/
   ];
 
-  mockExpirations=  [
+  mockExpirations: Expirations =  [
     {
       description: "Telefonía - Nro de Cuenta 123456",
       merchant_name: "Claro",
@@ -200,14 +212,15 @@ export class ServicesPaymentService {
     }
   ];
 
-  mockHistory=  [
+  mockHistory: Histories=   [
     {
       description: "Telefonía - Nro de Cuenta 123456",
       merchant_name: "Claro",
       vencido: true,
       autodebito: true,
       fechaAutodebito :'20 de enero',
-      amount:1000,date: '2024-01-01'
+      amount:1000,
+      date: '2024-01-01'
     },
     {
       description: "Telefonía - Nro de Cuenta 666899",
@@ -216,7 +229,7 @@ export class ServicesPaymentService {
       autodebito: true,
       fechaAutodebito :'21 de enero',
       amount:2000,
-      date: '2024-01-05'
+      date: '2024-12-05'
     },
     {
       description: "Gas - Nro de Cuenta 78544",
@@ -225,7 +238,16 @@ export class ServicesPaymentService {
       autodebito: true,
       fechaAutodebito :'24 de enero',
       amount:3000,
-      date: '2024-01-10'
+      date: '2025-01-10'
+    },
+    {
+      description: "Luz - Nro de Cuenta 111",
+      merchant_name: "EPEC",
+      vencido: false,
+      autodebito: true,
+      fechaAutodebito :'21 de febrero',
+      amount:3000,
+      date: '2025-02-02'
     }
   ];
 
@@ -248,7 +270,7 @@ export class ServicesPaymentService {
       });
     } else {
       // response can be null...
-      return this.apiService.get<Cards>(this.cardsEndpoint).pipe(
+      return this.apiService.get<Cards>(this.servicePaymentEndpoint).pipe(
         catchError((error: any) => {
           console.log(error);
           return throwError(() => new Error('Error obteniendo tarjetas'));
@@ -316,7 +338,7 @@ export class ServicesPaymentService {
       console.warn('creating card');
       console.log('body: ', body);
 
-      return this.apiService.post<Cards>(this.cardsEndpoint, body).pipe(
+      return this.apiService.post<Cards>(this.servicePaymentEndpoint, body).pipe(
         catchError((error: any) => {
           console.log(error);
           return throwError(() => new Error('Error creando tarjeta'));
@@ -338,7 +360,7 @@ export class ServicesPaymentService {
         }, 1000);
       });
     } else {
-      return this.apiService.get<string>(this.cardsEndpoint + '/tokens');
+      return this.apiService.get<string>(this.servicePaymentEndpoint + '/tokens');
     }
   }
 
@@ -398,7 +420,7 @@ export class ServicesPaymentService {
         },
       };
 
-      return this.apiService.put<any>(this.cardsEndpoint, body).pipe(
+      return this.apiService.put<any>(this.servicePaymentEndpoint, body).pipe(
         map((response) => {
           if (response.is_ok) {
             return true; // Response indicates success, return true
@@ -451,7 +473,7 @@ export class ServicesPaymentService {
         },
       };
 
-      return this.apiService.put<any>(this.cardsEndpoint, body).pipe(
+      return this.apiService.put<any>(this.servicePaymentEndpoint, body).pipe(
         map((response) => {
           if (response.is_ok) {
             return true; // Response indicates success, return true
@@ -492,7 +514,7 @@ export class ServicesPaymentService {
         },
       };
 
-      return this.apiService.put<any>(this.cardsEndpoint, body).pipe(
+      return this.apiService.put<any>(this.servicePaymentEndpoint, body).pipe(
         map((response) => {
           if (response.is_ok) {
             return true; // Response indicates success
@@ -620,7 +642,7 @@ export class ServicesPaymentService {
         alias: newAlias,
       };
 
-      return this.apiService.put<any>(this.cardsEndpoint, body).pipe(
+      return this.apiService.put<any>(this.servicePaymentEndpoint, body).pipe(
         map((response) => {
           if (response.is_ok) {
             return true; // Response indicates success
@@ -646,7 +668,7 @@ export class ServicesPaymentService {
     if (this.useMockData) {
       //MOCK DATA
       if (Math.random() > 0.9) {
-        return throwError(() => new Error('Error obteniendo tarjetas'));
+        return throwError(() => new Error('Error obteniendo services'));
       }
 
       return new Observable<Cards>((subscriber) => {
@@ -657,23 +679,23 @@ export class ServicesPaymentService {
       });
     } else {
       // response can be null...
-      return this.apiService.get<Cards>(this.cardsEndpoint).pipe(
+      return this.apiService.get<Cards>(this.servicePaymentEndpoint).pipe(
         catchError((error: any) => {
           console.log(error);
-          return throwError(() => new Error('Error obteniendo tarjetas'));
+          return throwError(() => new Error('Error obteniendo services'));
         })
       );
     }
   }
 
   public getExpirations(): Observable<Expirations> {
-    console.log('getServicesAndTaxes()');
+    console.log('getExpirations()');
 
     if (this.useMockData) {
       //MOCK DATA
-      if (Math.random() > 0.9) {
+      /*if (Math.random() > 0.9) {
         return throwError(() => new Error('Error obteniendo tarjetas'));
-      }
+      }*/
 
       return new Observable<Expirations>((subscriber) => {
         setTimeout(() => {
@@ -683,36 +705,36 @@ export class ServicesPaymentService {
       });
     } else {
       // response can be null...
-      return this.apiService.get<Expirations>(this.cardsEndpoint).pipe(
+      return this.apiService.get<Expirations>(this.servicePaymentEndpoint).pipe(
         catchError((error: any) => {
           console.log(error);
-          return throwError(() => new Error('Error obteniendo tarjetas'));
+          return throwError(() => new Error('Error obteniendo getExpirations'));
         })
       );
     }
   }
 
-  public getHistory(): Observable<Expirations> {
+  public getHistory(): Observable<Histories> {
     console.log('getHistory()');
 
     if (this.useMockData) {
       //MOCK DATA
-      if (Math.random() > 0.9) {
-        return throwError(() => new Error('Error obteniendo tarjetas'));
-      }
+      /*if (Math.random() > 0.9) {
+        return throwError(() => new Error('Error obteniendo historial'));
+      }*/
 
-      return new Observable<Expirations>((subscriber) => {
+      return new Observable<Histories>((subscriber) => {
         setTimeout(() => {
-          subscriber.next(this.mockExpirations);
+          subscriber.next(this.mockHistory);
           subscriber.complete();
         }, 1000);
       });
     } else {
       // response can be null...
-      return this.apiService.get<Expirations>(this.cardsEndpoint).pipe(
+      return this.apiService.get<Histories>(this.servicePaymentEndpoint).pipe(
         catchError((error: any) => {
           console.log(error);
-          return throwError(() => new Error('Error obteniendo tarjetas'));
+          return throwError(() => new Error('Error obteniendo historial'));
         })
       );
     }

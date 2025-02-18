@@ -4,18 +4,14 @@ import { PaymentCardsComponent } from './payment-cards.component';
 import { MyCardsComponent } from './my-cards/my-cards.component';
 import { CardsActivityComponent } from './cards-activity/cards-activity.component';
 
-
-
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
     PaymentCardsComponent,
     MyCardsComponent,
-    CardsActivityComponent
+    CardsActivityComponent,
   ],
-  exports : [
-    PaymentCardsComponent
-  ]
+  exports: [PaymentCardsComponent],
 })
-export class PaymentCardsModule { }
+export class PaymentCardsModule {}

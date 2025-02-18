@@ -1,0 +1,39 @@
+@if(accountFailure){
+<app-general-failure [backToStartEnable]="false"></app-general-failure>
+}@else{
+<div class="layout-container">
+  <div class="left-column">
+    <div class="insurance-card custom-card">
+      <!-- Mostrar preloader solo en la sección -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner></mat-spinner>
+        <!-- Spinner de Material -->
+      </div>
+
+      <!-- Mostrar el contenido de seguros solo si los datos han sido cargados -->
+      <div *ngIf="!isLoading">
+        <!-- Botón de Contratar nuevo seguro -->
+        <div class="insurance-actions">
+          <button
+            (click)="contractInsurance()"
+            class="btn-cta-filled w-100 btn-lg"
+          >
+            Contratar nuevo seguro
+          </button>
+
+          <button
+            (click)="OpenInsuranceFAQ()"
+            class="btn-ghost-color w-100 btn-lg"
+          >
+            Conocer más
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-column">
+    <app-insurance-list></app-insurance-list>
+  </div>
+</div>
+}

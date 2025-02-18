@@ -1,0 +1,27 @@
+<div class="order-card custom-card">
+  <div class="order-card-content">
+    <div class="order-card-header">
+      <h2 class="caption-500">TARJETA FÍSICA</h2>
+      <h2 class="heading-5-700-primary">Solicitaste tu tarjeta física</h2>
+      <p class="paragraph-500">
+        Realizá el seguimiento de tu tarjeta y activala cuando te llegue para
+        empezar a usarla
+      </p>
+    </div>
+    <div class="order-card-btn">
+      <button
+        class="btn-ghost-color btn-md subheading-700"
+        (click)="shippingStatus()"
+      >
+        Seguimiento
+      </button>
+      <button
+        class="btn-ghost-color btn-md subheading-700"
+        (click)="activateCard()"
+      >
+        Activar
+      </button>
+    </div>
+  </div>
+  <!-- <div *ngIf="cardOrder" [innerHTML]="cardOrder"></div> -->
+</div>

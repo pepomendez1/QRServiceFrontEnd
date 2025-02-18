@@ -63,8 +63,9 @@ export class AppLayoutComponent implements AfterViewInit {
     this.sidePanelService.setViewContainerRef(this.container);
   }
   ngOnInit() {
-    this.logoUrl = this.svgLibrary.getLogo();
-
+    this.svgLibrary.currentLogo$.subscribe((logo) => {
+      this.logoUrl = logo;
+    });
     this.accountName$ = this.onboardingService.getFirstName();
     this.sidenavItems$ = this.sidenavService.items$;
     this.sideNavigation$ = this.themeService.config$.pipe(

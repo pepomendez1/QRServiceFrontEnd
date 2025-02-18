@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 export class IconLookupService {
   private iconMap: { [key: string]: string } = {
     'transfer-cash_in': 'arrow_forward',
+    'transfer_cvu_received-cash_in': 'arrow_forward',
     'transfer-cash_out': 'arrow_back',
     'cards-cash_in': 'refresh',
     'cards-cash_out': 'credit_card',
@@ -14,6 +15,7 @@ export class IconLookupService {
     'payout-cash_in': 'attach_money',
     'payout-cash_out': 'money_off_csred',
     'balance-investments-cash_in': 'trending_up',
+    'balance-investment-cash_in': 'trending_up',
     'balance-investments-cash_out': 'sync',
   };
 

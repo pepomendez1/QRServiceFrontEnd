@@ -6,9 +6,11 @@ import { forkJoin, BehaviorSubject } from 'rxjs';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import { DatePipe } from '@angular/common';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
-import { SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DescriptionTable } from 'src/app/components/treasury-activity/treasury-activity-utils/description-table';
 import { StoreDataService } from '../store-data.service';
 import { SvgLibraryService } from '../svg-library.service';
+import { ThemeService } from './theme-service';
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 @Injectable({
@@ -17,10 +19,12 @@ import { SvgLibraryService } from '../svg-library.service';
 export class VoucherService {
   private generatingVoucher = new BehaviorSubject<boolean>(false); // Tracks generation state
   public generatingVoucher$ = this.generatingVoucher.asObservable(); // Expose as observable
-  //logoUrl: SafeHtml | null = null;
-  logoUrl: any;
+  logoUrl: SafeHtml | null = null;
+  //logoUrl: any;
   primaryColor: string = '#F50050';
   constructor(
+    private sanitizer: DomSanitizer,
+    private descriptionTable: DescriptionTable,
     private storeDataService: StoreDataService,
     private svgLibrary: SvgLibraryService,
     private onboardingService: OnboardingService,
@@ -29,13 +33,18 @@ export class VoucherService {
     private formatNamePipe: FormatNamePipe
   ) {
     //this.logoUrl = this.svgLibrary.getLogo();
-    storeDataService.getStore().subscribe({
+    this.initLogoAndColor();
+  }
+
+  private initLogoAndColor(): void {
+    this.storeDataService.getStore().subscribe({
       next: (store) => {
-        this.primaryColor = store.init_config?.primary_color || '#F50050';
-        this.logoUrl = store.init_config?.primary_logo_url;
+        const isDarkMode = false; // Replace with actual dark mode check if available
+        this.primaryColor = store.init_config?.primary_color || '#4876DB';
+        this.logoUrl = this.svgLibrary.getLogo(); // Pass primary color to svgLibrary
       },
       error: (err) => {
-        console.error('Error fetching parameters:', err);
+        console.error('Error fetching store data:', err);
       },
     });
   }
@@ -114,6 +123,12 @@ export class VoucherService {
           amount: this.formatAmount(transactionDetail.amount), // Formatted amount
           reason: transactionDetail.description,
           type: this.getType(transactionDetail.type),
+          description:
+            transactionDetail.description ||
+            this.descriptionTable.getDescription(
+              transactionDetail.type,
+              transactionDetail.source
+            ),
           senderName: `${onboardingName.first_name} ${this.toUpperCase(
             onboardingName.last_name
           )}`, // Sender name from onboarding
@@ -125,6 +140,9 @@ export class VoucherService {
           recipientTaxId: transactionDetail.tax_id || '', // Recipient CVU
           operationNumber: transactionDetail.id, // Operation number
           identificationCode: transactionDetail.transaction_reference, // Transaction reference
+          destinationMessage: this.getDestinationMessage(
+            transactionDetail.source
+          ),
         };
 
         // Generate the voucher
@@ -137,46 +155,51 @@ export class VoucherService {
       },
     });
   }
-  private getBase64FromSvgUrl(svgUrl: any): Promise<string> {
-    return new Promise((resolve, reject) => {
-      // Fetch the SVG content from the URL
-      fetch(svgUrl)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Failed to fetch SVG: ${response.statusText}`);
-          }
-          return response.text(); // Get the SVG as text
-        })
-        .then((svgContent) => {
-          // Create an SVG Blob
-          const blob = new Blob([svgContent], { type: 'image/svg+xml' });
-          const url = URL.createObjectURL(blob);
+  private getBase64FromSafeSvg(safeSvg: SafeHtml): Promise<string> {
+    // Bypass security to get the raw SVG content
+    const rawSvg = this.sanitizer.sanitize(1, safeSvg) as string;
 
-          const img = new Image();
-          img.onload = () => {
-            // Draw the SVG image onto a canvas
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.drawImage(img, 0, 0);
-              const base64 = canvas.toDataURL('image/png'); // Convert to Base64 PNG
-              resolve(base64);
-            } else {
-              reject(new Error('Could not get canvas context'));
-            }
-            URL.revokeObjectURL(url); // Clean up object URL
-          };
-          img.onerror = () => reject(new Error('Failed to load SVG as image'));
-          img.src = url; // Set the image source to the created object URL
-        })
-        .catch((error) => reject(error));
+    if (!rawSvg) {
+      return Promise.reject('Failed to extract raw SVG content');
+    }
+
+    const blob = new Blob([rawSvg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+
+    return new Promise<string>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+
+          if (!ctx) {
+            throw new Error('Failed to create canvas context');
+          }
+
+          ctx.drawImage(img, 0, 0);
+          const base64 = canvas.toDataURL('image/png');
+          resolve(base64);
+        } catch (error) {
+          reject(error);
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Failed to load SVG as image'));
+      };
+
+      img.src = url;
     });
   }
 
   generateVoucher(transactionData: any): void {
-    this.getBase64FromSvgUrl(this.logoUrl)
+    this.getBase64FromSafeSvg(this.logoUrl as SafeHtml) // Handle SafeHtml
       .then((logoBase64) => {
         const docDefinition: any = {
           pageSize: {
@@ -194,7 +217,7 @@ export class VoucherService {
                   margin: [0, 0, 0, 20],
                 },
                 {
-                  text: `${transactionData.type}`,
+                  text: `${transactionData.description}`,
                   style: 'heading5',
                   margin: [0, 0, 0, 4],
                 },
@@ -204,32 +227,38 @@ export class VoucherService {
                   margin: [0, 0, 0, 4],
                 },
                 {
-                  text: transactionData.date,
+                  text: transactionData.date || 'Fecha no disponible',
                   style: 'date500',
                 },
               ],
               margin: [0, 0, 0, 20],
             },
 
-            {
-              canvas: [
-                {
-                  type: 'line',
-                  x1: 0,
-                  y1: 0,
-                  x2: 300,
-                  y2: 0,
-                  lineWidth: 0.5,
-                  lineColor: '#C2C2C2',
-                }, // Color gris
-              ],
-              margin: [0, 0, 0, 15],
-            },
+            // Horizontal line
+            ...(transactionData.type
+              ? [
+                  {
+                    canvas: [
+                      {
+                        type: 'line',
+                        x1: 0,
+                        y1: 0,
+                        x2: 300,
+                        y2: 0,
+                        lineWidth: 0.5,
+                        lineColor: '#C2C2C2',
+                      },
+                    ],
+                    margin: [0, 0, 0, 15],
+                  },
+                ]
+              : []),
 
+            // Sender and recipient details
             {
               columns: [
                 {
-                  // Left column: Canvas for red circles and vertical line
+                  // Left column: Circle and line
                   canvas: [
                     {
                       type: 'ellipse',
@@ -238,88 +267,135 @@ export class VoucherService {
                       color: this.primaryColor,
                       r1: 4,
                       r2: 4,
-                    }, // Top circle
-                    {
-                      type: 'line',
-                      x1: 5,
-                      y1: 10,
-                      x2: 5,
-                      y2: 110,
-                      lineWidth: 1,
-                      lineColor: '#C2C2C2',
-                    }, // Vertical line
-                    {
-                      type: 'ellipse',
-                      x: 5,
-                      y: 115,
-                      color: this.primaryColor,
-                      r1: 4,
-                      r2: 4,
-                    }, // Bottom circle
+                    },
+                    ...(transactionData.recipientName ||
+                    transactionData.recipientTaxId ||
+                    transactionData.recipientCvu
+                      ? [
+                          {
+                            type: 'line',
+                            x1: 5,
+                            y1: 10,
+                            x2: 5,
+                            y2: 110,
+                            lineWidth: 1,
+                            lineColor: '#C2C2C2',
+                          },
+                          {
+                            type: 'ellipse',
+                            x: 5,
+                            y: 115,
+                            color: this.primaryColor,
+                            r1: 4,
+                            r2: 4,
+                          },
+                        ]
+                      : []),
                   ],
                   width: 20,
                 },
                 {
-                  // Right column: Text details with spacing between rows
+                  // Right column: Sender and recipient details
                   stack: [
-                    // First stack for "From" section
-                    {
-                      stack: [
-                        {
-                          text: 'De',
-                          style: 'details',
-                          margin: [0, 0, 0, 3],
-                        },
-                        {
-                          text: `${transactionData.senderName}`,
-                          style: 'nameText',
-                          margin: [0, 0, 0, 3],
-                        },
-                        {
-                          text: `CUIT/CUIL: ${transactionData.senderCuit} `,
-                          style: 'details',
-                          margin: [0, 0, 0, 3],
-                        },
-                        {
-                          text: `CVU: ${transactionData.senderCvu}`,
-                          style: 'details',
-                        },
-                      ],
-                      margin: [0, 0, 0, 47], // Spacing between "De" and "Para"
-                    },
-
-                    // Second stack for "To" section
-                    {
-                      stack: [
-                        {
-                          text: 'Para',
-                          style: 'details',
-                          margin: [0, 0, 0, 3],
-                        },
-                        {
-                          text: `${transactionData.recipientName}`,
-                          style: 'nameText',
-                          margin: [0, 0, 0, 3],
-                        },
-                        {
-                          text: `CUIT/CUIL: ${transactionData.recipientTaxId}`,
-                          style: 'details',
-                          margin: [0, 0, 0, 3],
-                        },
-                        {
-                          text: `${transactionData.recipientBank}`,
-                          style: 'details',
-                          margin: [0, 0, 0, 3],
-                        },
-                        {
-                          text: `CVU: ${transactionData.recipientCvu}`,
-                          style: 'details',
-                        },
-                      ],
-                    },
+                    // Sender information
+                    ...(transactionData.senderName ||
+                    transactionData.senderCuit ||
+                    transactionData.senderCvu
+                      ? [
+                          {
+                            text: transactionData.destinationMessage,
+                            style: 'details',
+                            margin: [0, 0, 0, 3],
+                          },
+                          ...(transactionData.senderName
+                            ? [
+                                {
+                                  text: transactionData.senderName,
+                                  style: 'nameText',
+                                  margin: [0, 0, 0, 3],
+                                },
+                              ]
+                            : []),
+                          ...(transactionData.senderCuit
+                            ? [
+                                {
+                                  text: `CUIT/CUIL: ${transactionData.senderCuit}`,
+                                  style: 'details',
+                                  margin: [0, 0, 0, 3],
+                                },
+                              ]
+                            : []),
+                          ...(transactionData.senderCvu
+                            ? [
+                                {
+                                  text: `CVU: ${transactionData.senderCvu}`,
+                                  style: 'details',
+                                },
+                              ]
+                            : []),
+                          // Add spacing if "Para" (recipient) exists
+                          ...(transactionData.recipientName ||
+                          transactionData.recipientTaxId ||
+                          transactionData.recipientCvu
+                            ? [
+                                {
+                                  text: '', // Empty text to create spacing
+                                  margin: [0, 0, 0, 47],
+                                },
+                              ]
+                            : []),
+                        ]
+                      : []),
+                    // Recipient information
+                    ...(transactionData.recipientName ||
+                    transactionData.recipientTaxId ||
+                    transactionData.recipientCvu
+                      ? [
+                          {
+                            text: 'Para',
+                            style: 'details',
+                            margin: [0, 0, 0, 3],
+                          },
+                          ...(transactionData.recipientName
+                            ? [
+                                {
+                                  text: transactionData.recipientName,
+                                  style: 'nameText',
+                                  margin: [0, 0, 0, 3],
+                                },
+                              ]
+                            : []),
+                          ...(transactionData.recipientTaxId
+                            ? [
+                                {
+                                  text: `CUIT/CUIL: ${transactionData.recipientTaxId}`,
+                                  style: 'details',
+                                  margin: [0, 0, 0, 3],
+                                },
+                              ]
+                            : []),
+                          ...(transactionData.recipientBank
+                            ? [
+                                {
+                                  text: transactionData.recipientBank,
+                                  style: 'details',
+                                  margin: [0, 0, 0, 3],
+                                },
+                              ]
+                            : []),
+                          ...(transactionData.recipientCvu
+                            ? [
+                                {
+                                  text: `CVU: ${transactionData.recipientCvu}`,
+                                  style: 'details',
+                                },
+                              ]
+                            : []),
+                        ]
+                      : []),
                   ],
-                  margin: [3, 0, 0, 0], // Margin for the overall stack (space between canvas and text)
-                  alignment: 'left', // Align text closer to the canvas
+                  margin: [3, 0, 0, 0],
+                  alignment: 'left',
                 },
               ],
               margin: [0, 0, 0, 20],
@@ -338,36 +414,48 @@ export class VoucherService {
               ],
               margin: [0, 0, 0, 15],
             },
+            // Operation number
             {
-              text: 'Numero de operación',
+              text: 'Número de operación',
               style: 'details',
               margin: [0, 0, 0, 2],
             },
             {
-              text: `#${transactionData.operationNumber}`,
+              text: `#${transactionData.operationNumber || 'No disponible'}`,
               style: 'detailsBold',
               margin: [0, 0, 0, 10],
             },
-            {
-              text: 'código de identificación',
-              style: 'details',
-              margin: [0, 0, 0, 2],
-            },
-            {
-              text: `${transactionData.identificationCode}`,
-              style: 'detailsBold',
-              margin: [0, 0, 0, 10],
-            },
-            {
-              text: 'Motivo',
-              style: 'details',
-              margin: [0, 0, 0, 2],
-            },
-            {
-              text: `${transactionData.reason}`,
-              style: 'detailsBold',
-            },
-            // Other content remains unchanged
+
+            // Transaction reason
+            ...(transactionData.reason
+              ? [
+                  {
+                    text: 'Motivo',
+                    style: 'details',
+                    margin: [0, 0, 0, 2],
+                  },
+                  {
+                    text: transactionData.reason || 'No especificado',
+                    style: 'detailsBold',
+                    margin: [0, 0, 0, 10],
+                  },
+                ]
+              : []),
+            // Transaction reference
+            ...(transactionData.identificationCode
+              ? [
+                  {
+                    text: 'Código de identificación',
+                    style: 'details',
+                    margin: [0, 0, 0, 2],
+                  },
+                  {
+                    text: `${transactionData.identificationCode}`,
+                    style: 'detailsBold',
+                    margin: [0, 0, 0, 10],
+                  },
+                ]
+              : []),
           ],
           styles: {
             heading5: {
@@ -377,9 +465,8 @@ export class VoucherService {
               lineHeight: 1,
               alignment: 'left',
             },
-
             amount: {
-              color: '#161616', // Red text
+              color: '#161616',
               font: 'Roboto',
               fontSize: 21,
               bold: true,
@@ -438,6 +525,16 @@ export class VoucherService {
         return 'Transferencia recibida';
       default:
         return 'Operación realizada';
+    }
+  }
+
+  getDestinationMessage(source: string) {
+    switch (source) {
+      case 'balance-investments':
+      case 'balance-investment':
+        return 'Destino';
+      default:
+        return 'De'; // Default case if no match is found
     }
   }
 }

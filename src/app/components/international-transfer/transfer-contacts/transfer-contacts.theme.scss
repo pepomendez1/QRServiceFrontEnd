@@ -1,0 +1,25 @@
+app-transfer-contacts {
+  .contact-selector {
+  .button-group {
+    background-color: $light-background-color-hover;
+  }
+  .option {
+    color: $theme-secondary-text;
+  }
+  .option.active {
+    color: $theme-text;
+  }
+  .option:not(.active):hover {
+    color: darken($theme-secondary-text, 10%); // Slight color change on hover for non-active options
+  }
+  .slider{
+    background-color: $theme-card;
+  }
+  }
+  .contact-list-container {
+    .contact-row.selected-contact {
+      background-color:  $light-background-color-hover; // Change the background color when selected
+      border: 1px solid  $light-background-color-hover;
+    }
+  }
+}

@@ -4,6 +4,7 @@ import { CardsActivityComponent } from './cards-activity/cards-activity.componen
 import { MyCardsComponent } from './my-cards/my-cards.component';
 import { SafeHtml } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { CardShippingBannerComponent } from './card-shipping-banner/card-shipping-banner.component';
 import { GeneralFailureComponent } from '@fe-treasury/shared/general-failure/general-failure.component';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
 @Component({
@@ -13,6 +14,7 @@ import { SvgLibraryService } from 'src/app/services/svg-library.service';
     CommonModule,
     CardsActivityComponent,
     MyCardsComponent,
+    CardShippingBannerComponent,
     GeneralFailureComponent,
   ],
   templateUrl: './payment-cards.component.html',
@@ -21,7 +23,8 @@ import { SvgLibraryService } from 'src/app/services/svg-library.service';
 export class PaymentCardsComponent {
   cardsFailure: boolean = false;
   problemImg: SafeHtml | null = null;
-
+  oderedPhysicalCard: boolean = false;
+  cardData: any = '';
   constructor(private svgLibrary: SvgLibraryService, private router: Router) {}
 
   ngOnInit(): void {
@@ -33,5 +36,11 @@ export class PaymentCardsComponent {
   getFailureStatus(status: boolean): void {
     console.log('Failure status: ', status);
     this.cardsFailure = status;
+  }
+  getShippingCard(card: boolean): void {
+    this.oderedPhysicalCard = card;
+  }
+  getShippingData(shipping: any): void {
+    this.cardData = shipping;
   }
 }

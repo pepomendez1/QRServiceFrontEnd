@@ -1,5 +1,4 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { Clipboard } from '@angular/cdk/clipboard';
 import { forkJoin, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { TreasuryService } from 'src/app/services/treasury.service';
@@ -13,6 +12,7 @@ import {
 } from '../investment/investment.service';
 import { RefreshService } from '@fe-treasury/shared/refresh-service/refresh-service';
 import { Observable } from 'rxjs';
+import { StoreDataService } from 'src/app/services/store-data.service';
 @Component({
   selector: 'app-treasury-balance',
   templateUrl: './treasury-balance.component.html',
@@ -20,63 +20,67 @@ import { Observable } from 'rxjs';
 })
 export class TreasuryBalanceComponent implements OnInit {
   @Output() generalFailure = new EventEmitter<boolean>();
-  actualSection: string = 'balance'; // Control de secciones (balance, transfer, account)
   availableAmount: number = 0.0; // Balance disponible
   formattedAmount: string = ''; // Balance formateado para mostrar
   integerPart: string = ''; // Parte entera del balance
   decimalPart: string = '00'; // Parte decimal del balance
-  copyMessage: string | null = null; // Mensaje de copiado
-  copyMessageTimeout: any; // Control del timeout para el mensaje de copiado
-  accountInfo: any = {
-    // Información de la cuenta (CVU, alias)
-    cvu: '',
-    alias: '',
-  };
+
   isLoading: boolean = true; // Variable para controlar el estado de carga
   transferOk: boolean = false;
-  public totalReturns: number = 0;
+  investmentActive: boolean = false;
+  totalReturns: string[] = [];
   public tna: number = 0;
   public errors: string[] = [];
   investmentInfoError: boolean = false;
   constructor(
     private snackbarService: SnackbarService,
+    private storeService: StoreDataService,
     private investmentService: InvestmentService,
     private treasuryService: TreasuryService,
     private sidePanelService: SidePanelService,
-    private clipboard: Clipboard,
     private refreshService: RefreshService
   ) {}
 
   ngOnInit(): void {
-    // Simulate loading to show preloader
     this.isLoading = true;
 
-    // Use forkJoin to run both calls simultaneously
-    forkJoin({
-      balance: this.getBalance(),
-      investmentInfo: this.getInvestmentInfo(),
-    }).subscribe({
-      next: (results) => {
-        // Both observables completed successfully
-        console.log('Results:', results);
-        this.isLoading = false;
-      },
-      error: (error) => {
-        // Errors are already handled locally; this block is not expected to be triggered
-        console.error('Unexpected error:', error);
-        this.isLoading = false;
-      },
-      complete: () => {
-        // Ensure the loader is turned off after completion
-        this.isLoading = false;
-      },
+    this.storeService.getStore().subscribe((store) => {
+      this.investmentActive =
+        store.init_config?.balance_investments_module === 'true';
+
+      // Prepare the API calls
+      const apiCalls: {
+        balance: Observable<any>;
+        investmentInfo?: Observable<any>;
+      } = {
+        balance: this.getBalance(),
+      };
+
+      // ✅ Conditionally add investment info
+      if (this.investmentActive) {
+        apiCalls.investmentInfo = this.getInvestmentInfo();
+      }
+
+      // Execute API calls
+      forkJoin(apiCalls).subscribe({
+        next: (results) => {
+          console.log('Results:', results);
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Unexpected error:', error);
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+        },
+      });
     });
 
-    // Subscribe to refresh service for balance updates
+    // ✅ Subscribe to refresh service for balance updates
     this.refreshService.refresh$.subscribe(() => {
       this.isLoading = true;
       this.getBalance().subscribe(() => {
-        // Balance refreshed, hide the preloader
         this.isLoading = false;
       });
     });
@@ -86,7 +90,7 @@ export class TreasuryBalanceComponent implements OnInit {
     this.investmentInfoError = false;
     return this.investmentService.getInvestmentsInfo().pipe(
       tap((data: InvestmentsInfo) => {
-        this.totalReturns = data.total_returns;
+        this.totalReturns = data.total_returns.toFixed(2).split('.');
         this.tna = data.tna;
         this.investmentInfoError = false; // Set the error flag
       }),
@@ -109,7 +113,6 @@ export class TreasuryBalanceComponent implements OnInit {
         this.availableAmount = data?.balance ?? 0.0;
         this.formatBalance(this.availableAmount);
         this.transferOk = this.availableAmount > 0;
-        this.accountInfo = data?.accounts[0];
       }),
       catchError((error) => {
         this.handleError('Error obteniendo información de la cuenta');
@@ -143,41 +146,5 @@ export class TreasuryBalanceComponent implements OnInit {
       {},
       false
     );
-  }
-
-  // Lógica para copiar el CVU o alias al portapapeles
-  copyToClipboard(field: string) {
-    let text: string;
-
-    if (field === 'CVU') {
-      text = this.accountInfo.cvu;
-    } else if (field === 'Alias') {
-      text = this.accountInfo.alias;
-    } else if (field === '') {
-      text = `nombre y apellido\n${this.accountInfo.cvu}\n${this.accountInfo.alias}`;
-    } else {
-      return; // Si el campo no es válido, salir de la función
-    }
-
-    this.clipboard.copy(text);
-    this.copyMessage = `${field || 'Información completa'} en el portapapeles`;
-
-    if (this.copyMessageTimeout) {
-      clearTimeout(this.copyMessageTimeout);
-    }
-
-    this.copyMessageTimeout = setTimeout(() => {
-      this.copyMessage = null;
-    }, 3000);
-  }
-
-  // Método para detectar si el usuario está en un dispositivo móvil
-  isMobile(): boolean {
-    return window.innerWidth <= 600;
-  }
-
-  // Acción al hacer clic en la sección de "rendimientos generados"
-  onEarningsClick() {
-    console.log('Rendimientos generados clickeado');
   }
 }

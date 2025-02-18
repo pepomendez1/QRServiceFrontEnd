@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ServicesPaymentComponent } from './services-payment.component';
 import { MyCardsComponent } from './my-services-and-taxes/my-services-and-taxes.component';
 import { CardsActivityComponent } from './expirations/expirations.component';
-
-
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [],
@@ -12,7 +13,12 @@ import { CardsActivityComponent } from './expirations/expirations.component';
     CommonModule,
     ServicesPaymentComponent,
     MyCardsComponent,
-    CardsActivityComponent
+    CardsActivityComponent,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   exports : [
     ServicesPaymentComponent

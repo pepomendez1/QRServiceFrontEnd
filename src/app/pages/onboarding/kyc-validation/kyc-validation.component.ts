@@ -13,6 +13,7 @@ export class KycValidationComponent {
   metadata: string | null = null;
   currentStep: number = 3;
   theme: string | null = null;
+  public flowId: string = '';
   isDarkMode: boolean = false;
   @Input() isMobile: boolean = false;
   isProcessing = false; // Tracks the processing state
@@ -31,6 +32,8 @@ export class KycValidationComponent {
     this.storeDataService.getStore().subscribe((data) => {
       if (data.init_config) {
         this.primaryColor = data.init_config.primary_color || '#507CDD';
+        this.flowId =
+          data.init_config.metamap_flow_id || '6692be9aa8d43a001cdc9a74';
       }
     });
     this.onboardingService.getOnboardingStatus().subscribe({

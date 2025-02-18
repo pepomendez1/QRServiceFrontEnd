@@ -77,6 +77,11 @@
           <span *ngIf="card?.status === 'BLOCKED'" class="tag-700 paused-pill"
             >PAUSADA</span
           >
+          <span
+            *ngIf="card?.status === 'DISABLED'"
+            class="tag-700 cancelled-pill"
+            >CANCELADA</span
+          >
         </div>
       </mat-option>
     </mat-select>
@@ -142,32 +147,29 @@
       </div>
 
       <div *ngSwitchCase="'DISABLED'">
-        <span [ngSwitch]="selectedCard.type">
-          <p *ngSwitchCase="'VIRTUAL'">
-            La tarjeta está cancelada. Por favor, selecciona otra tarjeta.
-          </p>
-          <div *ngSwitchCase="'PHYSICAL'" class="two-col-buttons-container">
-            <div class="col">
-              <button mat-ripple class="btn-round">
-                <mat-icon class="material-symbols-outlined"
-                  >location_on</mat-icon
-                >
-              </button>
-              <span>Seguimiento</span>
-            </div>
-            <div class="col">
-              <button mat-ripple class="btn-round">
-                <mat-icon class="material-symbols-outlined"
-                  >check_circle</mat-icon
-                >
-              </button>
-              <span>Activar</span>
-            </div>
-          </div>
-        </span>
+        <p>La tarjeta está cancelada. Por favor, selecciona otra tarjeta.</p>
       </div>
     </span>
   </div>
+
+  <!-- <div *ngSwitchCase="'PHYSICAL'" class="two-col-buttons-container">
+    <div class="col">
+      <button mat-ripple class="btn-round">
+        <mat-icon class="material-symbols-outlined"
+          >location_on</mat-icon
+        >
+      </button>
+      <span>Seguimiento</span>
+    </div>
+    <div class="col">
+      <button mat-ripple class="btn-round">
+        <mat-icon class="material-symbols-outlined"
+          >check_circle</mat-icon
+        >
+      </button>
+      <span>Activar</span>
+    </div>
+  </div> -->
 
   <!-- VISA SVG Template Definition -->
   <ng-template #visaTemplate let-fillColor="fill" let-strokeColor="stroke">

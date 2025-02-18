@@ -13,6 +13,7 @@ import { StoreDataService } from './services/store-data.service';
 import { SvgLibraryService } from './services/svg-library.service';
 import { DatePipe } from '@angular/common';
 import { FormatNamePipe } from './pipes/format-name.pipe';
+import { StatusPillPipe } from './pipes/status-pill.pipe';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import {
   MAT_SNACK_BAR_DEFAULT_OPTIONS,
@@ -39,9 +40,10 @@ import {
 // Custom Modules and Components
 //import { TreasuryModule } from './components/treasury/treasury.module';
 import { AuthModule } from './pages/authentication/auth/auth.module';
-import { forkJoin } from 'rxjs';
+import { firstValueFrom, forkJoin } from 'rxjs';
 import { error } from 'console';
 import { ThemeService } from './services/layout/theme-service';
+import { DynamicRoutesService } from './services/dynamic-routes';
 
 const CustomCurrencyMaskConfig: CurrencyMaskConfig = {
   align: 'right',
@@ -75,73 +77,67 @@ export function preloadSvgLibrary(
 ): () => Promise<void> {
   return () =>
     new Promise<void>((resolve, reject) => {
-      storeDataService.loadStore().then(() => {
-        storeDataService.getStore().subscribe({
-          next: (store) => {
-            const primaryColor = store.init_config?.primary_color || '#4876DB';
+      storeDataService.loadStore().then(async () => {
+        try {
+          // Fetch store data after it's loaded
+          const store = await firstValueFrom(storeDataService.getStore());
 
-            // Check contrast and determine dark mode
-            const isDarkMode =
-              themeService.checkContrast(primaryColor, '#FFFFFF') < 4.2;
+          const primaryColor = store.init_config?.primary_color || '#4876DB';
+          const defaultMode = store.init_config?.default_mode || 'light';
+          const isDarkMode = defaultMode === 'dark';
 
-            // Set strokeColor based on dark mode
-            const strokeColor = store.init_config?.image_stroke_color
-              ? store.init_config.image_stroke_color
-              : isDarkMode
-              ? '#EBEBEB' // Light stroke color for dark mode
-              : '#4D4D4D'; // Default stroke color for light mode
+          const strokeColor = store.init_config?.image_stroke_color
+            ? store.init_config.image_stroke_color
+            : isDarkMode
+            ? '#EBEBEB'
+            : '#4D4D4D';
 
-            // Dynamically generate logo
-            const logoUrl = store.init_config?.primary_logo_url
-              ? store.init_config.primary_logo_url
-              : themeService.getDynamicLogo(isDarkMode, primaryColor);
+          const logoUrl = store.init_config?.primary_logo_url
+            ? store.init_config.primary_logo_url
+            : themeService.getDynamicLogo(false, primaryColor);
 
-            console.log('Primary color:', primaryColor);
-            console.log('Stroke color:', strokeColor);
-            console.log('Logo URL:', logoUrl);
+          const contrastLogoUrl =
+            store.init_config?.contrast_logo_url ||
+            themeService.getDynamicLogo(true, primaryColor);
 
-            // Custom image URLs
-            const customUrls = SVG_NAMES.reduce((acc, name) => {
-              const customUrl = store.init_config?.[name];
-              if (typeof customUrl === 'string') {
-                acc[name] = customUrl;
+          console.log('Primary color:', primaryColor);
+          console.log('Stroke color:', strokeColor);
+          console.log('Primary Logo URL:', logoUrl);
+          console.log('Contrast Logo URL:', contrastLogoUrl);
+
+          const customUrls = Object.keys(store.init_config || {}).reduce(
+            (acc, key) => {
+              const value = store.init_config?.[key];
+              if (typeof value === 'string') {
+                acc[key] = value;
               }
               return acc;
-            }, {} as { [key: string]: string });
-
-            console.log('Custom SVG URLs:', customUrls);
-
-            // Preload default and custom SVGs
-            const logoPreload$ =
-              logoUrl.startsWith('<svg') || logoUrl.startsWith('<?xml') // Detect inline SVG
-                ? svgLibrary.preloadInlineSvg(logoUrl) // Handle inline SVGs
-                : svgLibrary.preloadLogo(logoUrl); // Handle remote URLs
-
-            // Preload default and custom SVGs
-            forkJoin([
-              svgLibrary.preloadSvgs(
-                SVG_NAMES,
-                primaryColor,
-                strokeColor,
-                customUrls
-              ),
-              logoPreload$, // Preload the logo (URL or inline SVG)
-            ]).subscribe({
-              next: () => {
-                console.log('SVGs and logo preloaded successfully.');
-                resolve();
-              },
-              error: (err) => {
-                console.error('Error during SVG preloading:', err);
-                reject(err);
-              },
-            });
-          },
-          error: (err) => {
-            console.error('Error loading store data:', err);
-            reject(err);
-          },
-        });
+            },
+            {} as { [key: string]: string }
+          );
+          // **Preload SVGs and logos**
+          forkJoin([
+            svgLibrary.preloadSvgs(
+              SVG_NAMES,
+              primaryColor,
+              strokeColor,
+              customUrls
+            ),
+            svgLibrary.preloadLogos(logoUrl, contrastLogoUrl),
+          ]).subscribe({
+            next: () => {
+              console.log('SVGs and logos preloaded successfully.');
+              resolve();
+            },
+            error: (err) => {
+              console.error('Error during SVG preloading:', err);
+              reject(err);
+            },
+          });
+        } catch (error) {
+          console.error('Error loading store data:', error);
+          reject(error);
+        }
       });
     });
 }
@@ -155,7 +151,6 @@ export function preloadSvgLibrary(
     HttpClientModule,
     AuthModule,
     BrowserAnimationsModule,
-    HttpClientModule,
 
     // Core Modules
     AppRoutingModule,
@@ -191,6 +186,7 @@ export function preloadSvgLibrary(
       deps: [SvgLibraryService, StoreDataService, ThemeService], // Add StoreDataService here
       multi: true,
     },
+
     {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
       useValue: {

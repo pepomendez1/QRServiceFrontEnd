@@ -4,7 +4,6 @@ import { StoreDataService } from 'src/app/services/store-data.service';
 import { SidePanelHeaderComponent } from '@fe-treasury/shared/side-panel/side-panel-header/side-panel-header.component';
 import { DISCLAIMER_CONTENT } from 'src/app/pages/onboarding/affidavit-terms/terms-cond/disclaimer-text.constant';
 import { TERMS_AND_CONDITIONS_INV_SALDOS } from 'src/app/pages/onboarding/affidavit-terms/terms-cond/terms-inv.constant';
-import { TERMS_AND_CONDITIONS_CONTENT } from 'src/app/pages/onboarding/affidavit-terms/terms-cond/terms-and-cond.constant';
 
 @Component({
   selector: 'app-affidavit-terms-info',
@@ -18,6 +17,7 @@ export class AffidavitTermsInfoComponent {
   @Output() backToTermsOpt = new EventEmitter<void>();
   headerTitle: string = '';
   fileContent: string = '';
+  FCIPolicyContent: string = '';
 
   constructor(private storeDataService: StoreDataService) {}
 
@@ -35,6 +35,10 @@ export class AffidavitTermsInfoComponent {
         this.headerTitle = 'Declaración jurada ';
         this.fileContent = DISCLAIMER_CONTENT;
         break;
+      case 'fci-policy':
+        this.headerTitle = 'Reglamento de Gestión FCI ';
+        this.loadFCIPolicy();
+        break;
       default:
         break;
     }
@@ -42,17 +46,33 @@ export class AffidavitTermsInfoComponent {
 
   private loadTermsAndConditions(): void {
     this.storeDataService.getStore().subscribe((storeData) => {
-      // Get the URL from the store or fallback to a local file
       const termsUrl =
         storeData.init_config?.terms_and_conditions ||
         '/assets/docs/terms_and_conditions.docx';
 
-      // Fetch the document content
-      this.fetchDocxContent(termsUrl);
+      this.fetchDocxContent(
+        termsUrl,
+        (content) => (this.fileContent = content),
+        'Error loading terms and conditions.'
+      );
     });
   }
 
-  private async fetchDocxContent(url: string) {
+  private loadFCIPolicy(): void {
+    const privacyUrl = '/assets/docs/fci_policy.docx';
+
+    this.fetchDocxContent(
+      privacyUrl,
+      (content) => (this.fileContent = content),
+      'Error loading FCI policy.'
+    );
+  }
+
+  private async fetchDocxContent(
+    url: string,
+    contentUpdater: (content: string) => void,
+    errorMessage: string
+  ) {
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -60,15 +80,16 @@ export class AffidavitTermsInfoComponent {
       }
       const arrayBuffer = await response.arrayBuffer();
 
-      // Lazy load mammoth
+      // Lazy load Mammoth
       const Mammoth = await import('mammoth');
       const result = await Mammoth.extractRawText({ arrayBuffer });
-      this.fileContent = result.value;
+      contentUpdater(result.value);
     } catch (error) {
-      console.error('Error fetching or parsing terms and conditions:', error);
-      this.fileContent = 'Error loading terms and conditions.';
+      console.error('Error fetching or parsing document:', error);
+      contentUpdater(errorMessage);
     }
   }
+
   handleArrowBack() {
     this.backToTermsOpt.emit();
   }

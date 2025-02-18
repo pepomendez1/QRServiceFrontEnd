@@ -6,13 +6,17 @@ import { firstValueFrom } from 'rxjs';
 export interface StorageData {
   init_config?: {
     // init config es la respuesta del endpoint `/user/auth/portalClient`
-    [key: string]: string | number | undefined; // Index signature
+    [key: string]: string | number | undefined | boolean; // Index signature
     card_order_text: string;
     lost_card_currency: string;
     lost_card_amount: string;
     portal_client_id: string;
     user_pool: string;
     terms_and_conditions: string;
+    faq_investments: string;
+    help_content_doc: string;
+    privacy_policy: string;
+    select_module_enable: string;
     max_physical_cards_on_account: number;
     max_virtual_cards_on_account: number;
     primary_color: string;
@@ -26,6 +30,9 @@ export interface StorageData {
     image_stroke_color: string;
     bar_chart_color: string;
     favicon_url: string;
+    metamap_flow_id: string;
+    toggle_mode_enable: string;
+    iframe_help_url: string;
     number_of_slides: string | number;
     slide1Title: string;
     slide1Description: string;

@@ -3,15 +3,14 @@ import { Card, Cards, PaymentCardsService } from '../payment-cards.service';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.service';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { MatIcon } from '@angular/material/icon';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
 import { StoreDataService } from 'src/app/services/store-data.service';
 import { SafeHtml } from '@angular/platform-browser';
 import { SnackbarService } from '@fe-treasury/shared/snack-bar/snackbar.service';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+
 import {
-  AbstractControl,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -22,15 +21,14 @@ import {
 import { MatRadioModule } from '@angular/material/radio';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { MatInputModule } from '@angular/material/input';
-import { MatError, MatFormFieldModule } from '@angular/material/form-field';
-import { MatRipple, MatRippleModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatRippleModule } from '@angular/material/core';
 import { SidePanelHeaderComponent } from '@fe-treasury/shared/side-panel/side-panel-header/side-panel-header.component';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { OnboardingService } from 'src/app/services/onboarding.service';
+import { CardShippingStatusComponent } from '../card-shipping-status/card-shipping-status.component';
 import {
-  SimpleSelectValues,
   SimpleSelectValuesId,
-  maritalStatusList,
   provinceList,
 } from 'src/app/utils/onboarding-lists';
 import { MatSelectModule } from '@angular/material/select';
@@ -80,7 +78,6 @@ export class CreateCardComponent {
   congratsImg: SafeHtml | null = null;
   loading = false;
   welcomeText: string = 'Pedí tu tarjeta ';
-  errors: string[] = [];
   cardType: 'VIRTUAL' | 'PHYSICAL' = 'VIRTUAL';
   card: Card | null = null;
   currentStep: number = 0;
@@ -91,6 +88,7 @@ export class CreateCardComponent {
     'success_tarjeta_virtual',
     'success_tarjeta_fisica',
   ];
+  shippingCardData: any;
   addressFields: any = [];
   public addressForm: FormGroup;
   public provinceList: SimpleSelectValuesId[] = provinceList;
@@ -112,7 +110,7 @@ export class CreateCardComponent {
 
     this.addressForm = this.fb.group({
       street_name: ['', Validators.required],
-      street_number: ['', Validators.required], //number
+      street_number: ['', Validators.required],
       floor: [''],
       apartment: [''],
       city: ['', Validators.required],
@@ -205,9 +203,13 @@ export class CreateCardComponent {
         this.loading = false;
       },
       error: (error: any) => {
-        this.handleError(error);
+        this.handleError(
+          new Error(
+            `Error en la creación de tu tarjeta ${this.selectedCardTypeControl.value}`
+          )
+        );
         this.loading = false;
-        this.errors.push(error.message);
+        this.sidePanelService.close();
       },
     });
   }
@@ -232,8 +234,8 @@ export class CreateCardComponent {
         this.populateAddressFields(response.address);
         this.loading = false;
       },
-      error: (error) => {
-        this.errors.push('Hubo un error obteniendo la dirección');
+      error: () => {
+        this.handleError(new Error('Hubo un error obteniendo la dirección'));
         this.loading = false;
         this.goToStep('formulario_direccion');
       },
@@ -339,9 +341,9 @@ export class CreateCardComponent {
       region: provinceList.find(
         (item) => item.viewValue.toUpperCase() === address.state.toUpperCase()
       )?.value,
-      street_number: address.street_number,
-      zip_code: address.zip_code,
-      floor: address.flat_number,
+      street_number: address.street_number.toString(),
+      zip_code: address.zip_code.toString(),
+      floor: address.flat_number.toString(),
     });
   }
 
@@ -361,8 +363,13 @@ export class CreateCardComponent {
       // For the 'region' field, transform the value to the view value
       if (field.id === 'region') {
         acc[field.id] = this.getProvinceNameByValue(field.value);
+      } else if (
+        field.id === 'apartment' &&
+        (!field.value || field.value.trim() === '')
+      ) {
+        acc[field.id] = '.'; // Set apartment to "." if empty
       } else {
-        acc[field.id] = field.value; // Set the id as the key and value as the value
+        acc[field.id] = field.value.toString();
       }
       return acc;
     }, {});
@@ -389,15 +396,70 @@ export class CreateCardComponent {
         this.loading = false;
       },
       error: (error: any) => {
-        this.handleError(error);
+        console.error('error generando tarjeta física: ', error);
+        this.handleError(new Error('Error generando tarjeta física'));
         this.loading = false;
-        this.errors.push(error.message);
       },
     });
   }
+  goToNextStep(): void {
+    const canCreateVirtual = this.data.canCreateVirtual;
+    const canCreatePhysical = this.data.canCreatePhysical;
 
+    if (canCreateVirtual && canCreatePhysical) {
+      // If both options are available, navigate to the selection screen
+      this.goToStep('seleccionar_tipo_tarjeta');
+    } else if (canCreateVirtual) {
+      // If only virtual cards can be created, navigate directly to the virtual card form
+      this.selectedCardTypeControl.setValue('VIRTUAL'); // Ensure the control is set
+      this.selectedCard(); // Call the logic to create the virtual card
+    } else if (canCreatePhysical) {
+      // If only physical cards can be created, navigate directly to the physical card form
+      this.goToStep('formulario_direccion');
+    } else {
+      // Handle the case where no cards can be created (optional)
+      console.warn('No puede crear tarjetas');
+    }
+  }
   private handleError(error: any) {
     this.snackBarService.openError(error.message, true, 3000);
+  }
+
+  trackShipment(event: Event): void {
+    event.preventDefault(); // Prevent default link behavior
+    console.log('Tracking shipment...');
+
+    this.cardService.getShipping().subscribe({
+      next: (data: any) => {
+        if (data) {
+          console.log('Shipping data found: ', data);
+          this.shippingCardData = data;
+
+          this.sidePanelService.open(
+            CardShippingStatusComponent,
+            'Seguimiento tarjeta',
+            this.shippingCardData
+          );
+        } else {
+          console.log('No shipping data found');
+          this.snackBarService.openInfo(
+            'No se encontró información de envío',
+            true,
+            3000
+          );
+          this.sidePanelService.close();
+        }
+      },
+      error: (error: any) => {
+        console.error('Error fetching shipping data: ', error);
+        this.snackBarService.openError(
+          'Error al obtener el estado del envío',
+          true,
+          3000
+        );
+        this.sidePanelService.close();
+      },
+    });
   }
 
   goToCards() {

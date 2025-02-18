@@ -1,11 +1,9 @@
-<div class="container">
+<div class="container custom-card">
   <div class="row">
     <p class="secondary-500-light">Tus servicios e impuestos</p>
-    <button mat-ripple class="btn-link-primary" *ngIf="!loading && (canCreatePhysical || canCreateVirtual)" [class]="
-        !loading && (!activeCards || activeCards.length === 0)
-          ? 'highlight' : ''">
+    <button mat-ripple class="mat-ripple btn-link-primary btn-md ng-star-inserted" *ngIf="!loading && (canCreatePhysical || canCreateVirtual)">
           <!--  (click)="createServicesAndTaxes()"> -->
-      <span class="secondary-600-primary new-card"> Pagar nuevo servicio</span>
+      <span class="secondary-600-primary new-card" (click)="openFiltersPanel()"> Pagar nuevo servicio</span>
     </button>
   </div>
   <div class="mat-spinner-container">
@@ -53,16 +51,13 @@
         </button>
         <mat-menu #menu="matMenu">
           <button mat-menu-item>
-            <mat-icon>edit</mat-icon>
-            <span>Editar</span>
+            <!-- <mat-icon>edit</mat-icon> -->
+            <mat-icon>settings</mat-icon>
+            <span>Configurar</span>
           </button>
-          <button mat-menu-item>
+          <button mat-menu-item class="red-button">
             <mat-icon>delete</mat-icon>
             <span>Eliminar</span>
-          </button>
-          <button mat-menu-item>
-            <mat-icon>info</mat-icon>
-            <span>Detalles</span>
           </button>
         </mat-menu>
       </div>
@@ -75,11 +70,11 @@
     <p>Agrega uno desde el boton de arriba</p>
   </div>
 
-  <button *ngIf="!loading && (canCreatePhysical || canCreateVirtual)" class="btn custom-button"><!-- (click)="createServicesAndTaxes()"> -->
+  <button *ngIf="!loading && (canCreatePhysical || canCreateVirtual)" class="btn-cta-filled w-100 btn-lg" (click)="openFiltersPanel()">
     <span class="plus-sign">+</span> Pagar nuevo servicio
   </button>
 
-
+  
   <!-- VISA SVG Template Definition -->
   <ng-template #visaTemplate let-fillColor="fill" let-strokeColor="stroke">
     <svg width="36.5" height="24.5" viewBox="0 0 36.5 24.5" fill="none" xmlns="http://www.w3.org/2000/svg">

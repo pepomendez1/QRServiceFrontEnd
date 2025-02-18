@@ -102,7 +102,22 @@
             <span class="secondary-500">{{ errorMessageDescription }}</span>
           </div>
         </div>
-        <div *ngIf="isProcessing" class="progress-bar-loading">
+        <div *ngIf="timeoutLogout" class="warning-message-box">
+          <mat-icon class="material-symbols-outlined">error_outline</mat-icon>
+          <div class="message-box-content">
+            <h1 class="paragraph-600 m-0 p-0">Cierre de sesión</h1>
+            <span class="secondary-500"
+              >Por razones de seguridad, tu última sesión se cerró por
+              inactividad. Ingresá a tu cuenta nuevamente para seguir
+              operando</span
+            >
+          </div>
+        </div>
+
+        <div
+          *ngIf="isProcessing || isGuardProcessing"
+          class="progress-bar-loading"
+        >
           <mat-progress-bar mode="indeterminate"></mat-progress-bar>
         </div>
         <!-- Botones -->
@@ -110,9 +125,13 @@
           <button
             class="btn-cta-filled btn-lg w-100"
             type="submit"
-            [disabled]="!isSubmitEnabled || isProcessing"
+            [disabled]="!isSubmitEnabled || isProcessing || isGuardProcessing"
           >
-            {{ isProcessing ? "Ingresando" : "Iniciar sesión" }}
+            {{
+              isProcessing || isGuardProcessing
+                ? "Ingresando"
+                : "Iniciar sesión"
+            }}
           </button>
           <button
             type="button"
@@ -124,5 +143,6 @@
         </div>
       </form>
     </div>
+    <app-onb-footer></app-onb-footer>
   </div>
 </div>

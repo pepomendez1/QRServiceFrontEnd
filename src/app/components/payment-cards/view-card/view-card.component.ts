@@ -59,6 +59,7 @@ export class ViewCardComponent implements OnInit {
   public buttonEnabled = false;
   isProcessing: boolean = false;
   debugMode: boolean = false;
+  bypassOTP: boolean = false;
   isSubmitButtonEnabled: boolean = false;
   public incorrectOTP: boolean = false;
   private showCardTimerInterval: any;
@@ -81,17 +82,22 @@ export class ViewCardComponent implements OnInit {
     this.messageService.clearMessage();
     this.sidePanelService.toggleDisableClose(false);
     this.email = this.authService.getEmail();
-    this.otpService.sendOtp(null).subscribe({
-      next: (response) => {
-        console.log('sendOtp:', response);
-        this.session = response.Session;
-        this.challengeName = response.ChallengeName;
-        this.loading = false;
-      },
-      error: (error: any) => {
-        console.error('Error sending OTP:', error);
-      },
-    });
+
+    if (!this.bypassOTP) {
+      this.otpService.sendOtp(null).subscribe({
+        next: (response) => {
+          console.log('sendOtp:', response);
+          this.session = response.Session;
+          this.challengeName = response.ChallengeName;
+          this.loading = false;
+        },
+        error: (error: any) => {
+          console.error('Error sending OTP:', error);
+        },
+      });
+    } else {
+      this.viewCard();
+    }
 
     // this.getCardIframeUrl(this.data.id);
   }
@@ -174,7 +180,7 @@ export class ViewCardComponent implements OnInit {
 
   getCardIframeUrl(cardId: string): void {
     // start 5min timer
-    this.timeLeft = 300;
+    this.timeLeft = this.bypassOTP ? 30000 : 300;
     this.showCardTimerInterval = setInterval(() => {
       this.timeLeft -= 1;
       if (this.timeLeft === 0) {
@@ -193,6 +199,7 @@ export class ViewCardComponent implements OnInit {
       },
       error: (error: any) => {
         this.loading = false;
+        console.log(error);
         this.handleError(error);
         this.errors.push(error.message);
       },

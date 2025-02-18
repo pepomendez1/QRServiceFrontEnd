@@ -22,6 +22,10 @@ import { MatList, MatListItem } from '@angular/material/list';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import createFuzzySearch from '@nozbe/microfuzz';
 import { RefreshService } from '@fe-treasury/shared/refresh-service/refresh-service';
+import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.service';
+import { FiltersComponent } from './filters/filters.component';
+
+
 
 type TransactionType = 'PURCHASE' | 'DEBIT' | 'CREDIT' | 'REFUND';
 
@@ -71,6 +75,28 @@ export class CardsActivityComponent implements OnInit {
   noHistory: boolean = false; // Controlador del estado de "sin transacciones"
   fuzzySearch: any;
 
+  periodsList: string[] = [
+    'Hoy',
+    // 'Ayer',
+    'Última semana',
+    // 'Últimos 15 días',
+    'Último mes',
+    'Último año',
+  ];
+  typesList: string[] = [
+    // 'Todas',
+    'Agua',
+    'Cable',
+    'Gas',
+    'Impuestos',
+    'Internet',
+    'Luz',
+    'Telefonía',
+    'Otros',
+  ];
+
+
+  selectedTypes = ['Todas'];
    readonly transactionTypeMapping: Record<
     TransactionType,
     { description: string; icon: string; transaction_type: string }
@@ -100,7 +126,9 @@ export class CardsActivityComponent implements OnInit {
   constructor(
     private snackBar: MatSnackBar,
     private refreshService: RefreshService,
-    private expirationsService: ServicesPaymentService
+    private expirationsService: ServicesPaymentService,
+    private sidePanelService: SidePanelService
+
   ) {
     this.loadExpirations();
     this.loadHistory();
@@ -123,7 +151,7 @@ export class CardsActivityComponent implements OnInit {
                 });*/
     //this.getExpirations(true);
     //this.filterExpirations()
-    this.filterHistory()
+    //this.filterHistory()
 
    /* this.history = [
       {description: "Telefonía - Nro de Cuenta 123456", merchant_name: "Claro", vencido: true, autodebito: true, fechaAutodebito :'20 de enero',amount:1000,date: '2024-01-01',},
@@ -206,11 +234,12 @@ export class CardsActivityComponent implements OnInit {
                 transaction.source
               ),
             }));*/
-            console.log('example history: ', transactions[0]);
+            console.log('history: ', transactions);
             this.fuzzySearch = createFuzzySearch(this.history, {
               getText: (item: any) => [
                 item.contact_name,
                 item.description,
+                item.merchant_name,
                 item.amount.toString(),
               ],
               strategy: 'aggressive',
@@ -247,8 +276,8 @@ export class CardsActivityComponent implements OnInit {
     return this.expirations.filter(item => item.checked).length;
   }
 
-openFiltersPanel() {
-    /*const filtersPanelRef = this.sidePanelService.open(
+/*openFiltersPanel() {
+    const filtersPanelRef = this.sidePanelService.open(
       FiltersComponent,
       'Filtros',
       {
@@ -273,8 +302,118 @@ openFiltersPanel() {
         this.selectedStates = data.selectedStates;
         this.loadTransactions();
       }
-    );*/
-  }
+    );
+  }*/
+
+    openFiltersPanel() {
+      const filtersPanelRef = this.sidePanelService.open(
+        FiltersComponent,
+        'Filtros',
+        {
+          periodsList: this.periodsList,
+          selectedPeriod: this.selectedPeriod,
+          typesList: this.typesList,
+          selectedTypes: this.selectedTypes
+        }
+      );
+
+      filtersPanelRef?.instance.applyFilters.subscribe(
+        (data: {
+          selectedPeriod: string;
+          selectedTypes: string[];
+          selectedStates: string[];
+        }) => {
+          console.log('Filters Applied:', data);
+          this.selectedPeriod = data.selectedPeriod;
+          this.selectedTypes = data.selectedTypes;
+
+          this.loadHistory();
+        }
+      );
+    }
+
+    /*filterHistory() {
+      // First, filter by type and state
+      const now = new Date();
+
+      this.filteredHistory = this.history.filter((transaction) => {
+        const matchesType =
+          this.selectedTypes.includes('Todas') ||
+          this.selectedTypes.some(
+            (category) => category === transaction.category
+          );
+
+        // Filtrar por período
+        let matchesPeriod = true; // Por defecto, no filtra si 'Todos' está seleccionado
+
+        if (this.selectedPeriod !== 'Todos') {
+          const transactionDate = new Date(transaction.date);
+          let startDate: Date;
+
+          startDate = new Date();
+          switch (this.selectedPeriod) {
+            case 'Hoy':
+              startDate.setDate(now.getDate() - 1);
+              break;
+            case 'Última semana':
+              startDate.setDate(now.getDate() - 7);
+              break;
+            case 'Último mes':
+              startDate.setMonth(now.getMonth() - 1);
+              break;
+            case 'Último año':
+              startDate.setFullYear(now.getFullYear() - 1);
+              break;
+          }
+
+          if (startDate) {
+            matchesPeriod = transactionDate >= startDate;
+          }
+        }
+        return matchesType && matchesPeriod;
+      });
+
+      //this.filteredHistory = this.history;
+      console.log('search input history', this.searchQuery);
+
+      console.log(
+        'Filtered history after type and state filter:',
+        this.filteredHistory
+      );
+
+      // Only proceed with search if there is a search term
+      if (this.searchQuery.trim().length > 0) {
+        this.searching = true;
+        console.log('searching...');
+
+        const searchResults = this.fuzzySearch(this.searchQuery);
+        console.log('searchResults...', searchResults);
+        if (searchResults) {
+          this.filteredHistory = searchResults.map(
+            (result: { item: any }) => result.item
+          );
+          this.noHistory = this.filteredHistory.length === 0;
+          console.log(
+            'Transactions match query:',
+            this.filteredHistory.length
+          );
+          setTimeout(() => {
+            this.searching = false;
+          }, 1000);
+        } else {
+          console.log('No search results');
+          this.noHistory = this.filteredHistory.length === 0;
+          setTimeout(() => {
+            this.searching = false;
+          }, 1000);
+        }
+      } else {
+        // If no search term, simply set noTransactions based on filtered transactions
+        this.noHistory = this.filteredHistory.length === 0;
+      }
+
+      console.log('Final filtered History:', this.filteredHistory);
+    }*/
 
  // filterExpirations() {
     // First, filter by type and state
@@ -336,7 +475,90 @@ openFiltersPanel() {
     console.log('Final filtered expirations:', this.filteredExpirations);
   }*/
 
-  filterHistory() {
+    filterHistory() {
+      // First, filter by type and state
+      const now = new Date();
+
+      console.log('this.history', this.history);
+      this.filteredHistory = this.history.filter((transaction) => {
+        const matchesType =
+          this.selectedTypes.includes('Todas') ||
+          /*this.selectedTypes.some((category) => category === transaction.category) ||*/
+          this.selectedTypes.some((category) => transaction.description.toLowerCase().includes(category.toLowerCase()));
+
+        // Filtrar por período
+        let matchesPeriod = true; // Por defecto, no filtra si 'Todos' está seleccionado
+
+        if (this.selectedPeriod !== 'Todo') {
+          const transactionDate = new Date(transaction.date);
+          let startDate: Date;
+
+          startDate = new Date();
+          switch (this.selectedPeriod) {
+            case 'Hoy':
+              startDate.setDate(now.getDate() - 1);
+              break;
+            case 'Última semana':
+              startDate.setDate(now.getDate() - 7);
+              break;
+            case 'Último mes':
+              startDate.setMonth(now.getMonth() - 1);
+              break;
+            case 'Último año':
+              startDate.setFullYear(now.getFullYear() - 1);
+              break;
+          }
+
+          if (startDate) {
+            matchesPeriod = transactionDate >= startDate;
+          }
+
+        }
+        return matchesType && matchesPeriod;
+      });
+
+      console.log('search input history', this.searchQuery);
+
+      console.log(
+        'Filtered history after type and state filter:',
+        this.filteredHistory
+      );
+
+      // Only proceed with search if there is a search term
+      if (this.searchQuery.trim().length > 0) {
+        this.searching = true;
+        console.log('searching...');
+
+        const searchResults = this.fuzzySearch(this.searchQuery);
+        console.log('searchResults...', searchResults);
+        if (searchResults) {
+          this.filteredHistory = searchResults.map(
+            (result: { item: any }) => result.item
+          );
+          this.noHistory = this.filteredHistory.length === 0;
+          console.log(
+            'Transactions match query:',
+            this.filteredHistory.length
+          );
+          setTimeout(() => {
+            this.searching = false;
+          }, 1000);
+        } else {
+          console.log('No search results');
+          this.noHistory = this.filteredHistory.length === 0;
+          setTimeout(() => {
+            this.searching = false;
+          }, 1000);
+        }
+      } else {
+        // If no search term, simply set noTransactions based on filtered transactions
+        this.noHistory = this.filteredHistory.length === 0;
+      }
+
+      console.log('Final filtered History:', this.filteredHistory);
+    }
+
+  filterHistory1() {
     // First, filter by type and state
     /*this.filteredExpirations = this.transactions.filter((transaction) => {
       const matchesType =

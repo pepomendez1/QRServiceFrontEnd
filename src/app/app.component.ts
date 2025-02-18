@@ -1,32 +1,44 @@
+import { Component, Inject, Renderer2, OnInit, OnDestroy } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import {
-  Component,
-  Inject,
-  Renderer2,
-  OnInit,
-  HostListener,
-} from '@angular/core';
 import { ThemeService } from './services/layout/theme-service';
 import { SidenavService } from './app-layout/sidenav/sidenav.service';
-import { filter, take } from 'rxjs/operators';
-import { ActivatedRoute, Router } from '@angular/router';
+import { SidenavItem } from './app-layout/sidenav/sidenav-item.interface';
+import { filter, firstValueFrom, Subscription } from 'rxjs';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Platform } from '@angular/cdk/platform';
 import { AuthService } from './services/auth.service';
 import { Title } from '@angular/platform-browser';
 import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.service';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { SessionManagementService } from './services/session.service';
+import { StoreDataService } from './services/store-data.service'; // ✅ Import StoreDataService
+import { FeatureFlagsService } from './services/modules.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+  private featureFlagsSubscription!: Subscription;
+  private routeSubscription!: Subscription;
+
+  private currentRoute: string = '';
   title = 'fe-treasury';
   isInIframe = false; // Determina si estamos en un iframe
   isLoading = false; // Bandera para manejar el estado de carga
   private focusListener: any; // Reference to the focus event listener
+
+  private featureFlags = {
+    international_account: false,
+    basic_modules: false,
+    balance_investments_module: false,
+    services_payment: false,
+    insurance_module: false,
+  };
+
   constructor(
+    private sessionManagementService: SessionManagementService,
     private sidePanelService: SidePanelService,
     private clipboard: Clipboard,
     private titleService: Title,
@@ -36,8 +48,10 @@ export class AppComponent implements OnInit {
     private renderer: Renderer2,
     private platform: Platform,
     private sidenavService: SidenavService,
+    private featureFlagsService: FeatureFlagsService,
     private authService: AuthService, // Inyecta AuthService
-    private router: Router // Inyectar Router para manejar redirecciones
+    private router: Router, // Inyectar Router para manejar redirecciones
+    private storeDataService: StoreDataService
   ) {
     this.titleService.setTitle(''); //initialize page title with empty string
     this.isInIframe = window.self !== window.top; // Verificar si estamos en un iframe
@@ -48,9 +62,7 @@ export class AppComponent implements OnInit {
       .pipe(filter((queryParamMap) => queryParamMap.has('style')))
       .subscribe((queryParamMap) => {
         const style = queryParamMap.get('style') ?? 'default'; // Proporcionar 'default' como respaldo
-        this.themeService.setStyle(
-          style as 'default' | 'dark' | 'light' | 'top'
-        );
+        this.themeService.setStyle(style as 'default' | 'dark');
       });
 
     // Actualizar el tema
@@ -68,90 +80,6 @@ export class AppComponent implements OnInit {
     this.isInIframe
       ? this.themeService.setNavigation('top')
       : this.themeService.setNavigation('side');
-    this.sidenavService.addItems([
-      {
-        name: 'Inicio',
-        routeOrFunction: '/app/home',
-        icon: 'dashboard',
-        position: 1,
-        navigation: true,
-        enabled: true,
-      },
-      {
-        name: 'Movimientos',
-        routeOrFunction: '/app/activity',
-        icon: 'list_alt',
-        position: 2,
-        navigation: true,
-        enabled: true,
-      },
-
-      {
-        name: 'Tarjetas',
-        routeOrFunction: '/app/cards',
-        icon: 'credit_card',
-        position: 3,
-        navigation: true,
-        enabled: true,
-      },
-      {
-        name: 'Inversiones',
-        routeOrFunction: '/app/investments',
-        icon: 'insert_chart',
-        position: 4,
-        navigation: true,
-        enabled: true,
-      },
-      // {
-      //   name: 'Pago de Servicios',
-      //   routeOrFunction: '/app/services-payment',
-      //   icon: 'lightbulb',
-      //   position: 5,
-      //   navigation: true,
-      //   enabled: true,
-      // },
-
-      {
-        name: 'Cerrar sesión',
-        action: this.logoutUser.bind(this), // Bind the logout function
-        enabled: true,
-        position: 6,
-        navigation: true,
-        icon: 'logout',
-      },
-      // {
-      //   name: 'Créditos',
-      //   routeOrFunction: '/app/lending',
-      //   icon: 'approval_delegation',
-      //   position: 5,
-      //   navigation: true,
-      //   enabled: false,
-      // },
-      // {
-      //   name: "Pagos múltiples",
-      //   routeOrFunction: "/app/multiple-payments",
-      //   icon: "groups",
-      //   position: 6,
-      //   navigation: true,
-      //   enabled: false,
-      // },
-      {
-        name: 'Mi perfil',
-        routeOrFunction: '/app/account-info',
-        icon: 'groups',
-        position: 7,
-        navigation: false,
-        enabled: false,
-      },
-      {
-        name: 'Ayuda',
-        routeOrFunction: '/app/help',
-        icon: 'groups',
-        position: 8,
-        navigation: false,
-        enabled: false,
-      },
-    ]);
   }
 
   private handleFocusEvent(): void {
@@ -205,7 +133,41 @@ export class AppComponent implements OnInit {
   logoutUser(): void {
     this.authService.logoutUser();
   }
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    // Subscribe to feature flag changes
+    this.featureFlagsSubscription =
+      this.featureFlagsService.featureFlags$.subscribe(() => {
+        this.buildNavigationMenu(); // Rebuild menu when flags change
+
+        this.router
+          .navigateByUrl('/app/home', { skipLocationChange: true })
+          .then(() => {
+            this.router.navigate([this.router.url]); // Force a navigation to the same route
+          });
+      });
+
+    this.buildNavigationMenu(); // ✅ Dynamically build the menu
+
+    // Monitor route changes and activate/deactivate session monitoring
+    this.routeSubscription = this.router.events
+      .pipe(
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd
+        ) // Narrow type to NavigationEnd
+      )
+      .subscribe((event: NavigationEnd) => {
+        const resolvedUrl = event.urlAfterRedirects; // Use the final resolved URL
+        console.log(`Route changed to: ${resolvedUrl}`);
+
+        if (resolvedUrl.startsWith('/app')) {
+          // Start monitoring session for app routes
+          this.sessionManagementService.startMonitoring();
+        } else {
+          // Stop monitoring session for non-app routes
+          this.sessionManagementService.stopMonitoring();
+        }
+      });
+
     this.sidePanelService.closureOriginChanged.subscribe((origin) => {
       if (origin === 'timeout') {
         console.log(
@@ -226,11 +188,137 @@ export class AppComponent implements OnInit {
         },
         (error) => {
           console.error('Error al recibir el token del parent:', error);
-          this.router.navigate(['/auth/login']); // Redirigir a login si hay error
+          //  this.router.navigate(['/auth/login']); // Redirigir a login si hay error
         }
       );
     }
     this.themeService.updateHeadContent();
+  }
+
+  private buildNavigationMenu(): void {
+    const featureFlags = this.featureFlagsService.getFeatureFlags();
+    const menuItems: SidenavItem[] = [
+      {
+        name: this.featureFlags.international_account ? 'Mi cuenta' : 'Inicio',
+        routeOrFunction: '/app/home',
+        icon: 'dashboard',
+        position: 1,
+        navigation: true,
+        enabled: true,
+      },
+      ...(featureFlags.basic_modules
+        ? [
+            {
+              name: 'Movimientos',
+              routeOrFunction: '/app/activity',
+              icon: 'list_alt',
+              position: 2,
+              navigation: true,
+              enabled: true,
+            },
+            {
+              name: 'Tarjetas',
+              routeOrFunction: '/app/cards',
+              icon: 'credit_card',
+              position: 3,
+              navigation: true,
+              enabled: true,
+            },
+          ]
+        : []),
+      ...(featureFlags.balance_investments_module
+        ? [
+            {
+              name: 'Inversiones',
+              routeOrFunction: '/app/investments',
+              icon: 'insert_chart',
+              position: 4,
+              navigation: true,
+              enabled: true,
+            },
+          ]
+        : []),
+      ...(featureFlags.services_payment
+        ? [
+            {
+              name: 'Pago de Servicios',
+              routeOrFunction: '/app/services-payment',
+              icon: 'lightbulb',
+              position: 5,
+              navigation: true,
+              enabled: true,
+            },
+          ]
+        : []),
+      ...(featureFlags.insurance_module
+        ? [
+            {
+              name: 'Seguros',
+              routeOrFunction: '/app/insurance',
+              icon: 'verified_user',
+              position: 6,
+              navigation: true,
+              enabled: true,
+            },
+          ]
+        : []),
+      ...(featureFlags.international_account
+        ? [
+            {
+              name: 'Facturas',
+              routeOrFunction: '/app/invoice',
+              icon: 'description',
+              position: 2,
+              navigation: true,
+              enabled: true,
+            },
+            {
+              name: 'Operaciones',
+              routeOrFunction: '/app/operations',
+              icon: 'list_alt',
+              position: 3,
+              navigation: true,
+              enabled: true,
+            },
+          ]
+        : []),
+      {
+        name: 'Cerrar sesión', // Always enabled
+        action: () => this.logoutUser(), // ✅ Explicitly use an arrow function
+        enabled: true,
+        position: 7,
+        navigation: true,
+        icon: 'logout',
+      },
+      {
+        name: 'Mi perfil', // Always enabled
+        routeOrFunction: '/app/account-info',
+        icon: 'groups',
+        position: 8,
+        navigation: false,
+        enabled: false,
+      },
+      {
+        name: 'Ayuda', // Always enabled
+        routeOrFunction: '/app/help',
+        icon: 'groups',
+        position: 9,
+        navigation: false,
+        enabled: false,
+      },
+    ];
+    this.sidenavService.addItems(menuItems);
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe to avoid memory leaks
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
+    if (this.featureFlagsSubscription) {
+      this.featureFlagsSubscription.unsubscribe();
+    }
+    this.sessionManagementService.stopMonitoring();
   }
 
   private addFocusListener(): void {

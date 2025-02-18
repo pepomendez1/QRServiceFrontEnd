@@ -4,74 +4,71 @@ import {
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
-  HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, switchMap, filter, take } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { SessionService } from './session.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<string | null> =
-    new BehaviorSubject<string | null>(null);
-
   constructor(
-    private injector: Injector,
-    private sessionService: SessionService
+    private injector: Injector, // Use Angular's Injector
+    private router: Router
   ) {}
-
-  private get authService(): AuthService {
-    return this.injector.get(AuthService); // Lazily inject AuthService
-  }
 
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    const accessToken = this.authService.getAccessTokenFromCookies(); // Ensure tokens are cookie-based
+    const skipAuth = req.headers.get('X-Skip-Auth');
+    if (skipAuth) {
+      const clonedRequest = req.clone({
+        headers: req.headers.delete('X-Skip-Auth'),
+      });
+      return next.handle(clonedRequest);
+    }
 
-    const clonedRequest = accessToken
-      ? req.clone({ setHeaders: { Authorization: `Bearer ${accessToken}` } })
-      : req;
+    // Lazily retrieve the AuthService
+    const authService = this.injector.get(AuthService);
+
+    const accessToken = authService.getAccessToken(); // Assume AuthService provides this method
+    let clonedRequest = req;
+
+    if (accessToken) {
+      clonedRequest = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    }
 
     return next.handle(clonedRequest).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && !this.isRefreshing) {
-          this.isRefreshing = true;
-          this.refreshTokenSubject.next(null);
-
-          return this.authService.refreshToken().pipe(
-            switchMap((newAuthData) => {
-              this.isRefreshing = false;
-              this.refreshTokenSubject.next(newAuthData.access_token);
-
+      catchError((error) => {
+        if (error.status === 401) {
+          // Handle token refresh using AuthService
+          return authService.refreshToken().pipe(
+            switchMap(() => {
+              const newAccessToken = authService.getAccessToken();
               const newRequest = req.clone({
                 setHeaders: {
-                  Authorization: `Bearer ${newAuthData.access_token}`,
+                  Authorization: `Bearer ${newAccessToken}`,
                 },
               });
               return next.handle(newRequest);
             }),
-            catchError(() => {
-              this.isRefreshing = false;
-              this.sessionService.logoutUser(); // Use SessionService for logout
-              return throwError(() => error);
-            })
-          );
-        } else if (error.status === 401 && this.isRefreshing) {
-          return this.refreshTokenSubject.pipe(
-            filter((token) => token !== null),
-            take(1),
-            switchMap((token) => {
-              const newRequest = req.clone({
-                setHeaders: { Authorization: `Bearer ${token}` },
-              });
-              return next.handle(newRequest);
+            catchError((refreshError) => {
+              console.error(
+                'Token refresh failed. Logging out...',
+                refreshError
+              );
+              authService.logOut(); // Log the user out
+              this.router.navigate(['/auth/login']);
+              return throwError(() => refreshError);
             })
           );
         }
+
         return throwError(() => error);
       })
     );

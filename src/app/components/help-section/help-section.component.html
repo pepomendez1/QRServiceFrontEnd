@@ -1,5 +1,6 @@
 <div class="help-container">
   <iframe
+    *ngIf="iframeUrl"
     src="https://pcomm.pystatic.com/arbol-soporte-01/index.html"
     frameborder="0"
     width="100%"
@@ -7,4 +8,5 @@
     title="Ayuda"
   >
   </iframe>
+  <div *ngIf="!iframeUrl" class="content-help" [innerHTML]="fileContent"></div>
 </div>

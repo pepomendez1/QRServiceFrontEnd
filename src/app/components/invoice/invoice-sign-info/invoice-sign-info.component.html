@@ -1,0 +1,27 @@
+<div class="invoice-sign custom-card">
+  <div class="invoice-sign-content">
+    <h2 class="heading-5-700-primary p-0 m-0">
+      {{ !hasPendingInvoices ? "No tenés" : "Tenés" }} facturas pendientes de
+      firmar
+    </h2>
+
+    <div class="invoice-sign-container">
+      <div class="invoice-sign-message">
+        <p class="paragraph-500">
+          Recordá que para enviar tu dinero en cuenta, debés tener tus facturas
+          firmadas
+        </p>
+
+        <div class="invoice-sign-btn">
+          <button
+            class="btn-ghost-color btn-md subheading-700"
+            (click)="goToInvoice()"
+          >
+            {{ !hasPendingInvoices ? "Ver mis facturas" : "Firmar facturas" }}
+          </button>
+        </div>
+      </div>
+      <div *ngIf="invoiceSign" [innerHTML]="invoiceSign"></div>
+    </div>
+  </div>
+</div>

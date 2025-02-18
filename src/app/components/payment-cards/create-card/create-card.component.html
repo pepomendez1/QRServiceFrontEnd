@@ -56,13 +56,7 @@
       buttonText="Continuar"
       buttonStyle="filled"
       [buttonDisabled]="loading"
-      (buttonClicked)="
-        goToStep(
-          data.canCreateVirtual
-            ? 'seleccionar_tipo_tarjeta'
-            : 'formulario_direccion'
-        )
-      "
+      (buttonClicked)="goToNextStep()"
     ></app-side-panel-footer>
   </div>
   } @case ("seleccionar_tipo_tarjeta"){
@@ -165,10 +159,11 @@
       /> -->
 
       <h2 class="heading-5-700">¡Ya solicitaste tu tarjeta!</h2>
-      <p class="heading-5-500">
-        Seguí el estado del envío desde acá. También podrás verlo en la sección
-        Tarjetas.
-      </p>
+      <span class="heading-5-500">
+        Seguí el estado del envío desde
+        <a href="#" (click)="trackShipment($event)">acá</a>. También
+        <br />podrás verlo en la sección Tarjetas.
+      </span>
     </div>
     <app-side-panel-footer
       class="w-100"

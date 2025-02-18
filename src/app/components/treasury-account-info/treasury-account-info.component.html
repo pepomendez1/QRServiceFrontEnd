@@ -89,6 +89,18 @@
             </button>
           </div>
         </div>
+
+        <div *ngIf="isEditMode" class="warning-message-box">
+          <mat-icon class="material-symbols-outlined">error_outline</mat-icon>
+          <div class="message-box-content">
+            <h1 class="paragraph-600 p-0 m-0">Cambio de alias</h1>
+            <span class="secondary-500"
+              >Sólo podés cambiar el alias de tu cuenta una vez cada 24 horas.
+              Si ya realizaste un cambio recientemente, por favor esperá hasta
+              que se cumpla este plazo para volver a intentarlo.</span
+            >
+          </div>
+        </div>
       </div>
     </div>
     }

@@ -14,7 +14,7 @@ export class MailRecoveryFormComponent {
   @Input() isMobile: boolean = false;
   @Output() mailCompleted = new EventEmitter<string>();
   @Output() returnToOpts = new EventEmitter<string>();
-
+  buttonText: string = '';
   recoveryMail: FormGroup;
   successMessage: any = null;
   errorMessage: any = null;
@@ -45,14 +45,17 @@ export class MailRecoveryFormComponent {
       case 'password':
         this.headerDescription =
           'Te enviaremos un código a tu mail para que generes una nueva contraseña';
+        this.buttonText = 'Continuar';
         break;
       case 'pin':
         this.headerDescription =
           ' Te enviaremos un código a tu mail para que generes un nuevo PIN';
+        this.buttonText = 'Continuar';
         break;
       case 'password-pin':
         this.headerDescription =
           'Te enviaremos un código a tu mail para que generes una nueva contraseña y PIN, además tendrás que validar tu identidad.';
+        this.buttonText = 'Enviar mail';
         break;
       default:
         break;

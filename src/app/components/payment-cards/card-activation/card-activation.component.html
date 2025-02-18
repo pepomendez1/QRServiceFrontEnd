@@ -1,0 +1,35 @@
+<div class="activate-card-container">
+  <app-side-panel-header
+    title="Activar tarjeta"
+    [arrowBackEnabled]="false"
+  ></app-side-panel-header>
+
+  <div class="activate-content">
+    @if (isLoading ) {
+    <div class="spinner-container">
+      <mat-spinner></mat-spinner>
+    </div>
+    } @else {
+    <div class="activate-form">
+      <iframe
+        *ngIf="!isLoading"
+        [src]="iframeUrl"
+        [ngStyle]="{ visibility: isIframeReady ? 'visible' : 'hidden' }"
+        (load)="onIframeLoad()"
+        frameborder="0"
+        width="100%"
+        height="100%"
+        class="activate-iframe"
+      >
+      </iframe>
+    </div>
+    }
+  </div>
+  <!-- <app-side-panel-footer
+    class="w-100"
+    [buttonText]="'Activar'"
+    buttonStyle="filled"
+    [buttonDisabled]="isLoading"
+    (buttonClicked)="activateCard()"
+  ></app-side-panel-footer> -->
+</div>

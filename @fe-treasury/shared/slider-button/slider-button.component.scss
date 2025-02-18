@@ -1,0 +1,50 @@
+.slider-button {
+  height: 40px;
+  width: 100%;
+  border-radius: 200px;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  padding: 5%;
+
+  .option {
+    padding: 10%;
+    border-radius: 8px;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    flex: 1;
+    display: flex; // Ensure the option is a flex container
+    align-items: center; // Center content vertically
+    justify-content: center; // Center content horizontally
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    transition: color 0.3s ease;
+      .slider-icons{
+        //align: middle;
+      }
+  }
+
+  .slider {
+    position: absolute;
+    top: 5%; // Match the padding percentage
+    left: 5%;
+    height: calc(100% - 10%); // Subtract padding from both sides
+    width: calc(50% - 5%); // Adjust width for two equal sections
+    //background-color: white;
+    border-radius: 200px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease; // Smooth sliding animation
+  }
+  .slider.right {
+    transform: translateX(100%); // Slide to the second option
+  }
+
+  .slider.left {
+    transform: translateX(0); // Slide to the first option
+  }
+
+}

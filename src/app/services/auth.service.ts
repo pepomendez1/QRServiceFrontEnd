@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import {
   CognitoUserPool,
   CognitoUser,
@@ -19,8 +19,10 @@ import { TokenService } from './token.service';
 import { MFAService } from './mfa.service';
 import { ErrorHandlingService } from './error-handling.service';
 import { StoreDataService } from './store-data.service';
+import { SnackbarService } from '@fe-treasury/shared/snack-bar/snackbar.service';
 import { RegisterSteps } from '../pages/authentication/register/register.component';
 import { CookieService } from './cookie.service';
+import { SessionManagementService } from './session.service';
 function toSnakeCaseKeys(obj: any): any {
   if (typeof obj !== 'object' || obj === null) {
     return obj;
@@ -64,8 +66,10 @@ export class AuthService {
   public authDataSubject: BehaviorSubject<AuthResponse | null>;
   private checkMagiLink = '/public/wibond-connect/user/auth/magic_token';
   constructor(
+    private sessionManagementService: SessionManagementService,
     private cookieService: CookieService,
     private http: HttpClient,
+    private snackBarService: SnackbarService,
     private configService: ConfigService,
     private integrationService: IntegrationService,
     private tokenService: TokenService,
@@ -79,6 +83,10 @@ export class AuthService {
       this.tokenService.getAuthData()
     );
     this.initializeConfig();
+    // Subscribe to the logout event
+    this.sessionManagementService.onLogout.subscribe(() => {
+      this.logoutUser();
+    });
   }
 
   // Método para manejar errores 403
@@ -378,38 +386,54 @@ export class AuthService {
     );
   }
 
-  refreshToken(): Observable<AuthResponse> {
-    return this.configService.getConfig().pipe(
-      switchMap((config) => {
-        const authData = this.tokenService.getAuthData();
-        if (!authData) {
-          return throwError('No auth data available');
+  refreshToken(): Observable<void> {
+    console.log('refreshing the token..........................');
+    if (!this.cognitoUser) {
+      console.error('Cognito user not set. Cannot refresh token.');
+      return throwError(() => new Error('Cognito user not set.'));
+    }
+
+    const refreshTokenValue = this.tokenService.getToken('refresh_token');
+    if (!refreshTokenValue) {
+      console.error('Refresh token is missing.');
+      return throwError(() => new Error('Refresh token is missing.'));
+    }
+
+    const refreshToken = new CognitoRefreshToken({
+      RefreshToken: refreshTokenValue,
+    });
+    //console.log('cognito refresh token ', refreshToken);
+
+    return new Observable((observer) => {
+      this.cognitoUser!.refreshSession(refreshToken, (err, session) => {
+        if (err) {
+          console.error('Error refreshing token:', err);
+          observer.error(err);
+          return;
         }
 
-        const tokenEndpoint = `${config.domain}/oauth2/token`;
-        const body = new URLSearchParams();
-        body.set('grant_type', 'refresh_token');
-        body.set('client_id', config.clientId);
-        body.set('refresh_token', authData.refresh_token);
+        console.log('Token refreshed successfully:');
 
-        const headers = new HttpHeaders({
-          'Content-Type': 'application/x-www-form-urlencoded',
+        // Extract new tokens
+        const accessToken = session.getAccessToken().getJwtToken();
+        const idToken = session.getIdToken().getJwtToken();
+        const newRefreshToken = session.getRefreshToken().getToken();
+
+        // Update tokens using TokenService
+        this.tokenService.setAuthData({
+          access_token: accessToken,
+          id_token: idToken,
+          refresh_token: newRefreshToken,
+          expires_in: session.getAccessToken().getExpiration(),
+          token_type: 'Bearer',
         });
 
-        return this.http
-          .post<AuthResponse>(tokenEndpoint, body.toString(), { headers })
-          .pipe(
-            tap((newAuthData) => this.tokenService.setAuthData(newAuthData)),
-            catchError(
-              this.errorHandlingService.handleError<AuthResponse>(
-                'refreshToken',
-                authData
-              )
-            )
-          );
-      })
-    );
+        observer.next();
+        observer.complete();
+      });
+    });
   }
+
   getTokenFromLink(linkData: { code: string }): Observable<AuthResponse> {
     return new Observable((observer) => {
       // First, fetch the configuration
@@ -637,14 +661,30 @@ export class AuthService {
 
   isAuthenticated(): Observable<boolean> {
     console.log('Verificando autenticación...');
-    const authData = this.tokenService.getAuthData();
-    // console.log('auth data : ', authData);
-    // Si tenemos authData, verificamos si el token ha expirado
+    let authData = this.tokenService.getAuthData(); // Fetch token data from cookies
+
+    // 1️⃣ Check if authData is available and token is still valid
     if (authData && authData.access_token) {
       console.log('AuthData disponible');
-      return of(!this.tokenService.isTokenExpired(authData.access_token));
+      if (!this.tokenService.isTokenExpired(authData.access_token)) {
+        return of(true); // Token is valid, user is authenticated
+      }
+
+      console.log('Token expirado, intentando refrescar...');
+      return this.refreshToken().pipe(
+        map((newTokens) => {
+          console.log('Tokens refrescados exitosamente:', newTokens);
+          return true; // Successfully refreshed, user remains authenticated
+        }),
+        catchError((err) => {
+          console.error('Error al refrescar el token, cerrando sesión...', err);
+          this.logoutUser();
+          return of(false);
+        })
+      );
     }
-    // Si no tenemos authData, verificamos si estamos en un iframe
+
+    // 2️⃣ If authData is missing, check if running inside an iframe
     if (window.self !== window.top) {
       console.log(
         'No hay authData, estamos en un iframe, solicitando token del parent.'
@@ -664,10 +704,30 @@ export class AuthService {
           }
         );
       });
-    } else {
-      // Si no estamos en un iframe y no tenemos authData, no estamos autenticados
-      return of(false);
     }
+
+    // 3️⃣ If not inside an iframe, check if refresh_token exists
+    const refreshToken = this.cookieService.getCookie('refresh_token');
+    if (refreshToken) {
+      console.log(
+        'AuthData no disponible, pero hay refresh_token. Intentando refrescar...'
+      );
+      return this.refreshToken().pipe(
+        map((newTokens) => {
+          console.log('Tokens refrescados exitosamente:', newTokens);
+          return true; // Successfully refreshed, user remains authenticated
+        }),
+        catchError((err) => {
+          console.error('Error al refrescar el token, cerrando sesión...', err);
+          this.logoutUser();
+          return of(false);
+        })
+      );
+    }
+
+    // 4️⃣ No access_token, no refresh_token, and not in an iframe → User is not authenticated
+    console.log('No hay authData ni refresh_token, usuario no autenticado.');
+    return of(false);
   }
 
   // Method to check if the password is completed
@@ -853,7 +913,8 @@ export class AuthService {
    */
   logoutUser(): void {
     console.log('Logging out user...');
-
+    this.snackBarService.close();
+    this.sessionManagementService.stopMonitoring(); // Stop session monitor
     // Clear authentication cookies
     this.cookieService.deleteCookie('access_token');
     this.cookieService.deleteCookie('id_token');

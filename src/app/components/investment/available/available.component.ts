@@ -88,6 +88,7 @@ export class AvailableComponent implements OnInit {
     // Fetch investment info
     this.investmentService.getInvestmentsInfo().subscribe({
       next: (data: InvestmentsInfo) => {
+        console.log('data info investments: : ', data);
         this.totalInvested = data.total_invested;
         this.totalReturns = data.total_returns;
         this.lastDailyReturn = data.last_daily_return;

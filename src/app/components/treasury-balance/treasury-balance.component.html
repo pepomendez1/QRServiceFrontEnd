@@ -20,9 +20,9 @@
 
     <!-- Información adicional - Rendimientos generados (con flecha y sección clickeable) -->
     <div
+      *ngIf="investmentActive"
       class="balance-details clickable"
       [routerLink]="['/app/investments']"
-      (click)="onEarningsClick()"
     >
       <div class="earnings-info" *ngIf="!investmentInfoError">
         <p class="earnings-summary paragraph-500">
@@ -30,7 +30,7 @@
           <span class="paragraph-500">rendimientos generados</span>
         </p>
         <div class="earnings-growth">
-          <span class="growth-percentage tag-700">{{ tna }} %</span>
+          <span class="growth-percentage tag-700">{{ tna | percent }}</span>
           <mat-icon class="arrow-icon">chevron_right</mat-icon>
           <!-- Flecha al final -->
         </div>
@@ -55,9 +55,4 @@
       Transferir
     </button>
   </div>
-</div>
-
-<!-- Mensaje de copiado -->
-<div *ngIf="copyMessage" class="copy-message">
-  {{ copyMessage }}
 </div>

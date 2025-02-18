@@ -8,8 +8,40 @@
     <mat-icon>menu</mat-icon>
   </button>
   <h1 class="heading-2">{{ currentRouteName }}</h1>
-  <!-- <mat-slide-toggle color="primary"> </mat-slide-toggle> -->
   <div class="header-buttons">
+    <div
+      *ngIf="toggleModuleEnabled"
+      [matMenuTriggerFor]="menuPeriod"
+      class="rounded-box clickable"
+    >
+      <mat-icon>storefront</mat-icon>
+      <p class="body-2 m-0">Módulos</p>
+    </div>
+
+    <mat-menu #menuPeriod="matMenu" class="filter-mat-menu">
+      <mat-radio-group
+        [(ngModel)]="selectedModule"
+        (change)="onModuleChange($event)"
+      >
+        <mat-radio-button value="basic_modules"
+          >Módulos Básicos</mat-radio-button
+        >
+        <mat-radio-button value="international_account"
+          >Cuenta Internacional</mat-radio-button
+        >
+      </mat-radio-group>
+    </mat-menu>
+
+    <app-slider-button
+      *ngIf="toggleThemeEnabled"
+      [iconOptions]="true"
+      [sizeHeight]="'48px'"
+      [sizeWidth]="'100px'"
+      [iconLeft]="'light_mode'"
+      [iconRight]="'dark_mode'"
+      [defaultOption]="defaultOption"
+      (optionSelected)="toggleTheme($event)"
+    ></app-slider-button>
     <div class="rounded-box clickable" (click)="goToHelp()">
       <mat-icon class="material-symbols-outlined">help_outline</mat-icon>
       <p class="body-2 m-0">Ayuda</p>
