@@ -1,9 +1,9 @@
-name: Deploy Angular to S3 - Prod
+name: Deploy Angular to S3 - Staging
 
 on:
   push:
     branches:
-      - frontend-prod
+      - staging
 
 permissions:
   id-token: write
@@ -11,12 +11,14 @@ permissions:
   issues: write
 
 env:
-  working_dir: "./src/fe-treasury"
+  working_dir: "."
+  AWS_IAM_ROLE: ${{ secrets.AWS_IAM_ROLE }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: "prod"
+    environment: "staging"
 
     steps:
       - name: Checkout code
@@ -28,7 +30,7 @@ jobs:
           node-version: "18.13.0"
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install
         working-directory: ${{ env.working_dir }}
 
       - name: Build Angular app
@@ -38,8 +40,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ env.AWS_IAM_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to S3
-        run: aws s3 sync ./src/fe-treasury/dist/fe-treasury s3://905418156807-fe-treasury-bucket
+        run: aws s3 sync ./dist/fe-treasury s3://975050267840-fe-treasury-bucket
