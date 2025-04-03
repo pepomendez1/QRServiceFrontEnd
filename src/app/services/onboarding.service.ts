@@ -8,8 +8,13 @@ const ONBOARDING_STEPS = {
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, of, throwError, tap } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { TokenService } from './token.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CognitoUser } from 'amazon-cognito-identity-js';
 import { ApiService } from './api.service';
+import { Token } from '@angular/compiler';
+import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 export interface OnboardingResponse {
   type: string; // físicas/jurídicas
   step: string; // onboarding step
@@ -52,7 +57,7 @@ interface TermsFormData {
 interface AffidavitTermsFormData {
   terms: boolean;
   disclaimer: boolean;
-  inv_saldo: boolean
+  inv_saldo: boolean;
   facta: string;
   ocde: string;
   pep: string;
@@ -74,11 +79,10 @@ interface OnboardingStatusResponse {
 })
 export class OnboardingService {
   private onboardingEndpoint = '/public/wibond-connect/onboarding';
-  private onboardingFlowEndpoint =
-    '/public/wibond-connect/onboarding/flow';
+  private onboardingFlowEndpoint = '/public/wibond-connect/onboarding/flow';
   private kycHistoryEndpoint =
     '/public/wibond-connect/onboarding/kyc-histories';
-
+  private apiUrl = environment.apiUrl;
   private currentStepSubject = new BehaviorSubject<string>('kyc_kyb_pending');
   public currentStep$ = this.currentStepSubject.asObservable();
 
@@ -88,16 +92,26 @@ export class OnboardingService {
   private onboardingFinishedSubject = new BehaviorSubject<boolean>(false);
   public onboardingFinished$ = this.onboardingFinishedSubject.asObservable();
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private tokenService: TokenService,
+    private router: Router, // Inject the Router service
+    private http: HttpClient
+  ) {}
 
-  checkOnboardingStatus(): void {
+  checkOnboardingStatus(metamapCompleted: boolean = false): void {
     // Set loading to true
     this.isLoadingSubject.next(true);
 
     this.getOnboardingData().subscribe({
       next: (response: OnboardingStatusResponse) => {
         console.log('onboarding response: ', response);
-        const currentStep = response.status;
+        let currentStep = response.status;
+
+        // If metamap_completed is true, force the user to the address step
+        if (metamapCompleted) {
+          currentStep = ONBOARDING_STEPS.ADDRESS;
+        }
 
         // Update current step and completion state
         this.currentStepSubject.next(currentStep);
@@ -105,6 +119,12 @@ export class OnboardingService {
         // If onboarding is completed
         if (currentStep === ONBOARDING_STEPS.COMPLETED) {
           this.onboardingFinishedSubject.next(true);
+
+          // Check if metamap_status is not 'Completed'
+          if (response.metamap_status !== 'Completed') {
+            // Navigate to the on-hold route
+            this.router.navigate(['/on-hold']);
+          }
         }
 
         // Stop the loading spinner
@@ -315,14 +335,63 @@ export class OnboardingService {
       })
     );
   }
+  // In your onboarding.service.ts file
+  getOnboardingStatusOTP(): Observable<any> {
+    const url = `${this.apiUrl}${this.onboardingEndpoint}`;
+    const authData = this.tokenService.getAuthDataOTP();
+    if (!authData) {
+      return throwError(() => new Error('Error en la autenticación por OTP'));
+    }
 
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${authData.access_token_otp}`,
+      'Content-Type': 'application/json',
+      'Wibond-Id': `${authData.id_token_otp}`,
+    });
+
+    return this.http.get<any>(url, { headers }).pipe(
+      catchError((error) => {
+        console.error(
+          'Error obteniendo datos de owner id de onboarding:',
+          error
+        );
+        return throwError(
+          () => new Error('Error obteniendo datos de owner id de onboarding')
+        );
+      })
+    );
+  }
   // comenzar verificación biométrica para recupero de clave
-  startKycHistoryRegister(): any {
-    return this.apiService.post<any>(this.kycHistoryEndpoint, {});
+  startKycHistoryRegister(): Observable<any> {
+    const url = `${this.apiUrl}${this.kycHistoryEndpoint}`;
+    const authData = this.tokenService.getAuthDataOTP();
+    if (!authData) {
+      return throwError(() => new Error('Error en la autenticación por OTP'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${authData.access_token_otp}`,
+      'Content-Type': 'application/json',
+      'Wibond-Id': `${authData.id_token_otp}`,
+    });
+
+    return this.http.post<any>(url, {}, { headers });
   }
 
-  getKycHistoryRegister(): any {
-    return this.apiService.get<any>(this.kycHistoryEndpoint);
+  getKycHistoryRegister(): Observable<any> {
+    const url = `${this.apiUrl}${this.kycHistoryEndpoint}`;
+    const authData = this.tokenService.getAuthDataOTP();
+    if (!authData) {
+      return throwError(() => new Error('Error en la autenticación por OTP'));
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${authData.access_token_otp}`,
+      'Content-Type': 'application/json',
+      'Wibond-Id': `${authData.id_token_otp}`,
+    });
+
+    return this.http.get<any>(url, { headers });
   }
 
   formatUpperCase(street: string): string {

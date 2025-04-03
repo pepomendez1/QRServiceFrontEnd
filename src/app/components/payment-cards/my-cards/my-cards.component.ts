@@ -129,6 +129,7 @@ export class MyCardsComponent implements OnInit {
           this.loading = false;
           this.activeCards = data;
           this.selectedCard = data[0];
+          console.log('selected card: ', data[0]);
           // emit the selected card to all components that inject MyCardsService
           this.myCardsService.setCardSelected(this.selectedCard);
         } else {

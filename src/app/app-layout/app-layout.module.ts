@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { LoadingIndicatorModule } from '@fe-treasury/shared/loading-indicator/loading-indicator.module';
 import { MaterialModule } from '@fe-treasury/shared/material-components.module';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -20,6 +21,7 @@ import { NavigationModule } from './navigation/navigation.module';
     LoadingIndicatorModule,
     HeaderModule,
     SidenavModule,
+    FormsModule,
   ],
   exports: [AppLayoutComponent],
 })

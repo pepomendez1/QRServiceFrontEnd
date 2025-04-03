@@ -90,7 +90,7 @@ export class ResetPasswordComponent {
       return;
     } else {
       this.isProcessing = true;
-      console.log('Form submitted', this.authForm.value);
+      // console.log('Form submitted', this.authForm.value);
       if (this.debugMode) {
         setTimeout(() => {
           this.isProcessing = false;

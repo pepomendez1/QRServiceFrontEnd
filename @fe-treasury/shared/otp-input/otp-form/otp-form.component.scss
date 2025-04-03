@@ -1,0 +1,117 @@
+.form-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1em;
+    .otp-form-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5em;
+    .otp-input-container {
+      display: flex;
+      justify-content: center; // Center the inputs
+      width: 100%;
+      gap: 0.5em; // Reduced gap for mobile
+      flex-wrap: nowrap;
+
+      // display: flex;
+      // flex-grow: 1;
+      // gap: 1em;
+      // align-items: left;
+      // justify-content: space-between;
+      // flex-wrap: nowrap;
+      // flex-direction: row;
+      // transition: gap 0.2s ease-out;
+
+      .otp-input {
+        width: 2.5em;
+        height: 2.5em;
+        border-radius: 0.5em;
+        text-align: center;
+        font-size: 16px;
+        appearance: none;
+        transition: border-color 0.2s ease-out, border-radius 0.2s ease-out;
+      }
+
+      .otp-input:last-child {
+        margin-right: 0;
+        /* No margin after the last input */
+      }
+
+      .otp-input:focus {
+       // border-color: #0d0d0e;
+        /* Highlighted border when focused */
+        outline: none;
+        appearance: none;
+      }
+    }
+    .otp-input-container.error .otp-input {
+      border-color: #E44B52;
+    }
+  }
+    .time-left {
+      color: #999;
+      text-align: center;
+      margin: 0;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .form-wrapper {
+    form {
+      .otp-form-container {
+      .otp-input-container {
+        gap: 0;
+
+        .otp-input {
+          border-radius: 0px;
+          border-right: 0px solid #ccc;
+          width: 1.8em;
+          height: 1.8em;
+          font-size: 14px;
+
+          &:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+          }
+          &:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            border-right: 1px solid #ccc;
+          }
+        }
+      }
+    }
+    }
+  }
+
+}
+
+
+// iOS-specific fixes
+@supports (-webkit-touch-callout: none) {
+
+@media (max-width: 767px) {
+  .form-wrapper {
+    form {
+      .otp-form-container {
+        .otp-input-container {
+  .otp-input {
+    width: 1.3em;
+    height: 1.3em;
+  }
+}
+      }
+    }
+  }
+}
+}

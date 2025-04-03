@@ -4,4 +4,10 @@
   iframe {
     border: none;
   }
+  .content-help {
+    margin: 1em;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
 }

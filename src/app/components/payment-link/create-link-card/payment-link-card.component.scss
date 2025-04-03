@@ -1,0 +1,71 @@
+.payment-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-radius: 12px;
+  position: relative; // Needed for the sticky button
+  //min-height: 30dvh; // Ensures full height for flex behavior
+
+  .title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .amount-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 32px;
+    font-weight: bold;
+
+    .currency-symbol {
+      font-size: 24px;
+      margin-right: 8px;
+    }
+
+    .amount {
+      flex: 1;
+      text-align: right;
+    }
+
+    .decimals {
+      font-size: 16px;
+      font-weight: 500;
+      color: #a3a3a3;
+    }
+  }
+
+  .toggle-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b6b6b;
+
+    .mat-slide-toggle {
+      transform: scale(0.9);
+    }
+  }
+
+  .product-input {
+    width: "auto";
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d1d1;
+    font-size: 14px;
+    outline: none;
+
+    &:focus {
+      border-color: #fa0050;
+      box-shadow: 0 0 0 3px rgba(250, 0, 80, 0.2);
+    }
+  }
+
+  // Sticky Button
+  .sticky-button-container {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto; // Pushes everything above and keeps button at the bottom
+  }
+}

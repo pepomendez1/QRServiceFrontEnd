@@ -118,6 +118,97 @@ export class InternationalAccountService {
     },
   ];
 
+  mockDataContacts: any[] = [
+      {
+        id: 3,
+        name: 'Parker, Peter',
+        accountNumber: '3220001805000040970014',
+        initials: '',
+        bank_name: 'BANCO INDUSTRIAL S.A.',
+        additional_info: '',
+        favorite: true,
+        currency: 'USD',
+        country: 'USA',
+      },
+      {
+        id: 4,
+        name: 'Stark, Tony',
+        accountNumber: '3220004782023055910025',
+        initials: '',
+        bank_name: 'BANCO INDUSTRIAL S.A.',
+        additional_info: '',
+        favorite: false,
+        currency: 'ARS',
+        country: 'Argentina',
+      },
+      {
+        id: 2,
+        name: 'Diaz, Bruno',
+        accountNumber: '3220001823000055910025',
+        initials: '',
+        bank_name: 'BANCO INDUSTRIAL S.A.',
+        additional_info: '',
+        favorite: false,
+        currency: 'USD',
+        country: 'USA',
+      },
+      {
+        id: 5,
+        name: 'Rogers, Steve',
+        accountNumber: '3220001823000099776025',
+        initials: '',
+        bank_name: 'BANCO INDUSTRIAL S.A.',
+        additional_info: '',
+        favorite: false,
+        currency: 'ARS',
+        country: 'Argentina',
+      },
+      {
+        id: 6,
+        name: 'Grimm, Ben',
+        accountNumber: '3220001823765455910025',
+        initials: '',
+        bank_name: 'BANCO INDUSTRIAL S.A.',
+        additional_info: '',
+        favorite: false,
+        currency: 'USD',
+        country: 'USA',
+      },
+      {
+        id: 7,
+        name: 'García, Pepe',
+        accountNumber: '3220001823765466910025',
+        initials: '',
+        bank_name: 'BANCO INDUSTRIAL S.A.',
+        additional_info: '',
+        favorite: false,
+        currency: 'ARS',
+        country: 'Argentina',
+      },
+      {
+        id: 8,
+        name: 'Perez, Juan',
+        accountNumber: '3220001828865455910025',
+        initials: '',
+        bank_name: 'BANCO INDUSTRIAL S.A.',
+        additional_info: '',
+        favorite: false,
+        currency: 'USD',
+        country: 'USA',
+      },
+      {
+        id: 9,
+        name: 'Castro, Ana',
+        accountNumber: '32200018237654559100012',
+        initials: '',
+        bank_name: 'BANCO INDUSTRIAL S.A.',
+        additional_info: '',
+        favorite: false,
+        currency: 'ARS',
+        country: 'Argentina',
+      },
+    ];
+
   constructor(private apiService: ApiService) {}
 
   /**
@@ -163,6 +254,71 @@ export class InternationalAccountService {
           return throwError(() => new Error('Error obteniendo operaciones'));
         })
       );
+    }
+  }
+
+    /**
+   * Método para obtener todos los contactos de la cuenta
+   * @returns Un observable con todos contactos.
+   */
+    getContacts(): Observable<any> {
+      if (this.useMockData) {
+        return new Observable<any>((subscriber) => {
+          setTimeout(() => {
+            subscriber.next({ contacts: this.mockDataContacts });
+            subscriber.complete();
+          }, 1000);
+        });
+      } else {
+        return this.apiService.get<any>(`${this.endpoint}/contacts`).pipe(
+          catchError((error: any) => {
+            console.log(error);
+            return throwError(() => new Error('Error obteniendo contactos'));
+          })
+        );
+      }
+    }
+
+
+    /**
+   * Método para agregar un contacto de la lista de favoritos de un usuario
+   * @returns Un observable con la respuesta de la acción.
+   */
+  toggleFavoriteContact(
+    contactId: number,
+    favoriteStatus: boolean
+  ): Observable<any> {
+    if(this.useMockData) {
+      return new Observable<any>((subscriber) => {
+        setTimeout(() => {
+          subscriber.next({ result: true });
+          subscriber.complete();
+        }, 1000);
+      });
+    } else {
+      const endpoint = `${this.endpoint}/account/favorites`;
+      const body = { contact_id: contactId, favorite: favoriteStatus };
+      return this.apiService.put<any>(endpoint, body);
+    }
+  }
+
+
+  /**
+   * Método para eliminar un contacto de la lista de contactos de un usuario
+   * @returns Un observable con la respuesta de la eliminación.
+   */
+  deleteContact(contactId: number): Observable<any> {
+    if(this.useMockData) {
+      return new Observable<any>((subscriber) => {
+        setTimeout(() => {
+          subscriber.next({ result: true });
+          subscriber.complete();
+        }, 1000);
+      });
+    } else {
+      const endpoint = `${this.endpoint}/account/contacts`;
+      const body = { contact_id: contactId };
+      return this.apiService.delete<any>(endpoint, body);
     }
   }
 

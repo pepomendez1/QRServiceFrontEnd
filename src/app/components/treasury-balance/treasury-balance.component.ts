@@ -28,7 +28,7 @@ export class TreasuryBalanceComponent implements OnInit {
   isLoading: boolean = true; // Variable para controlar el estado de carga
   transferOk: boolean = false;
   investmentActive: boolean = false;
-  totalReturns: string[] = [];
+  public totalReturns: number = 0;
   public tna: number = 0;
   public errors: string[] = [];
   investmentInfoError: boolean = false;
@@ -90,7 +90,17 @@ export class TreasuryBalanceComponent implements OnInit {
     this.investmentInfoError = false;
     return this.investmentService.getInvestmentsInfo().pipe(
       tap((data: InvestmentsInfo) => {
-        this.totalReturns = data.total_returns.toFixed(2).split('.');
+        // let dataTest = {
+        //   total_invested: 256212.25144531258,
+        //   total_returns: 3613.8314453125004,
+        //   last_daily_return: 767.21875,
+        //   last_date: '2025-03-25T00:00:00Z',
+        //   tna: 0.2752,
+        // };
+        // this.totalReturns = dataTest.total_returns;
+        // this.tna = dataTest.tna;
+
+        this.totalReturns = data.total_returns;
         this.tna = data.tna;
         this.investmentInfoError = false; // Set the error flag
       }),
