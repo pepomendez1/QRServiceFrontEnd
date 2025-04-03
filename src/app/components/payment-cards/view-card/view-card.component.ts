@@ -3,22 +3,18 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { PaymentCardsService } from '../payment-cards.service';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import {
-  DomSanitizer,
-  SafeHtml,
-  SafeResourceUrl,
-} from '@angular/platform-browser';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
 import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.service';
 import { SecondsToTimeStringPipe } from 'src/app/pipes/seconds-to-time-string.pipe';
 import { SidePanelHeaderComponent } from '@fe-treasury/shared/side-panel/side-panel-header/side-panel-header.component';
-import { OtpFormModule } from '@fe-treasury/shared/otp-form/otp-form.module';
-import { SvgLibraryService } from 'src/app/services/svg-library.service';
+import { OtpInputModule } from '@fe-treasury/shared/otp-input/otp-input.module';
 import { OTPService } from 'src/app/services/otp.service';
 import { MessagesModule } from '@fe-treasury/shared/messages/messages.module';
 import { MessageService } from '@fe-treasury/shared/messages/messages.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { OtpInputComponent } from '@fe-treasury/shared/otp-input/otp-input.component';
 import { SnackbarService } from '@fe-treasury/shared/snack-bar/snackbar.service';
 import { SidePanelFooterComponent } from '@fe-treasury/shared/side-panel/side-panel-footer/side-panel-footer.component';
 @Component({
@@ -32,12 +28,13 @@ import { SidePanelFooterComponent } from '@fe-treasury/shared/side-panel/side-pa
     MessagesModule,
     SidePanelHeaderComponent,
     SidePanelFooterComponent,
-    OtpFormModule,
+    OtpInputModule,
   ],
   templateUrl: './view-card.component.html',
   styleUrl: './view-card.component.scss',
 })
 export class ViewCardComponent implements OnInit {
+  @ViewChild(OtpInputComponent) otpInputComponent!: OtpInputComponent;
   @Input() data: any;
 
   public iframeUrl: SafeResourceUrl = '';
@@ -45,27 +42,24 @@ export class ViewCardComponent implements OnInit {
   public steps = ['otp', 'viewCard'];
   public currentStep = 0;
   public errors: string[] = [];
-  public timeLeftOTP = 300;
   public timeLeft = 0;
-  clearForm = false;
-  timeOut: boolean = false;
-  resetTimer: boolean = false; // Reset timer signal
-  enterOTPImg: SafeHtml | null = null;
   // opt data
   public email: any = '';
   public session: string | null = '';
   public challengeName: string | null = '';
-  public otpObject: string = '';
-  public buttonEnabled = false;
+  buttonText: string = 'Continuar'; // Default button text
+  buttonEnabled: boolean = false; // Default button state
+
   isProcessing: boolean = false;
   debugMode: boolean = false;
   bypassOTP: boolean = false;
-  isSubmitButtonEnabled: boolean = false;
+
+  isIframeReady: boolean = false;
+
   public incorrectOTP: boolean = false;
   private showCardTimerInterval: any;
   constructor(
     private clipboard: Clipboard,
-    private svgLibrary: SvgLibraryService,
     private cardService: PaymentCardsService,
     private authService: AuthService,
     private sanitizer: DomSanitizer,
@@ -76,9 +70,6 @@ export class ViewCardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.svgLibrary.getSvg('enter-password').subscribe((svgContent) => {
-      this.enterOTPImg = svgContent; // SafeHtml type to display SVG dynamically
-    });
     this.messageService.clearMessage();
     this.sidePanelService.toggleDisableClose(false);
     this.email = this.authService.getEmail();
@@ -93,6 +84,8 @@ export class ViewCardComponent implements OnInit {
         },
         error: (error: any) => {
           console.error('Error sending OTP:', error);
+          this.loading = false;
+          this.snackBarService.openError('Error en el envío de OTP', true);
         },
       });
     } else {
@@ -102,80 +95,29 @@ export class ViewCardComponent implements OnInit {
     // this.getCardIframeUrl(this.data.id);
   }
 
+  handleButtonText(text: string): void {
+    this.buttonText = text;
+  }
+  handleButtonEnabled(isEnabled: boolean): void {
+    this.buttonEnabled = isEnabled;
+  }
+
+  otpValidatedOK() {
+    this.isProcessing = false;
+    this.viewCard();
+  }
+
+  submitOtp(): void {
+    if (this.buttonEnabled) {
+      this.otpInputComponent.submitOtp();
+    }
+  }
+
   viewCard() {
     this.loading = true;
     this.currentStep = 1;
     this.sidePanelService.toggleDisableClose(true);
     this.getCardIframeUrl(this.data.provider_id);
-  }
-  handleTimeOut(): void {
-    console.log('Time Out');
-    this.timeOut = true;
-    this.messageService.showMessage(
-      'El tiempo de validez del código ha caducado - ',
-      'warning',
-      'Reenviar código',
-      () => this.resendCode()
-    );
-  }
-
-  resendCode() {
-    this.incorrectOTP = false;
-    this.isProcessing = true;
-    if (this.debugMode) {
-      this.timeOut = false;
-      this.resetTimer = true;
-      setTimeout(() => (this.resetTimer = false), 0);
-      this.messageService.showMessage('Código enviado!', 'success');
-      setTimeout(() => {
-        this.messageService.clearMessage();
-      }, 5000);
-      this.isProcessing = false;
-      this.restartValues();
-    } else {
-      this.otpService.sendOtp(this.email).subscribe({
-        next: (response) => {
-          console.log('OTP Sent:', response);
-          //localStorage.setItem('otpEmail', this.email || '');
-          localStorage.setItem('otpSession', response.Session);
-          localStorage.setItem('challengeName', response.ChallengeName);
-          this.timeOut = false;
-
-          // Reset timer and force change detection
-          this.resetTimer = true;
-          setTimeout(() => (this.resetTimer = false), 0);
-          this.messageService.showMessage('Código enviado!', 'success');
-          this.clearForm = true;
-          setTimeout(() => (this.clearForm = false), 0);
-
-          setTimeout(() => {
-            this.messageService.clearMessage();
-          }, 5000);
-          this.isProcessing = false;
-          //this.cdr.detectChanges(); // Force change detection to update the child component
-          this.restartValues();
-        },
-        error: (error: any) => {
-          console.error('Error sending OTP:', error);
-          this.messageService.showMessage(
-            'Error en el envío de mail!: ',
-            'error'
-          );
-          this.isProcessing = false;
-        },
-      });
-    }
-  }
-  restartValues(): void {
-    //this.email = localStorage.getItem('otpEmail');
-    this.session = localStorage.getItem('otpSession');
-    this.challengeName = localStorage.getItem('challengeName');
-
-    if (!this.email || !this.session) {
-      console.error('Missing email or session in localStorage');
-      this.messageService.showMessage('Código incorrecto', 'error');
-      // Optionally, redirect the user back to the request OTP screen or show an error message
-    }
   }
 
   getCardIframeUrl(cardId: string): void {
@@ -235,6 +177,17 @@ export class ViewCardComponent implements OnInit {
     }, 100); // Delay of 100ms
     this.clearTimer();
   }
+
+  onIframeLoad(): void {
+    console.log('Iframe loaded. Waiting for styles...');
+
+    setTimeout(() => {
+      // console.log('Assuming styles are applied. Stopping loader.');
+
+      this.isIframeReady = true;
+    }, 2000); // Adjust delay based on observed loading time
+  }
+
   private clearClipboard(): void {
     if (document.hasFocus()) {
       const placeholder = ' ';
@@ -250,51 +203,5 @@ export class ViewCardComponent implements OnInit {
     } else {
       console.warn('Cannot clear clipboard: Document is not focused.');
     }
-  }
-  // otp
-
-  enableButton(event: boolean) {
-    this.buttonEnabled = event;
-    console.log('Button enabled: ', event);
-  }
-
-  handleOtpEvent(otp?: string) {
-    if (otp) {
-      this.otpObject = otp;
-    }
-    return;
-  }
-  handleButtonState(isEnabled: boolean): void {
-    this.isSubmitButtonEnabled = isEnabled;
-  }
-  submitOtp() {
-    this.isProcessing = true;
-    console.log('Submit', this.otpObject);
-    // otp is an object
-    // {
-    //   "digit1": "1",
-    //   "digit2": "2",
-    //   "digit3": "3",
-    //   "digit4": "4",
-    //   "digit5": "5",
-    //   "digit6": "6"
-    // }
-    // but it has to be converted to a string
-    const otpString = Object.values(this.otpObject).join('');
-
-    this.otpService
-      .verifyOtp(null, otpString, this.session || '', this.challengeName || '')
-      .subscribe({
-        next: (data: any) => {
-          this.isProcessing = false;
-          this.viewCard();
-        },
-        error: (error: any) => {
-          console.error('Error verifying OTP:', error);
-          this.incorrectOTP = true;
-          this.isProcessing = false;
-          // Handle error, show messag
-        },
-      });
   }
 }

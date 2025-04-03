@@ -3,23 +3,29 @@
   display: flex;
   flex-direction: column;
 }
+
 .welcome-container {
   height: 100vh;
   width: 100vw;
   position: relative;
-  //background-color: #FFFFFF;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-
+  /* Pseudo-Card Container */
+  .pseudo-card-container {
+    width: max(40vw, 700px); // Match swiper-container width
+    height: 600px; // Match swiper-container height
+    position: relative; // For absolute positioning of the button
+    border-radius: 12px 0px 0px 0px; // Match swiper-container border radius
+    background-color: transparent; // Ensure it doesn't block the swiper
+  }
 
   swiper-container {
-    width: max(40vw, 700px);
-    height: 600px;
-    border-radius: 12px 0px 0px 0px;
-    //box-shadow: 0px 2px 16px 0px #1414151F;
+    width: 100%; // Fill the pseudo-card container
+    height: 100%; // Fill the pseudo-card container
+
     swiper-slide {
       display: flex;
 
@@ -27,42 +33,35 @@
         width: 100%;
         height: 100%;
         display: flex;
-        //padding: 0 4em 3em 4em;
 
         .swiper-card {
           display: flex;
           flex: 1;
           flex-direction: column;
           justify-content: center;
-         // background-color: white;
-
-          //box-shadow: 0px 2px 16px 0px #1414151F;
-
-          //padding: 2em;
-          overflow: hidden;
+          height: 100%;
 
           .image-container {
-            //height: 30vh;
             display: flex;
-            flex: 1;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             background-repeat: no-repeat;
             background-position: center;
             border-radius: 12px 12px 80px 0px;
-           // background-size: contain;
+            background-size: contain;
+            height: 100%;
+            flex: 1;
           }
 
           .content {
-            //flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            //background-color: white;
-            border-radius: 1em;
             text-align: center;
             align-items: center;
             gap: 1em;
-            padding: 2em;
+            padding: 2em 2em 6em 2em;
+            box-sizing: border-box;
             .text-content {
               width: 65%;
               display: flex;
@@ -73,18 +72,14 @@
               flex: 1;
               gap: 1em;
               padding: 1em;
+
               h2 {
                 margin: 0;
               }
+
               p {
                 margin: 0;
               }
-            }
-
-            .create-account-btn {
-              padding: 8px 12px;
-              width: 40%;
-              flex: 0;
             }
           }
         }
@@ -92,28 +87,17 @@
     }
   }
 
-  /* Styling for filled mat-flat-button */
-  // swiper-container::part(bullet) {
-  //   background-color: #272727;
-  // }
-  // swiper-container::part(button-prev) {
-  //   padding-left: 1.5em;
-  //   height: 20px;
-  //   width: 20px;
-  //   color: #292828;
-  //   transform: translateY(600%);
-
-  // }
-  // swiper-container::part(button-next) {
-  //   padding-right: 1.5em;
-  //   height: 20px;
-  //   width: 20px;
-  //   color: #464343;
-  //   transform: translateY(600%);
-  // }
-  // swiper-container::part(bullet-active) {
-  //   background-color: black;
-  // }
+  /* Fixed Button */
+  .create-account-btn {
+    position: absolute; // Fix the button inside the pseudo-card
+    bottom: 20px; // Adjust as needed
+    left: 50%; // Center horizontally
+    transform: translateX(-50%); // Center horizontally
+    z-index: 10; // Ensure it's above the swiper content
+    padding: 8px 12px; // Retain original button styling
+    width: 40%; // Retain original button styling
+    flex: 0; // Retain original button styling
+  }
 }
 
 @media screen and (max-width: 840px) {
@@ -121,78 +105,57 @@
     padding: 0;
     align-items: flex-start;
 
-    .svg-logo {
-      //position: relative;
-      width: 150px;
-      z-index: 10;
-    }
+    .pseudo-card-container {
+      width: 100vw; // Full width on mobile
+      height: 100vh; // Full height on mobile
 
-    swiper-container {
-      width: 100vw;
-      height: 100vh;
-      max-width: 100%;
+      swiper-container {
+        height: 100%; // Ensure swiper-container takes full height
+        swiper-slide {
+          height: 100%; // Ensure swiper-slide takes full height
 
-      swiper-slide {
-        height: 100vh;
-        .swiper-card-container {
-          padding: 0;
-          height: 100vh;
-          .swiper-card {
-            height: 100vh;
-            padding: 0;
-            gap: 0;
-            border-radius: 0;
+          .swiper-card-container {
+            height: 100%; // Ensure swiper-card-container takes full height
+            display: flex;
+            flex-direction: column; // Stack children vertically
 
-            .image-container {
-              flex: 1;
-              height: 50%;
-              border-radius: 0 0 100px 0;
-            }
-
-            hr {
-              display: none;
-            }
-
-            .content {
+            .swiper-card {
+              height: 100%; // Ensure swiper-card takes full height
               display: flex;
-              padding: 1em;
-              border-radius: 0;
-              flex: 1;
+              flex-direction: column; // Stack children vertically
+              justify-content: space-between; // Space out image and content
 
-              flex-direction: column;
-              align-items: flex-start;
-              justify-content: space-between;
-              .text-content {
-                flex: 1;
-                width: 100%;
-                display: flex;
-                text-align: center;
-                flex-direction: column;
-                align-items: center;
-                gap: 1em;
-                padding: 0;
-                //align-items: center;
-                justify-content: flex-start;
-
-                h2 {
-                  margin: 0;
-
-                }
-                p {
-                  margin: 0;
-
-                }
+              .image-container {
+                height: 60vh; // Use viewport height to enforce half the screen
+                min-height: 60vh; // Ensure it doesn't shrink below 50vh
+                flex-shrink: 0; // Prevent the image container from shrinking
+                border-radius: 0 0 80px 0; // Adjust border radius if needed
               }
-              .create-account-btn {
-                padding: 12px 16px;
-                width: 100%;
-                flex: 0;
+
+              .content {
+                flex: 1; // Allow content to take remaining space
+                gap: 1em;
+                padding: 1em 1em 6em 1em; // Add padding at the bottom for the button
+                box-sizing: border-box;
+
+                .text-content {
+                  text-align: center;
+
+              align-items: center;
+              justify-content: flex-start;
+                  width: 90%; // Adjust text width for better readability
+                }
               }
             }
           }
         }
       }
-    }
 
+      .create-account-btn {
+        width: 90%; // Full width on mobile
+        max-width: none; // Remove max-width restriction
+        bottom: 1em; // Adjust as needed
+      }
+    }
   }
 }

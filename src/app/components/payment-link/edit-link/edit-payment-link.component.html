@@ -1,0 +1,48 @@
+<div class="edit-payment-link-container">
+    <!-- Header -->
+     <div>
+    <app-side-panel-header [title]="'Editar ' + (paymentLinkData?.description || 'Link de Pago')"
+        [arrowBackEnabled]="false">
+    </app-side-panel-header>
+
+    <!-- Payment Link UI (Reusing Card Inputs) -->
+    <div class="payment-link-card">
+        <!-- Amount Input Component -->
+        <app-amount-input 
+        [(ngModel)]="amount"
+        [disabled]="isAmountUndefined"
+        (setAmount)="setAmount($event)">
+        </app-amount-input>
+
+        <!-- Toggle for Undefined Amount -->
+        <!-- <div class="toggle-container">
+            <span>Sin monto definido</span>
+            <mat-slide-toggle [(ngModel)]="isAmountUndefined" (change)="toggleAmountUndefined()"></mat-slide-toggle>
+        </div>
+ -->
+        <!-- Product Name Input -->
+        <input type="text" class="product-input" placeholder="Nombre del producto o servicio"
+            [(ngModel)]="productName" />
+        <p class="paragraph-600">Link</p>
+        <input type="text" class="product-input" placeholder="" [(ngModel)]="productLink" disabled="true"/>
+        <!-- <hr width="100%" size="1" color="#EBEBEB" /> -->
+    </div>
+    </div>
+
+    <!-- Error Message -->
+    <p *ngIf="errorMessage()" class="error-message">{{ errorMessage() }}</p>
+
+    <!-- Footer with Save Button -->
+    <div class="sticky-button-container">
+        <button class="btn-cta-filled w-100 btn-lg" (click)="togglePaymentStatus()" [disabled]="isLoading()">
+            {{ paymentLinkData.status === 'PAUSED' ? 'Activar' : 'Pausar' }}
+        </button>
+    </div>
+    <app-side-panel-footer
+        class="w-100"
+        buttonText="Guardar" 
+        buttonStyle="filled" 
+        [buttonDisabled]="isLoading()"
+        (buttonClicked)="save()">
+    </app-side-panel-footer>
+</div>

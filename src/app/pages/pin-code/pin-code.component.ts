@@ -16,6 +16,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MessageService } from '@fe-treasury/shared/messages/messages.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { StoreDataService } from 'src/app/services/store-data.service';
 @Component({
   selector: 'app-pin-code',
   templateUrl: './pin-code.component.html',
@@ -40,11 +41,13 @@ export class PinCodeComponent {
   diffPinConfirm: boolean = false;
   setPin: string = '';
   confirmPin: string = '';
+  isIframe: boolean = false;
   private formChanged = false; // Tracks if the form has switched
   constructor(
     private svgLibrary: SvgLibraryService,
     private fb: FormBuilder,
     private router: Router,
+    private storeDataService: StoreDataService,
     private authService: AuthService,
     private snackbarService: SnackbarService,
     private pinCodeService: PinCodeService,
@@ -78,6 +81,7 @@ export class PinCodeComponent {
   }
 
   ngOnInit(): void {
+    this.isIframe = this.storeDataService.checkIframe();
     this.logoUrl = this.svgLibrary.getLogo();
     this.breakpointObserver
       .observe(['(max-width: 840px)'])
@@ -175,7 +179,7 @@ export class PinCodeComponent {
     if (this.pinConfirm.valid) {
       this.isProcessing = true;
       const pinConfirmed = Object.values(this.pinConfirm.value).join('');
-      console.log('Form submitted:', pinConfirmed);
+      //console.log('Form submitted:', pinConfirmed);
       if (pinConfirmed !== this.setPin) {
         this.isProcessing = false;
         this.diffPinConfirm = true;

@@ -1,0 +1,57 @@
+<div class="costs-container">
+    <div class="cost-section">
+        <h3 class="subheading-700">Tarjeta de débito</h3>
+        <p class="secondary-400">Tu dinero estará disponible en:</p>
+
+        <div class="options-row">
+            <div *ngFor="let option of getDebitOptions()" class="cost-option"
+                [class.selected]="selectedDebitOption === option.id" (click)="selectDebit(option.id)">
+                <span class="label">{{ option.name }}</span>
+                <span class="fee bold">{{ option.commission | number:'1.2-2' }}% + IVA</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="cost-section">
+        <h3 class="subheading-700">Tarjeta de crédito</h3>
+        <p class="secondary-400">Tu dinero estará disponible en:</p>
+
+        <div class="options-row">
+            <div *ngFor="let option of getCreditOptions()" class="cost-option"
+                [class.selected]="selectedCreditOption === option.id" (click)="selectCredit(option.id)">
+                <span class="label">{{ option.name }}</span>
+                <span class="fee bold">{{ option.commission | number:'1.2-2' }}% + IVA</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="installments-section">
+    <div class="installments-toggle">
+        <span class="subheading-700">Ofrecer cuotas sin interés</span>
+        <p class="additional-cost">
+            El costo por ofrecer cuotas se sumará al {{ getCreditLabel() }} que pagás por cobro con tarjeta de crédito.
+        </p>
+    </div>
+
+        <div class="installment-options">
+            <div class="installment-grid">
+                <div class="installment-item" *ngFor="let option of getInstallmentOptions()"
+                    (click)="toggleInstallmentSelection(option.installments)">
+                    <div class="custom-dot" [class.selected]="selectedInstallments.includes(option.installments)"></div>
+                    <span class="installment-label">
+                        {{ option.installments }} cuotas
+                    </span>
+                    <span class="percentage">+ {{ option.factor | number:'1.2-2' }}% + IVA</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sticky-button-container" *ngIf="hasChanges()">
+        <div class="button-container">
+            <button class="btn-cta-filled w-100 btn-lg" (click)="updateCommission()" [disabled]="isLoading">
+                {{ isLoading ? 'Actualizando...' : 'Actualizar' }}
+            </button>
+        </div>
+    </div>
+</div>

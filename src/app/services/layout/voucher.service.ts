@@ -123,23 +123,55 @@ export class VoucherService {
           amount: this.formatAmount(transactionDetail.amount), // Formatted amount
           reason: transactionDetail.description,
           type: this.getType(transactionDetail.type),
+          transactionSource: transactionDetail.source,
           description:
             transactionDetail.description ||
             this.descriptionTable.getDescription(
               transactionDetail.type,
               transactionDetail.source
             ),
-          senderName: `${onboardingName.first_name} ${this.toUpperCase(
-            onboardingName.last_name
-          )}`, // Sender name from onboarding
-          senderCuit: `${onboardingName.tax_id}`, // Sender tax ID
-          senderCvu: accountInfo.cvu || 'N/A', // Sender CVU from account info
-          recipientName: this.formatName(transactionDetail.contact_name), // Recipient name
-          recipientBank: transactionDetail.entity_name, // Recipient bank
-          recipientCvu: transactionDetail.destination, // Recipient CVU
-          recipientTaxId: transactionDetail.tax_id || '', // Recipient CVU
-          operationNumber: transactionDetail.id, // Operation number
-          identificationCode: transactionDetail.transaction_reference, // Transaction reference
+          senderName:
+            transactionDetail.type === 'cash_in'
+              ? this.formatName(transactionDetail.contact_name)
+              : `${onboardingName.first_name} ${this.toUpperCase(
+                  onboardingName.last_name
+                )}`, // Sender name from onboarding
+          senderCuit:
+            transactionDetail.type === 'cash_in'
+              ? transactionDetail.tax_id || ''
+              : `${onboardingName.tax_id}`, // Sender tax ID
+          senderAccountType:
+            transactionDetail.type === 'cash_in' ? 'CBU/CVU' : 'CVU', // Sender CVU from account info ,
+          senderCvu:
+            transactionDetail.type === 'cash_in'
+              ? transactionDetail.destination
+              : accountInfo.cvu || 'N/A', // Sender CVU from account info
+          senderBank:
+            transactionDetail.type === 'cash_in'
+              ? transactionDetail.entity_name
+              : '', // Sender bank from account info
+          recipientName:
+            transactionDetail.type === 'cash_in'
+              ? `${onboardingName.first_name} ${this.toUpperCase(
+                  onboardingName.last_name
+                )}`
+              : this.formatName(transactionDetail.contact_name), // Recipient name
+          recipientBank:
+            transactionDetail.type === 'cash_in'
+              ? ''
+              : transactionDetail.entity_name, // Recipient bank
+          recipientAccountTypeText:
+            transactionDetail.type === 'cash_in' ? 'CVU' : 'CVU/CBU',
+          recipientCvu:
+            transactionDetail.type === 'cash_in'
+              ? accountInfo.cvu || 'N/A'
+              : transactionDetail.destination || '', // Recipient CVU
+          recipientTaxId:
+            transactionDetail.type === 'cash_in'
+              ? `${onboardingName.tax_id}`
+              : transactionDetail.tax_id || '', // Recipient CVU
+          operationNumber: transactionDetail.transaction_reference, // Operation number
+          identificationCode: transactionDetail.external_id, // Transaction reference
           destinationMessage: this.getDestinationMessage(
             transactionDetail.source
           ),
@@ -268,9 +300,13 @@ export class VoucherService {
                       r1: 4,
                       r2: 4,
                     },
-                    ...(transactionData.recipientName ||
-                    transactionData.recipientTaxId ||
-                    transactionData.recipientCvu
+                    ...((transactionData.transactionSource.includes(
+                      'transfer'
+                    ) ||
+                      transactionData.transactionSource.includes('cards')) &&
+                    (transactionData.recipientName ||
+                      transactionData.recipientTaxId ||
+                      transactionData.recipientCvu)
                       ? [
                           {
                             type: 'line',
@@ -328,7 +364,15 @@ export class VoucherService {
                           ...(transactionData.senderCvu
                             ? [
                                 {
-                                  text: `CVU: ${transactionData.senderCvu}`,
+                                  text: `${transactionData.senderAccountType}: ${transactionData.senderCvu}`,
+                                  style: 'details',
+                                },
+                              ]
+                            : []),
+                          ...(transactionData.senderBank
+                            ? [
+                                {
+                                  text: transactionData.senderBank,
                                   style: 'details',
                                 },
                               ]
@@ -386,7 +430,7 @@ export class VoucherService {
                           ...(transactionData.recipientCvu
                             ? [
                                 {
-                                  text: `CVU: ${transactionData.recipientCvu}`,
+                                  text: `${transactionData.recipientAccountTypeText}: ${transactionData.recipientCvu}`,
                                   style: 'details',
                                 },
                               ]
@@ -415,16 +459,22 @@ export class VoucherService {
               margin: [0, 0, 0, 15],
             },
             // Operation number
-            {
-              text: 'Número de operación',
-              style: 'details',
-              margin: [0, 0, 0, 2],
-            },
-            {
-              text: `#${transactionData.operationNumber || 'No disponible'}`,
-              style: 'detailsBold',
-              margin: [0, 0, 0, 10],
-            },
+            ...(transactionData.operationNumber
+              ? [
+                  {
+                    text: 'Número de operación',
+                    style: 'details',
+                    margin: [0, 0, 0, 2],
+                  },
+                  {
+                    text: `#${
+                      transactionData.operationNumber || 'No disponible'
+                    }`,
+                    style: 'detailsBold',
+                    margin: [0, 0, 0, 10],
+                  },
+                ]
+              : []),
 
             // Transaction reason
             ...(transactionData.reason
@@ -508,9 +558,29 @@ export class VoucherService {
           },
         };
 
-        pdfMake
-          .createPdf(docDefinition)
-          .download('comprobante_transaccion.pdf');
+        const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+
+        const isMobile =
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+          );
+
+        if (isMobile) {
+          // Force download on mobile
+          pdfDocGenerator.getBlob((blob: Blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'comprobante_transaccion.pdf'; // Set the file name
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url); // Clean up the URL object
+          });
+        } else {
+          // Open in a new tab for desktop
+          pdfDocGenerator.open();
+        }
       })
       .catch((error) => {
         console.error('Error loading logo:', error);

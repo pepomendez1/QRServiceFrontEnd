@@ -1,97 +1,368 @@
-<app-side-panel-header title="Pagar cuentas y servicios" [arrowBackEnabled]="false"></app-side-panel-header>
+<div class="transfer-wrapper">
+  <app-side-panel-header
+    [title]="headerTitle"
+    [arrowBackEnabled]="true"
+    [arrowBackEnabled]="arrowBackEnabled"
+    (arrowBack)="handleArrowBack()"
+    (closePressed)="openConfirmationDialog()"
+    *ngIf="headerEnable"></app-side-panel-header>
 
-<h2 class="paragraph-500 p-0 m-0">Agregar nueva cuenta o servicio</h2>
+  <h2 *ngIf="step < 2" class="paragraph-500 p-0 m-0">Agregar nueva cuenta o servicio</h2>
 
-<div class="filter-container">
-
-  <form class="filters-component-container" (ngSubmit)="onSubmit()" [formGroup]="filtersForm">
-    <div *ngIf="!selectedService; else serviceSelected">
-      <!-- <div > -->
-      <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
-        <mat-icon class="search-icon-light">search</mat-icon>
-
-        <input class="input-search paragraph-500 search" placeholder="Buscar" formControlName="searchQuery"
-          (focus)="isFocused = true" (blur)="isFocused = false" />
-        <mat-spinner class="search-spinner" [class.show]="searching"></mat-spinner>
-      </div>
-
-      <div *ngFor="let service of getKeys(filteredServices)" class="service-section">
-        <h3 class="paragraph-500-light m-1">{{ capitalize(service) }}</h3>
-        <mat-card class="service-card">
-          <div *ngFor="let company of filteredServices[service]" class="service-item"
-            (click)="onCompanyClick(company, service)">
-            <img [src]="company.companyLogo" alt="{{ company.companyName }}" class="service-logo" />
-            <span class="service-name">{{ company.companyName }}</span>
-            <mat-icon class="chevron-icon">chevron_right</mat-icon>
-          </div>
-          <a class="view-all" (click)="onViewAll(service)">Ver todos ({{ filteredServices[service].length }})</a>
-        </mat-card>
-      </div>
-
+  <div class="content">
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner class="center-spinner"></mat-spinner>
     </div>
+    <form (ngSubmit)="onSubmit()" [formGroup]="filtersForm" style="height: 100%;">
 
-    <ng-template #serviceSelected>
-      <div>
+      <!-- item list  -->
+      <!-- <div *ngIf="!selectedService; else serviceSelected"> -->
+      <div *ngIf="!loading && step==0" class="step-container">
+
+        <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
+          <mat-icon class="search-icon-light">search</mat-icon>
+
+          <input #searchInput class="input-search paragraph-500 search" placeholder="Buscar" formControlName="searchQuery"
+            (focus)="isFocused = true" (blur)="isFocused = false" />
+          <mat-spinner class="search-spinner" [class.show]="searching"></mat-spinner>
+        </div>
+
+        <!-- No transactions message -->
+        <div *ngIf="getKeys(filteredServices).length==0" class="no-transactions">
+          <!-- <img src="../../../../assets/images/problem.svg" alt="No hay servicios para mostrar" />
+        <p class="secondary-500-light">No hay servicios para mostrar.</p> -->
+          <div *ngIf="!loading && problemImg" [innerHTML]="problemImg"></div>
+          <div class="secondary-500-light">No hay servicios para mostrar</div>
+        </div>
+
+        <div class="scroll-container">
+          <div *ngFor="let category of getKeys(filteredServices)" class="service-section">
+            <h3 class="paragraph-500-light m-1">{{ capitalize(category) }}</h3>
+            <mat-card class="service-card">
+
+              <div *ngFor="let company of filteredServices[category]" class="service-item"
+                (click)="onCompanyClick(company, category)">
+
+                <img *ngIf="company.companyLogo" [src]="company.companyLogo" (error)="onImageError($event)"
+                  alt="{{ company.companyName }}" class="service-logo" />
+                <img *ngIf="!company.companyLogo"
+                  [src]="'https://public-logo.prod.tapila.cloud/tags_common/tag_PrestamosYServiciosFinancieros.png'"
+                  alt="{{ company.companyName }}" class="service-logo" />
+
+
+                <span class="service-name">{{ company.companyName }}</span>
+                <mat-icon class="chevron-icon">chevron_right</mat-icon>
+              </div>
+
+              <a class="view-all" (click)="onViewAll(category)">Ver todos ({{ filteredServices[category].length }})</a>
+            </mat-card>
+          </div>
+        </div>
+
+      </div>
+      <!-- end item list  -->
+
+
+      <!-- #serviceSelected -->
+      <div *ngIf="!loading && step==1" class="step-container">
         <!-- Imagen del servicio -->
         <div class="service-info">
-          <img src="{{selectedService.companyLogo}}" alt="personal" class="service-logo-selected" />
+          <img src="{{selectedService.companyLogo}}" alt="personal" class="service-logo-selected" (error)="onImageError($event)"/>
           <h3 class="service-name-selected">{{selectedService.companyName}}</h3>
           <p class="service-category-selected">{{selectedService.companyCategory}}</p>
         </div>
 
-        <!-- Campo de número de cliente -->
-        <!-- <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Número de cliente</mat-label>
-        <input matInput formControlName="clientNumber" placeholder="Número de cliente" />
-        <mat-hint>
-          <a href="#">¿Dónde encuentro mi número de cliente?</a>
-        </mat-hint>
-      </mat-form-field> -->
 
-        <!-- <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Agregar alias</mat-label>
-        <input matInput formControlName="alias" placeholder="Agregar alias" />
-      </mat-form-field> -->
+        <div class="info-wrapper" *ngIf="selectedService">
 
+          <div class="account-info">
+            <div class="info-box">
+              <div class="input-box" id="nroCuenta-input">
+                <div class="input-data">
+                  <p class="caption-500-light input-label">Número de cuenta</p>
+                  <input class="input-value paragraph-500" pattern="[0-9]*" inputmode="numeric"
+                    (input)="sanitizeInputNumeric($event)" formControlName="clientNumber" />
+                </div>
+              </div>
+            </div>
+          </div>
 
+          <div class="account-info input-margin-top">
+            <div class="info-box">
+              <div class="input-box" id="alias-input">
+                <div class="input-data">
+                  <p class="caption-500-light input-label">Alias</p>
+                  <input class="input-value paragraph-500 " formControlName="alias" />
+                </div>
+              </div>
+            </div>
+          </div>
 
+          <!-- <button [disabled]="filtersForm.invalid" class="btn-cta-filled w-100 btn-lg btn-margin-top"
+            (click)="nextStep()">
+            Continuar
+          </button> -->
+
+        </div>
 
 
       </div>
-    </ng-template>
+      <!-- end serviceSelected -->
 
 
-  </form>
+      <div *ngIf="!loading && step == 2 && foundFactura" class="step-container">
+        <div class="paragraph-500 ">¿Esta es la factura que querés pagar?</div>
 
-  <div class="info-wrapper" *ngIf="selectedService">
+        <div class="detalle-factura">
+          <div class="text-gray">Detalle de factura</div>
 
-    <div class="account-info">
-      <div class="info-box">
-        <div class="input-box" id="nroCuenta-input">
-          <div class="input-data">
-            <p class="caption-500-light">Número de cuenta</p>
-            <input class="input-alias paragraph-500" [(ngModel)]="accountInfo.nroCuenta" />
+          <div class="empresa-info">
+            <img src="{{ debtsData.companyLogo }}" alt="Personal" class="empresa-logo" />
+            <span class="empresa-nombre">{{ debtsData.companyName }}</span>
+          </div>
+
+          <p>Número de cliente: {{ debtsData.customerId }}</p>
+          <p>Nombre del titular: {{ debtsData.customerName }}</p>
+          <p>Dirección de establecimiento: {{ debtsData.customerAddress }}</p>
+          <p>Alias: {{ debtsData.alias }}</p>
+
+          <!-- <div *ngFor="let debt of debtsData.debts" class="factura-footer">
+          <p><strong>Vencimiento:</strong> {{ debt.expirationDate }}</p>
+          <p><strong>Monto:</strong> {{ debt.amount | currency:'ARS' }}</p>
+        </div> -->
+          <div class="factura-footer">
+            <p><strong>Vencimiento: {{ debtsData.debts[0].expirationDate }}</strong></p>
+            <!-- <p *ngIf="debtsData.debts[0].amountType=='CLOSED'"><strong>Monto: {{ debtsData.debts[0].amount | currency:'ARS' }}</strong></p>
+          <p *ngIf="debtsData.debts[0].amountType=='OPEN'">
+            <input class="input-value paragraph-500" formControlName="newAmount" type="number"/>
+          </p> -->
+
+            <p *ngIf="debtsData.debts[0].amountType !== 'OPEN'">
+              <strong>Monto: {{ debtsData.debts[0].amount | currency:'ARS' }}</strong>
+            </p>
+
+            <!-- Si amountType es OPEN y NO se está editando, muestra solo el monto con el botón "Editar" -->
+            <div *ngIf="debtsData.debts[0].amountType === 'OPEN' && !isEditing" style="display: flex">
+              <p *ngIf="debtsData.debts[0].amount == filtersForm.value.newAmount">
+                <strong>Monto: {{ debtsData.debts[0].amount | currency:'ARS' }}</strong>
+              </p>
+              <p *ngIf="debtsData.debts[0].amount != filtersForm.value.newAmount">
+                <strong>Nuevo Monto: {{ filtersForm.value.newAmount | currency:'ARS' }}</strong>
+              </p>
+              <button mat-button (click)="isEditing = true" class="icon-button"><mat-icon style="font-size: 18px;">edit</mat-icon></button>
+            </div>
+
+            <div *ngIf="debtsData.debts[0].amountType === 'OPEN' && isEditing" style="display: flex">
+              <div class="account-info">
+                <div class="info-box">
+                  <div class="input-box">
+                    <div class="input-data">
+                      <p class="caption-500-light input-label-amount">Nuevo monto</p>
+                      <div class="input-container-amount">
+                        <span class="symbol-amount">$</span>
+                        <input class="input-value-amount paragraph-500" formControlName="newAmount" type="text"
+                          (input)="onInputChange($event)" (keydown)="handleKeyDown($event)"
+                          />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!--           <button *ngIf="debtsData.debts[0].amountType === 'OPEN' && isEditing" (click)="isEditing = false">Guardar</button> -->
+
+          </div>
+          <!-- No transactions message -->
+          <div *ngIf="!debtsData.debts.length" class="no-transactions">
+            <div *ngIf="problemImg" [innerHTML]="problemImg"></div>
+            <!-- <img src="../../../../assets/images/problem.svg" alt="No hay facturas a pagar" /> -->
+            <p class="secondary-500-light">No tenés facturas a pagar.</p>
           </div>
         </div>
       </div>
-    </div>
+      <div *ngIf="!loading && step == 2 && !foundFactura" class="step-container">
+        <!-- No transactions message -->
+        <div *ngIf="!foundFactura" class="no-transactions">
+          <div *ngIf="!loading && problemImg" [innerHTML]="problemImg"></div>
+          <!-- <p class="secondary-500">{{ noActivityMessage }}</p> -->
+          <div class="secondary-500-light">Te sugerimos renovar la información y volver a intentar en unos minutos</div>
+        </div>
+      </div>
 
-    <div class="account-info input-margin-top">
-      <div class="info-box">
-        <div class="input-box" id="alias-input">
-          <div class="input-data">
-            <p class="caption-500-light">Alias</p>
-            <input class="input-alias paragraph-500 " [(ngModel)]="accountInfo.alias" />
+      <div *ngIf="!loading && step == 3" class="step-container">
+        <div class="paragraph-500 ">Resumen</div>
+
+        <div class="resumen-factura">
+          <div class="text-gray">Monto a pagar</div>
+          <p *ngIf="filtersForm.get('newAmount')?.value == 0 || filtersForm.get('newAmount')?.value == debtsData.debts[0].amount">
+            {{ debtsData.debts[0].amount | currency:'ARS' }}</p>
+          <p *ngIf="filtersForm.get('newAmount')?.value > 0 && filtersForm.get('newAmount')?.value != debtsData.debts[0].amount">
+            {{filtersForm.get('newAmount')?.value | currency:'ARS' }}</p>
+        </div>
+
+        <div class="resumen-factura">
+          <div class="text-gray">Detalle de factura</div>
+
+          <div class="empresa-info">
+            <img src="{{ debtsData.companyLogo }}" alt="Personal" class="empresa-logo" />
+            <span class="empresa-nombre">{{ debtsData.companyName }}</span>
+          </div>
+
+          <p>Número de cliente: {{ debtsData.customerId }}</p>
+          <p>Nombre del titular: {{ debtsData.customerName }}</p>
+          <p>Dirección de establecimiento: {{ debtsData.customerAddress }}</p>
+          <p>Alias: {{ debtsData.alias }}</p>
+
+        </div>
+        <div class="resumen-factura">
+          <div class="text-gray">Método de pago</div>
+          <!-- <p><strong>Monto:</strong> {{ debtsData.debts[0].amount | currency:'ARS' }}</p> -->
+
+          <!-- List of transactions -->
+          <div class="activities-container">
+            <!-- <div class="activity-item" *ngFor="let activity of payMethods">
+                  <mat-checkbox color="primary" required [(ngModel)]="activity.checked"></mat-checkbox>
+
+                  <div class="activity-info">
+                    <div class="details">
+                      <div class="paragraph-500">
+                        {{ activity.description ? activity.description : "Sin descripción" }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="activity-amount">
+                    <div class="paragraph-400" >
+                      {{ debtsData.debts[0].amount | currency : "ARS" }}
+                    </div>
+                  </div>
+                </div> -->
+            <mat-radio-group >
+              <div class="payment-option">
+                <mat-radio-button class="custom-radio" [value]="'account'" [checked]="true" [disabled]="true">
+                  <div class="payment-label">
+                    <span class="paragraph-500">Dinero disponible en cuenta:</span>
+                  </div>
+                </mat-radio-button>
+
+                <strong class="paragraph-500"> {{ availableAmount | currency : "ARS" }}</strong>
+
+                <div *ngIf="availableAmount<debtsData.debts[0].amount" class="not-enough-amount">
+                  <mat-icon color="primary">notifications</mat-icon>
+                  <span class="hightlight-text">Saldo insuficiente</span>
+                </div>
+              </div>
+
+              <!-- <div class="payment-option">
+                    <mat-radio-button class="custom-radio" [value]="'tarjeta'">
+                      <div class="payment-label">
+                        <span class="paragraph-500">VISA Débito 4242</span>
+                      </div>
+                    </mat-radio-button>
+                    <span class="card-badge">VISA</span>
+                  </div> -->
+            </mat-radio-group>
+
+
           </div>
         </div>
       </div>
-    </div>
 
-    <button [disabled]="accountInfo.nroCuenta.length==0 || accountInfo.alias.length==0" class="btn-cta-filled w-100 btn-lg btn-margin-top" (click)="addService()">
-      Continuar
-    </button>
+      <div *ngIf="!loading && step == 4 && pagoOK" style="height: 100%;">
+        <div class="success-container">
+          <mat-icon>check</mat-icon>
+          <span class="heading-5-700">Pago de servicio realizado</span>
+        </div>
+      </div>
+      <div *ngIf="!loading && step == 4 && !pagoOK" style="height: 100%;">
+        <div class="error-container">
+          <mat-icon>close</mat-icon>
+          <div class="error-text">
+            <span class="heading-5-700">Pago de servicio rechazado</span>
+            <span class="paragraph-600">Lamentablemente, el pago no se pudo completar.</span>
+            <span class="paragraph-600">Te sugerimos que verifiques la información y lo intentes de nuevo en unos minutos.</span>
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="!loading && step == 10" style="height: 100%;">
+
+        <div class="otp-content">
+          <div *ngIf="passwordImg" [innerHTML]="passwordImg"></div>
+
+          <app-otp-input
+            [OTPdescription]="'Copia acá ese código para autorizar el pago'"
+            [userMail]="userEmail"
+            [session]="session"
+            [challengeName]="challengeName"
+            (buttonText)="handleButtonText($event)"
+            (buttonEnabled)="handleButtonEnabled($event)"
+            (otpValidated)="otpValidatedOK()"
+          ></app-otp-input>
+
+        </div>
+      </div>
+
+      <!-- Detalle de pago de servicio -->
+      <div *ngIf="!loading && step == 5" class="step-container">
+        <div class="paragraph-500 ">Detalle de Pago</div>
+
+        <div class="status-badge">
+          <span [ngClass]="pagoOK ? 'status processed' : 'status rejected'">
+            {{ pagoOK ? 'Aprobado' : 'Rechazado' }}
+          </span>
+        </div>
+
+        <div class="item">
+          <div class="subtitle">Número de operación</div>
+          <div class="text">
+            <strong>#{{ currentPayDetail.operationId }}</strong>
+            <mat-icon
+              class="copy-icon"
+              matTooltip="Copiar número de operación"
+              matTooltipPosition="above"
+              [cdkCopyToClipboard]="currentPayDetail.operationId">
+              content_copy
+            </mat-icon>
+          </div>
+        </div>
+        <div class="item">
+          <div class="subtitle">Fecha y Hora</div>
+          <div class="text">
+            <strong>
+              {{ currentPayDetail.createdAt | date : "dd/MM/yyyy - HH:mm" }}
+            </strong>
+          </div>
+        </div>
+        <div class="item">
+          <div class="subtitle">Monto</div>
+          <div class="text">
+            <strong>
+              {{ currentPayDetail.amount | currency : "ARS" : "symbol-narrow" }}
+            </strong>
+          </div>
+        </div>
+        <div class="resumen-factura">
+          <div class="text-gray">Detalle de factura</div>
+
+          <div class="empresa-info">
+            <img src="{{ debtsData.companyLogo }}" alt="Personal" class="empresa-logo" />
+            <span class="empresa-nombre">{{ currentPayDetail.companyName }}</span>
+          </div>
+
+          <p>Número de cliente: {{ debtsData.customerId || 'Sin detalle' }}</p>
+          <p>Nombre del titular: {{ debtsData.customerName || 'Sin detalle' }}</p>
+          <p>Dirección de establecimiento: {{ debtsData.customerAddress || 'Sin detalle' }}</p>
+          <p>Alias: {{ debtsData.alias || 'Sin detalle' }}</p>
+
+        </div>
+      </div>
+
+    </form>
+
+    <app-side-panel-footer *ngIf="footerEnable" class="w-100" [buttonText]="buttonText" buttonStyle="filled"
+      [buttonDisabled]="filtersForm.invalid || loading" (buttonClicked)="nextStep()"></app-side-panel-footer>
 
   </div>
-  <!--  -->
-
-</div><!--  -->
+</div>

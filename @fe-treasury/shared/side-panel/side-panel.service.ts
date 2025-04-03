@@ -80,6 +80,8 @@ export class SidePanelService {
 
       this.togglePadding(false);
       this.sidenav.open();
+      this.setBodyOverflow(true); // Prevent body from scrolling
+      this.setBodyTouchAction(true); // Disable touch scrolling on the body
     } else {
       this.pendingOpen = { component, title, data: data || {} };
     }
@@ -116,6 +118,8 @@ export class SidePanelService {
     if (this.sidenav) {
       this.sidenav.close();
     }
+    this.setBodyOverflow(false); // Restore body scrolling
+    this.setBodyTouchAction(false); // Restore touch scrolling on the body
   }
 
   toggle(
@@ -131,11 +135,21 @@ export class SidePanelService {
         this.open(component, title, data, disableClose);
       } else if (this.sidenav) {
         this.sidenav.open();
+        this.setBodyOverflow(true); // Prevent body from scrolling
+        this.setBodyTouchAction(true); // Disable touch scrolling on the body
       } else {
         if (component) {
           this.pendingOpen = { component, title, data, disableClose };
         }
       }
     }
+  }
+
+  private setBodyOverflow(hidden: boolean): void {
+    document.body.style.overflow = hidden ? 'hidden' : '';
+    document.documentElement.style.overflow = hidden ? 'hidden' : ''; // Also prevent HTML element from scrolling
+  }
+  private setBodyTouchAction(hidden: boolean): void {
+    document.body.style.touchAction = hidden ? 'none' : '';
   }
 }

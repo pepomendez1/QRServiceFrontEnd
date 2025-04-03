@@ -4,7 +4,7 @@ import { MaterialModule } from '@fe-treasury/shared/material-components.module';
 import { DashboardComponent } from './dashboard.component';
 import { CardComponent } from 'src/app/components/card/card.component';
 import { TreasuryActivityComponent } from 'src/app/components/treasury-activity/treasury-activity.component';
-import { TreasuryModule } from 'src/app/components/treasury/treasury.module';
+//import { TreasuryModule } from 'src/app/components/treasury/treasury.module';
 import { DashboardRoutingModule } from './dashboard-routing.module'; // Import routing module
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +16,7 @@ import { GeneralFailureComponent } from '@fe-treasury/shared/general-failure/gen
   imports: [
     CommonModule,
     MaterialModule,
-    TreasuryModule,
+
     ReactiveFormsModule,
     FormsModule,
     DashboardRoutingModule,

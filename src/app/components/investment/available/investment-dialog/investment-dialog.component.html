@@ -4,17 +4,39 @@
   </h1>
   <span class="secondary-500"> {{ messageContent }}</span>
   <div class="checkbox-group" *ngIf="data.type === 'start'">
-    <mat-checkbox [required]="true" color="primary" required [(ngModel)]="tyc">
-      Acepto TyC Cuenta Remunerada
-    </mat-checkbox>
-    <mat-checkbox
-      [required]="true"
-      color="primary"
-      required
-      [(ngModel)]="rules"
-    >
-      Acepto Reglamento FCI
-    </mat-checkbox>
+    <div class="accept-checkbox">
+      <mat-checkbox
+        [required]="true"
+        color="primary"
+        required
+        [(ngModel)]="tyc"
+      >
+        Acepto
+      </mat-checkbox>
+      <span
+        class="text-button-type clickable"
+        (click)="openDialog('terms_balance_investment')"
+      >
+        TyC Cuenta Remunerada</span
+      >
+    </div>
+    <div class="accept-checkbox">
+      <mat-checkbox
+        [required]="true"
+        color="primary"
+        required
+        [(ngModel)]="rules"
+        >Acepto
+
+        <!-- <span (click)="openDialog('fci_policy')">Acepto Reglamento FCI</span> -->
+      </mat-checkbox>
+
+      <span
+        class="text-button-type clickable"
+        (click)="openDialog('fci_policy')"
+        >Reglamento FCI</span
+      >
+    </div>
   </div>
   <div class="buttons-container">
     <div mat-dialog-actions>

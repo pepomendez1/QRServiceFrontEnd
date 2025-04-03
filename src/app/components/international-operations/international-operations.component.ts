@@ -7,6 +7,7 @@ import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.serv
 import createFuzzySearch from '@nozbe/microfuzz';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { StoreDataService } from 'src/app/services/store-data.service';
 
 @Component({
   selector: 'app-international-operations',
@@ -22,7 +23,7 @@ export class InternationalOperationsComponent {
 
   @Input() limitOperations: boolean = false; // Flag to limit the number of transactions
   @Input() operationsLimit: number = 5; // Default limit of 5 transactions
-
+  isIframe: boolean = false;
   isFocused = false;
   periodsList: string[] = ['Hoy', 'Última semana', 'Último mes', 'Último año'];
 
@@ -72,6 +73,7 @@ export class InternationalOperationsComponent {
     private router: Router,
     //private iconLookupService: IconLookupService,
     private refreshService: RefreshService,
+    private storeDataService: StoreDataService,
     private sidePanelService: SidePanelService
   ) {
     this.loadOperations();
@@ -89,6 +91,7 @@ export class InternationalOperationsComponent {
   }
 
   filterOperations() {
+    this.isIframe = this.storeDataService.checkIframe();
     // First, filter by type and state
     this.filteredOperations = this.operations.filter((operation) => {
       const matchesType =

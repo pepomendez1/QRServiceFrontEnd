@@ -5,8 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TransferContactsComponent } from './transfer-contacts/transfer-contacts.component';
 import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
-import { ActivityDetailsComponent } from '../treasury/activity-details/activity-details.component';
-import { OtpFormModule } from '@fe-treasury/shared/otp-form/otp-form.module';
+import { ActivityDetailsComponent } from '../activity-details/activity-details.component';
+import { OtpInputModule } from '@fe-treasury/shared/otp-input/otp-input.module';
 import { OTPService } from 'src/app/services/otp.service';
 import { FormatNamePipe } from 'src/app/pipes/format-name.pipe';
 import { ChangeDetectorRef } from '@angular/core';
@@ -33,15 +33,13 @@ import { finalize } from 'rxjs';
     CommonModule,
     TransferContactsComponent,
     TransferAmountComponent,
-    ActivityDetailsComponent,
     FormsModule,
     MatIconModule,
     MessagesModule,
-    OtpFormModule,
+    OtpInputModule,
     FormatNamePipe,
     MatDialogModule,
     MatProgressSpinnerModule,
-    ConfirmationDialogComponent,
     SidePanelHeaderComponent,
     SidePanelFooterComponent,
   ],

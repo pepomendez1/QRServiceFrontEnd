@@ -1,0 +1,43 @@
+.otp-validation {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  justify-content: space-between;
+
+  .otp-content{
+    padding-top: 2em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    flex:1;
+    p {
+      width: 70%;
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 16px;
+      }
+    }
+    .otp-form{
+      padding-top: 1.5em;
+    }
+  }
+}
+
+
+// iOS-specific fixes
+// @supports (-webkit-touch-callout: none) {
+//   .otp-validation {
+//     padding-top: env(safe-area-inset-top);
+//     padding-bottom: env(safe-area-inset-bottom);
+
+//     .otp-content {
+//       padding-left: max(1rem, env(safe-area-inset-left));
+//       padding-right: max(1rem, env(safe-area-inset-right));
+//     }
+//   }
+// }

@@ -190,8 +190,8 @@ export class SvgLibraryService {
       ? this.preloadedContrastLogo
       : this.preloadedPrimaryLogo;
 
-    console.log('Current Theme:', isDarkMode ? 'Dark' : 'Light');
-    console.log('Selected Logo:', selectedLogo);
+    // console.log('Current Theme:', isDarkMode ? 'Dark' : 'Light');
+    // console.log('Selected Logo:', selectedLogo);
 
     return selectedLogo;
   }
@@ -244,7 +244,7 @@ export class SvgLibraryService {
 
         this.preloadedPrimaryLogo =
           this.sanitizer.bypassSecurityTrustHtml(sanitizedSvg); // Cache the sanitized SVG
-        console.log('Inline SVG preloaded successfully.');
+        //console.log('Inline SVG preloaded successfully.');
         observer.next();
         observer.complete();
       } catch (error) {

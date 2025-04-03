@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { catchError, Observable, of, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
@@ -12,9 +12,13 @@ export class ConfigService {
   // Método para obtener la configuración para un partner específico.
 
   getConfig(): Observable<any> {
-    // The complete URL
+    console.log('portal client endpoint ----------------------');
     const url = `${this.apiUrl}/public/wibond-connect/user/auth/portalClient`;
-    // Perform the GET request with headers
-    return this.http.get(url, {});
+    return this.http.get(url, {}).pipe(
+      catchError((error) => {
+        console.error('Error fetching config:', error);
+        return throwError(error); // Re-throw the error to propagate it
+      })
+    );
   }
 }

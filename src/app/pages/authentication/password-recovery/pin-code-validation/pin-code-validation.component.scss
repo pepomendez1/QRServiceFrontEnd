@@ -1,20 +1,28 @@
 .pin-code-validation-container {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  flex:1;
 }
 .section-content {
   padding-top: 0.5em;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  justify-content: space-between;
-  flex:1;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    justify-content: space-between;
 }
 
 
 form{
   flex:1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  .pin-form-container{
+    flex:1;
+  display: flex;
+  flex-direction: column;
+  }
 }
 
 
@@ -29,15 +37,32 @@ form{
 
 @media screen and (max-width: 840px) {
   .pin-code-validation-container {
-    width: 100vw;
+    width: 100dvw;
     padding: 20px;
-    height: 100vh;
+    height: 100dvh;
     .button-container {
-      position: fixed;
+      position: sticky; // Stick the button to the bottom
       bottom: 0;
       left: 0;
-      width: 100%;
-      padding: 1rem;
+      right: 0;
+      width: 100%; // Full width for the button container
     }
   }
+}
+
+// iPhone-specific adjustments
+@media only screen and (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 3) {
+  .pin-code-validation-container {
+    height: 100dvh; /* Ensure dynamic viewport height is used */
+    padding: 1em;
+  }
+    .pin-form {
+      .pin-form-container {
+        padding-top: 10px; /* Reduce padding for smaller iPhone screens */
+      }
+
+      .button-container {
+        padding: 10px; /* Reduce padding for smaller iPhone screens */
+      }
+    }
 }

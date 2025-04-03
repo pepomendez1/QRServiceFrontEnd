@@ -88,7 +88,7 @@ export class MailRecoveryFormComponent {
     if (this.recoveryMail.invalid) return;
 
     this.isProcessing = true;
-    const email = this.recoveryMail.value.emailInput;
+    const email = this.recoveryMail.value.emailInput.toLowerCase();
 
     if (this.recoveryType === 'password-pin') {
       this.sendOtp(email);

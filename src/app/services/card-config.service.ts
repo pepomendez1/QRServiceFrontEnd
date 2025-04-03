@@ -79,11 +79,10 @@ export class CardConfigService {
           ? Number(storeData.init_config.max_virtual_cards_on_account)
           : 1; // Default value
 
+        console.log('cards data= ', cardsData);
         if (!cardsData) {
           console.log('No cards data'); // Debug log
-          this.canCreatePhysical$.next(false);
-          this.canCreateVirtual$.next(false);
-          return;
+          cardsData = []; // Treat as empty array
         }
 
         console.log('Processing storeData and cardsData');

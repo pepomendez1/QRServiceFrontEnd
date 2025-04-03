@@ -259,3 +259,21 @@ button {
   }
 }
 
+.activity-item {
+  cursor: pointer;
+}
+
+
+.no-transactions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 43vh; //calc ccon botón Ver toda mi actividad
+}
+
+.no-transactions-message {
+  font-size: 18px;
+  color: #757575;
+}

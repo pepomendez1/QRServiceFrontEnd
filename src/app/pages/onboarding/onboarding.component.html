@@ -14,7 +14,9 @@
     <app-kyc-validation
       [isMobile]="isMobile"
       *ngIf="(currentStep$ | async) === ONBOARDING_STEPS.KYC"
-      (stepCompleted)="onboardingService.checkOnboardingStatus()"
+      (stepCompleted)="
+        onboardingService.checkOnboardingStatus($event === 'metamap_completed')
+      "
     ></app-kyc-validation>
 
     <app-address-form

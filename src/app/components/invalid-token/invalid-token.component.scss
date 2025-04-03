@@ -1,0 +1,40 @@
+.invalid-token {
+  padding-top: 3em;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+  overflow: hidden;
+  .text-content {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-grow: 1;
+    p,h2{
+      width: 80%;
+    }
+
+  }
+  .button-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 20%;
+  }
+
+  .hidden {
+    visibility: hidden;
+  }
+  .visible {
+    visibility: visible;
+  }
+}

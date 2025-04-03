@@ -91,6 +91,8 @@
           [control]="getFormControl('pinCode')"
           [placeholder]="''"
           [type]="'password'"
+          pattern="[0-9]*"
+          inputmode="numeric"
           [maxLength]="6"
           [errorMessages]="getPinCodeErrors()"
         ></app-reactive-input>
@@ -110,6 +112,35 @@
               >Por razones de seguridad, tu última sesión se cerró por
               inactividad. Ingresá a tu cuenta nuevamente para seguir
               operando</span
+            >
+          </div>
+        </div>
+
+        <div
+          *ngIf="tokenExpirationLogoutCredentials"
+          class="warning-message-box"
+        >
+          <mat-icon class="material-symbols-outlined">error_outline</mat-icon>
+          <div class="message-box-content">
+            <h1 class="paragraph-600 m-0 p-0">Cierre de sesión</h1>
+            <span class="secondary-500"
+              >El tiempo para completar el registro de credenciales caducó.
+              Ingresá nuevamente con el link que te enviamos y te vamos a enviar
+              uno nuevo</span
+            >
+          </div>
+        </div>
+
+        <div
+          *ngIf="tokenExpirationLogoutOnboarding"
+          class="warning-message-box"
+        >
+          <mat-icon class="material-symbols-outlined">error_outline</mat-icon>
+          <div class="message-box-content">
+            <h1 class="paragraph-600 m-0 p-0">Cierre de sesión</h1>
+            <span class="secondary-500"
+              >El tiempo para completar el registro caducó. Si ya configuraste
+              tu contraseña y PIN podés ingresar y continuar el proceso.</span
             >
           </div>
         </div>

@@ -1,9 +1,12 @@
 .content {
-  height: 100%;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 1em;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 
   .loading-container{
     display: flex;
@@ -23,22 +26,6 @@
     flex: 1;
     width: 100%;
     justify-content: space-between;
-
-    .otp-content{
-      padding-top: 2em;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      //justify-content: center;
-      text-align: center;
-      flex:1;
-      p {
-        width: 80%;
-      }
-      .otp-form{
-        padding-top: 1.5em;
-      }
-    }
   }
 
   .view-card-container {
@@ -61,10 +48,6 @@
         height: 100%;
         border: none;
       }
-    }
-
-    .btn {
-      width: 100%;
     }
   }
 

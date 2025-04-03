@@ -7,7 +7,7 @@ import { PasswordRecoveryComponent } from './password-recovery.component';
 import { MailRecoveryFormComponent } from './mail-form/mail-form.component';
 import { NotificationScreenComponent } from './notification-screen/notification-screen.component';
 import { InsertOtpScreenComponent } from './insert-otp-screen/insert-otp-screen.component';
-import { OtpFormModule } from '@fe-treasury/shared/otp-form/otp-form.module';
+import { OtpFormModule } from '@fe-treasury/shared/otp-input/otp-form/otp-form.module';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { PinCodeModule } from '../../pin-code/pin-code.module';
 import { MessagesModule } from '@fe-treasury/shared/messages/messages.module';
