@@ -102,26 +102,30 @@ export class CardsActivityComponent implements OnInit {
     // Subscribe to card selection changes
     this.cardSelectedSubscription = this.myCardsService.cardSelected.subscribe(
       (card: Card | null) => {
-        if (this.cardSelected?.id === card?.id) {
-          // Prevent duplicate API calls for the same card
+        // Explicitly handle the case where card is null or undefined
+        if (!card) {
+          this.cardSelected = null;
+          this.loading = false;
+          this.noActivityMessage = 'No tenés ninguna tarjeta activa';
+          console.log('No card selected: ', this.noActivityMessage);
+          return;
+        }
+
+        // Prevent duplicate API calls for the same card
+        if (this.cardSelected?.id === card.id) {
           return;
         }
 
         this.cardSelected = card;
-        console.log('Card selected: ..... ', this.cardSelected);
+        console.log('Card selected: ', this.cardSelected);
         this.updateActivityTitle();
 
-        if (this.cardSelected) {
-          this.resetState();
-          this.getTransactions(true);
-        } else {
-          this.loading = false;
-          this.noActivityMessage = 'No tenés ninguna tarjeta activa';
-        }
+        // Fetch transactions if a card is selected
+        this.resetState();
+        this.getTransactions(true);
       }
     );
   }
-
   resetState(): void {
     this.activities = [];
     this.currentPage = 1;

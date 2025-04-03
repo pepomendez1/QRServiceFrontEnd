@@ -13,8 +13,14 @@ export interface StorageData {
     portal_client_id: string;
     user_pool: string;
     terms_and_conditions: string;
+    // DOCS
+    affidavit_file: string;
+    terms_and_conditions_investments: string;
+    iframe_help_url: string;
     faq_investments: string;
+    help_content_doc: string;
     privacy_policy: string;
+    select_module_enable: string;
     max_physical_cards_on_account: number;
     max_virtual_cards_on_account: number;
     primary_color: string;
@@ -29,21 +35,21 @@ export interface StorageData {
     bar_chart_color: string;
     favicon_url: string;
     metamap_flow_id: string;
-    toggle_mode_enable: boolean;
+    toggle_mode_enable: string;
+    inactivity_monitor_status: string;
+    toggle_inactivity_monitor: string;
     number_of_slides: string | number;
     slide1Title: string;
     slide1Description: string;
-    slide1Image: string;
     slide2Title: string;
     slide2Description: string;
-    slide2Image: string;
     slide3Title: string;
     slide3Description: string;
-    slide3Image: string;
     slide4Title: string;
     slide4Description: string;
-    slide4Image: string;
+    payment_portal_url: string;
   };
+  isIframe?: boolean; // ✅ Add isIframe flag
   cognitoUser?: CognitoUser | null; // Add cognitoUser to the interface
   // Feel free to add more as needed
 }
@@ -61,7 +67,11 @@ export class StoreDataService {
   async loadStore(): Promise<void> {
     try {
       const config = await firstValueFrom(this.configService.getConfig());
-      this.updateStore({ init_config: config });
+      const isIframe = window.self !== window.top; // ✅ Detect iframe
+      this.updateStore({
+        init_config: config,
+        isIframe, // ✅ Save isIframe state
+      });
     } catch (error) {
       console.error('Error loading store:', error);
       throw error; // Optional: rethrow error if needed
@@ -84,5 +94,17 @@ export class StoreDataService {
   resetStore(): void {
     console.log('resetStore');
     this.storeSubject.next({});
+  }
+  // ✅ Expose isIframe check
+  checkIframe(): boolean {
+    return this.storeSubject.getValue().isIframe ?? false;
+  }
+
+  getUserPoolId(): string {
+    return this.storeSubject.getValue().init_config?.user_pool ?? '';
+  }
+
+  getClientId(): string {
+    return this.storeSubject.getValue().init_config?.portal_client_id ?? '';
   }
 }

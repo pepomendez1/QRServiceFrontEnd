@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, of, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, of, throwError, BehaviorSubject, forkJoin } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import {
   CognitoUserPool,
@@ -51,6 +51,13 @@ export interface AuthResponse {
   token_type: string;
 }
 
+export interface AuthResponseOTP {
+  access_token_otp: string;
+  id_token_otp: string;
+  expires_in?: number; // Make it optional
+  token_type: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -63,6 +70,7 @@ export class AuthService {
   private clientId: string | null = null;
   private challengeName: string | null = null;
   private challengeParameters: any = null;
+  public isIframe: boolean = false;
   public authDataSubject: BehaviorSubject<AuthResponse | null>;
   private checkMagiLink = '/public/wibond-connect/user/auth/magic_token';
   constructor(
@@ -96,11 +104,10 @@ export class AuthService {
   }
 
   private initializeConfig(): void {
-    this.configService.getConfig().subscribe((config) => {
-      this.storeDataService.updateStore({ init_config: config });
-      this.userPoolId = config.user_pool;
-      this.clientId = config.portal_client_id;
-    });
+    console.log('initialize auth service... ');
+    this.isIframe = this.storeDataService.checkIframe();
+    this.userPoolId = this.storeDataService.getUserPoolId();
+    this.clientId = this.storeDataService.getClientId();
   }
 
   public initializeAuth(): void {
@@ -188,7 +195,11 @@ export class AuthService {
           this.storeDataService.updateStore({
             cognitoUser: this.cognitoUser,
           });
+          const decodedToken = this.tokenService.decodeToken(
+            authData.access_token
+          );
 
+          this.cookieService.setCookie('username', decodedToken.username, 1);
           // After successfully authenticating, get the device key
           this.cognitoUser!.getDevice({
             onSuccess: (device: any) => {
@@ -352,7 +363,7 @@ export class AuthService {
     username: string;
     newPassword: string;
   }): Observable<any> {
-    const url = `${this.apiUrl}/public/wibond-connect/user/auth/reset_password`; // URL de tu backend
+    const url = `${this.apiUrl}/public/wibond-connect/user/auth/set_password `; // URL de tu backend
 
     // Obtener el token de la sesión actual
     const authData = this.tokenService.getAuthData();
@@ -388,11 +399,77 @@ export class AuthService {
 
   refreshToken(): Observable<void> {
     console.log('refreshing the token..........................');
+
+    // If CognitoUser is not set, reinitialize it
     if (!this.cognitoUser) {
-      console.error('Cognito user not set. Cannot refresh token.');
-      return throwError(() => new Error('Cognito user not set.'));
+      console.log('CognitoUser not set. Attempting to reinitialize...');
+
+      // Get the username from cookies
+      const username = this.cookieService.getCookie('username');
+      if (!username) {
+        console.error(
+          'Username not found in cookies. Cannot reinitialize CognitoUser.'
+        );
+        return throwError(() => new Error('Username not found.'));
+      }
+
+      // Get the refresh token from cookies
+      const refreshTokenValue = this.tokenService.getToken('refresh_token');
+      if (!refreshTokenValue) {
+        console.error('Refresh token is missing.');
+        return throwError(() => new Error('Refresh token is missing.'));
+      }
+
+      // Reinitialize CognitoUser
+      return this.reinitializeCognitoUser(username, refreshTokenValue).pipe(
+        switchMap((cognitoUser) => {
+          this.cognitoUser = cognitoUser;
+          console.log('CognitoUser reinitialized successfully.');
+
+          // Now refresh the session
+          const refreshToken = new CognitoRefreshToken({
+            RefreshToken: refreshTokenValue,
+          });
+
+          return new Observable<void>((observer) => {
+            this.cognitoUser!.refreshSession(refreshToken, (err, session) => {
+              if (err) {
+                console.error('Error refreshing token:', err);
+                observer.error(err);
+                return;
+              }
+
+              console.log('Token refreshed successfully:');
+
+              // Extract new tokens
+              const accessToken = session.getAccessToken().getJwtToken();
+              const idToken = session.getIdToken().getJwtToken();
+              const newRefreshToken = session.getRefreshToken().getToken();
+
+              // Update tokens using TokenService
+              this.tokenService.setAuthData({
+                access_token: accessToken,
+                id_token: idToken,
+                refresh_token: newRefreshToken,
+                expires_in: session.getAccessToken().getExpiration(),
+                token_type: 'Bearer',
+              });
+
+              observer.next();
+              observer.complete();
+            });
+          });
+        }),
+        catchError((err) => {
+          console.error('Error reinitializing CognitoUser:', err);
+          return throwError(
+            () => new Error('Failed to reinitialize CognitoUser.')
+          );
+        })
+      );
     }
 
+    // If CognitoUser is already set, proceed with refreshing the token
     const refreshTokenValue = this.tokenService.getToken('refresh_token');
     if (!refreshTokenValue) {
       console.error('Refresh token is missing.');
@@ -402,9 +479,8 @@ export class AuthService {
     const refreshToken = new CognitoRefreshToken({
       RefreshToken: refreshTokenValue,
     });
-    //console.log('cognito refresh token ', refreshToken);
 
-    return new Observable((observer) => {
+    return new Observable<void>((observer) => {
       this.cognitoUser!.refreshSession(refreshToken, (err, session) => {
         if (err) {
           console.error('Error refreshing token:', err);
@@ -430,6 +506,70 @@ export class AuthService {
 
         observer.next();
         observer.complete();
+      });
+    });
+  }
+
+  private reinitializeCognitoUser(
+    username: string,
+    refreshToken: string
+  ): Observable<CognitoUser> {
+    return new Observable((observer) => {
+      // Get the user pool and client ID from configuration
+      this.configService.getConfig().subscribe((config) => {
+        if (!config) {
+          observer.error('Configuration is missing');
+          return;
+        }
+
+        this.userPoolId = config.user_pool;
+        this.clientId = config.portal_client_id;
+
+        console.log('Reinitializing CognitoUser with username:', username);
+
+        // Create a new CognitoUser object
+        const userPool = new CognitoUserPool({
+          UserPoolId: this.userPoolId!,
+          ClientId: this.clientId!,
+        });
+
+        this.cognitoUser = new CognitoUser({
+          Username: username,
+          Pool: userPool,
+        });
+
+        // Set up the session using the refresh token
+        const cognitoRefreshToken = new CognitoRefreshToken({
+          RefreshToken: refreshToken,
+        });
+
+        // Refresh the session to validate the refresh token
+        this.cognitoUser.refreshSession(cognitoRefreshToken, (err, session) => {
+          if (err) {
+            console.error(
+              'Error refreshing session during reinitialization:',
+              err
+            );
+            observer.error(err);
+            return;
+          }
+
+          console.log('CognitoUser reinitialized successfully.');
+
+          // Update tokens in cookies
+          const authData: AuthResponse = {
+            access_token: session.getAccessToken().getJwtToken(),
+            id_token: session.getIdToken().getJwtToken(),
+            refresh_token: session.getRefreshToken().getToken(),
+            expires_in: session.getAccessToken().getExpiration(),
+            token_type: 'Bearer',
+          };
+
+          this.tokenService.setAuthData(authData);
+
+          observer.next(this.cognitoUser!);
+          observer.complete();
+        });
       });
     });
   }
@@ -510,73 +650,99 @@ export class AuthService {
 
   getTokenFromParent(): Observable<AuthResponse> {
     return new Observable((observer) => {
-      // Primero obtener la configuración
-      this.configService.getConfig().subscribe(
-        (config) => {
-          this.userPoolId = config.user_pool;
-          this.clientId = config.portal_client_id;
+      // Flag to track if the token has been processed
+      let isTokenProcessed = false;
 
-          console.log(
-            'pool id: ',
-            this.userPoolId,
-            'client id: ',
-            this.clientId
-          );
+      // Function to handle the message event
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data.action === 'deliverToken' && event.data.authData) {
+          const authData: AuthResponse = toSnakeCaseKeys(event.data.authData);
 
-          // Escuchar el mensaje del token desde el parent
-          window.addEventListener('message', (event: MessageEvent) => {
-            console.log(event);
-            /* if (event.origin !== 'http://localhost:4200') {
-              console.error('Origen no válido para el mensaje:', event.origin);
-              observer.error('Origen no válido para el mensaje');
-              return;
-            } */
+          // Validate if the token is valid
+          if (authData && authData.access_token) {
+            // Check if the token is expired
+            if (this.tokenService.isTokenExpired(authData.access_token)) {
+              console.error('Token has expired');
+              console.log('Attempting to redirect to /invalid-token');
 
-            if (event.data.action === 'deliverToken' && event.data.authData) {
-              const authData: AuthResponse = toSnakeCaseKeys(
-                event.data.authData
-              );
-              // Validar si el token es válido
-              if (authData && authData.access_token) {
-                this.tokenService.setAuthData(authData); // Almacenar los datos de autenticación
-                this.authDataSubject.next(authData); // Actualizar el estado de autenticación
+              // Mark the token as processed
+              isTokenProcessed = true;
 
-                // También puedes decodificar el token aquí si lo necesitas
-                const decodedToken = this.tokenService.decodeToken(
-                  authData.access_token
-                );
-                const username = decodedToken.username; // Usar el nombre de usuario
+              // Remove the event listener to prevent further processing
+              window.removeEventListener('message', handleMessage);
 
-                // Configurar Cognito User Pool
-                const userPool = new CognitoUserPool({
-                  UserPoolId: this.userPoolId!,
-                  ClientId: this.clientId!,
+              // Redirect to /invalid-token
+              this.router
+                .navigate(['/invalid-token'])
+                .then((success) => {
+                  if (success) {
+                    console.log('✅ Successfully redirected to /invalid-token');
+                  } else {
+                    console.error('❌ Failed to redirect to /invalid-token');
+                    // Fallback to window.location.href if router.navigate fails
+                    window.location.href = '/invalid-token';
+                  }
+                })
+                .catch((error) => {
+                  console.error('Error during redirection:', error);
+                  // Fallback to window.location.href if router.navigate fails
+                  window.location.href = '/invalid-token';
                 });
 
-                this.cognitoUser = new CognitoUser({
-                  Username: username,
-                  Pool: userPool,
-                });
-
-                console.log('Token recibido y configurado');
-                // Enviar el resultado al observer
-                observer.next(authData);
-                observer.complete();
-              } else {
-                console.error('Formato de token inválido:', authData);
-                observer.error('Formato de token inválido');
-              }
+              observer.error('Token has expired');
+              return; // Stop further execution
             }
-          });
 
-          // Enviar mensaje al parent para solicitar el token
-          window.parent.postMessage({ action: 'requestToken' }, '*');
-        },
-        (error) => {
-          console.error('Error obteniendo la configuración:', error);
-          observer.error('Error obteniendo la configuración');
+            // Token is valid, proceed with setting up the user
+            this.tokenService.setAuthData(authData);
+            this.authDataSubject.next(authData);
+
+            const decodedToken = this.tokenService.decodeToken(
+              authData.access_token
+            );
+            const username = decodedToken.username;
+
+            console.log('user pool : ', this.userPoolId);
+            console.log('ClientId : ', this.clientId);
+            const userPool = new CognitoUserPool({
+              UserPoolId: this.userPoolId!,
+              ClientId: this.clientId!,
+            });
+
+            this.cognitoUser = new CognitoUser({
+              Username: username,
+              Pool: userPool,
+            });
+
+            console.log('Token received and configured');
+            // this.router.navigateByUrl('/app');
+
+            // Mark the token as processed
+            isTokenProcessed = true;
+
+            // Remove the event listener to prevent further processing
+            window.removeEventListener('message', handleMessage);
+
+            observer.next(authData);
+            observer.complete();
+          } else {
+            console.error('Invalid token format:', authData);
+            observer.error('Invalid token format');
+          }
         }
-      );
+      };
+
+      // Add the event listener
+      window.addEventListener('message', handleMessage);
+
+      // Send a message to the parent to request the token
+      window.parent.postMessage({ action: 'requestToken' }, '*');
+
+      // Cleanup logic for the Observable
+      return () => {
+        // Remove the event listener when the Observable is unsubscribed
+        window.removeEventListener('message', handleMessage);
+      };
     });
   }
 
@@ -585,17 +751,14 @@ export class AuthService {
     confirmPassword: string;
   }): Observable<any> {
     const url = `${this.apiUrl}/public/wibond-connect/user/auth/reset_password`; // URL de tu backend
-    const authData = this.tokenService.getAuthData();
+    const authData = this.tokenService.getAuthDataOTP();
 
-    if (this.isAuthenticated() && authData) {
-      const decodedToken = this.tokenService.decodeToken(authData.access_token);
-      const username = decodedToken.username; // Get the username from the token
-
+    if (authData) {
       // Crear los headers, incluyendo el token de autorización y el Wibond-Id
       const headers = new HttpHeaders({
-        Authorization: `Bearer ${authData.access_token}`,
+        Authorization: `Bearer ${authData.id_token_otp}`,
         'Content-Type': 'application/json',
-        'Wibond-Id': `${authData.id_token}`, // Aquí agregamos el Wibond-Id con el id_token
+        'Wibond-Id': `${authData.id_token_otp}`, // Aquí agregamos el Wibond-Id con el id_token
       });
 
       // Crear el cuerpo de la solicitud
@@ -620,25 +783,25 @@ export class AuthService {
     }
   }
   // Método para obtener el token
-  getToken(): Observable<string> {
-    /* return this.authDataSubject.pipe(
-      switchMap((authData) => {
-        if (authData && authData.access_token) {
-          return of(authData.access_token);
-        } else {
-          return throwError('No token available');
-        }
-      })
-    ); */
-    const authDataString = sessionStorage.getItem('auth_data'); // Obtener el string del localStorage
-    if (authDataString) {
-      const authData = JSON.parse(authDataString); // Parsear el string JSON
-      // Ahora puedes acceder a la propiedad "access_token"
-      return of(authData.access_token); // Retornar la propiedad que necesitas
-    } else {
-      return throwError('No token available'); // O manejar el caso en que no haya auth_data
-    }
-  }
+  // getToken(): Observable<string> {
+  //   /* return this.authDataSubject.pipe(
+  //     switchMap((authData) => {
+  //       if (authData && authData.access_token) {
+  //         return of(authData.access_token);
+  //       } else {
+  //         return throwError('No token available');
+  //       }
+  //     })
+  //   ); */
+  //   const authDataString = sessionStorage.getItem('auth_data'); // Obtener el string del localStorage
+  //   if (authDataString) {
+  //     const authData = JSON.parse(authDataString); // Parsear el string JSON
+  //     // Ahora puedes acceder a la propiedad "access_token"
+  //     return of(authData.access_token); // Retornar la propiedad que necesitas
+  //   } else {
+  //     return throwError('No token available'); // O manejar el caso en que no haya auth_data
+  //   }
+  // }
 
   // Método para obtener el ID token
   getIdToken(): Observable<string> {
@@ -747,7 +910,6 @@ export class AuthService {
     const authData = this.tokenService.getAuthData();
     if (authData && authData.id_token) {
       const decodedToken = this.tokenService.decodeToken(authData.id_token);
-
       if (decodedToken && decodedToken.email) {
         return decodedToken.email;
       }
@@ -861,47 +1023,89 @@ export class AuthService {
   // Helper method to initialize the CognitoUser if it’s not set
 
   // List devices method
-  public listActiveDevices(): Observable<any> {
+  public listActiveDevices(
+    limit: number = 10,
+    paginationToken: string | null = null
+  ): Observable<any> {
     console.log('list active devices....');
     return new Observable((observer) => {
-      this.initializeCognitoUser().subscribe({
-        next: (cognitoUser) => {
-          console.log(' cognito user: ', cognitoUser);
+      // Check if the user is authenticated (and refresh token if necessary)
+      this.isAuthenticated().subscribe({
+        next: (isAuthenticated) => {
+          if (!isAuthenticated) {
+            // If not authenticated, throw an error
+            observer.error('User is not authenticated');
+            return;
+          }
 
-          cognitoUser.listDevices(10, null, {
-            onSuccess: (result) => {
-              console.log('Devices:', result.Devices);
-              // Pass the devices list to the observer
-              observer.next(result.Devices);
-              observer.complete();
+          // User is authenticated, proceed to initialize Cognito user
+          this.initializeCognitoUser().subscribe({
+            next: (cognitoUser) => {
+              console.log('cognito user: ', cognitoUser);
+
+              // List devices
+              cognitoUser.listDevices(limit, paginationToken, {
+                onSuccess: (result) => {
+                  console.log('Devices:', result.Devices);
+                  // Pass the devices list and pagination token to the observer
+                  observer.next({
+                    devices: result.Devices,
+                    paginationToken: result.PaginationToken,
+                  });
+                  observer.complete();
+                },
+                onFailure: (error) => {
+                  console.error('Failed to list devices:', error);
+                  observer.error(error);
+                },
+              });
             },
-            onFailure: (error) => {
-              console.error('Failed to list devices:', error);
-              observer.error(error);
-            },
+            error: (err) => observer.error(err),
           });
         },
-        error: (err) => observer.error(err),
+        error: (err) => {
+          console.error('Authentication check failed:', err);
+          observer.error(err);
+        },
       });
     });
   }
 
   public logoutCognitoDevice(deviceKey: string): Observable<void> {
     return new Observable((observer) => {
-      if (!this.cognitoUser) {
-        console.error('No Cognito user found.');
-        return;
-      }
+      this.isAuthenticated().subscribe({
+        next: (isAuthenticated) => {
+          if (!isAuthenticated) {
+            // If not authenticated, throw an error
+            observer.error('User is not authenticated');
+            return;
+          }
 
-      this.cognitoUser.forgetSpecificDevice(deviceKey, {
-        onSuccess: () => {
-          console.log(`Successfully logged out from device: ${deviceKey}`);
+          // User is authenticated, proceed to initialize Cognito user
+          this.initializeCognitoUser().subscribe({
+            next: (cognitoUser) => {
+              console.log('cognito user: ', cognitoUser);
 
-          observer.next();
-          observer.complete();
+              cognitoUser.forgetSpecificDevice(deviceKey, {
+                onSuccess: () => {
+                  console.log(
+                    `Successfully logged out from device: ${deviceKey}`
+                  );
+
+                  observer.next();
+                  observer.complete();
+                },
+                onFailure: (err: any) => {
+                  console.error('Failed to log out from the device:', err);
+                  observer.error(err);
+                },
+              });
+            },
+            error: (err) => observer.error(err),
+          });
         },
-        onFailure: (err) => {
-          console.error('Failed to log out from the device:', err);
+        error: (err) => {
+          console.error('Authentication check failed:', err);
           observer.error(err);
         },
       });
@@ -911,46 +1115,110 @@ export class AuthService {
   /**
    * Logs out the user by clearing authentication data and redirecting to the login page.
    */
+
   logoutUser(): void {
-    console.log('Logging out user...');
+    const isIframe = this.storeDataService.checkIframe();
+
     this.snackBarService.close();
-    this.sessionManagementService.stopMonitoring(); // Stop session monitor
+    this.sessionManagementService.stopInactivityMonitoring();
+    this.sessionManagementService.stopTokenExpirationMonitoring();
+    if (isIframe) {
+      console.log(
+        '🖼️ Iframe mode detected, showing session expired message...'
+      );
+      this.router.navigate(['/auth/pin-validation']);
+      return;
+    }
     // Clear authentication cookies
     this.cookieService.deleteCookie('access_token');
     this.cookieService.deleteCookie('id_token');
     this.cookieService.deleteCookie('refresh_token');
-
+    this.cookieService.deleteCookie('username');
     // Clear other session data if applicable
     sessionStorage.removeItem('auth_data');
     localStorage.clear();
-    // Redirect the user to the login page
-    this.router.navigate(['/auth']);
+    this.router.navigate(['/auth/login']);
   }
 
   public logoutAllDevices(): Observable<any> {
-    const logoutAllUrl = `${this.apiUrl}/public/wibond-connect/user/auth/global-sign-out`; // URL de tu backend
+    const logoutAllUrl = `${this.apiUrl}/public/wibond-connect/user/auth/global-sign-out`;
     const authData = this.tokenService.getAuthData();
 
     if (this.isAuthenticated() && authData) {
-      // Crear los headers, incluyendo el token de autorización y el Wibond-Id
       const headers = new HttpHeaders({
         Authorization: `Bearer ${authData.access_token}`,
         'Content-Type': 'application/json',
-        'Wibond-Id': `${authData.id_token}`, // Aquí agregamos el Wibond-Id con el id_token
+        'Wibond-Id': `${authData.id_token}`,
       });
 
-      // Realizar el POST al backend
-      return this.http.post<any>(logoutAllUrl, {}, { headers }).pipe(
-        tap((response) => {
-          console.log('Todas las sesiones se cerraron con éxito ', response);
+      // Step 1: Forget all devices
+      return this.forgetAllDevices().pipe(
+        switchMap(() => {
+          // Step 2: Perform global sign-out (revoke all tokens)
+          return this.http.post<any>(logoutAllUrl, {}, { headers });
+        }),
+        tap(() => {
+          console.log('All devices forgotten and sessions logged out');
         }),
         catchError((error) => {
-          console.error('Error saliendo de las sesiones:', error);
-          return throwError(() => new Error('Error en el cierre de sesiones'));
+          console.error(
+            'Error during forgetting devices or global sign-out:',
+            error
+          );
+          return throwError(() => new Error('Error during global sign-out'));
         })
       );
     } else {
-      return throwError(() => new Error('Usuario no autenticado'));
+      return throwError(() => new Error('User not authenticated'));
     }
+  }
+
+  public forgetAllDevices(): Observable<void> {
+    return new Observable((observer) => {
+      this.listActiveDevices(60).subscribe({
+        next: (result) => {
+          const devices = result.devices;
+          if (devices.length === 0) {
+            observer.next(); // No devices to forget
+            observer.complete();
+            return;
+          }
+
+          // Forget each device
+          const forgetDeviceObservables = devices.map((device: any) => {
+            return new Observable<void>((deviceObserver) => {
+              this.cognitoUser!.forgetSpecificDevice(device.DeviceKey, {
+                onSuccess: () => {
+                  console.log(`Forgot device: ${device.DeviceKey}`);
+                  deviceObserver.next();
+                  deviceObserver.complete();
+                },
+                onFailure: (err) => {
+                  console.error(
+                    `Failed to forget device: ${device.DeviceKey}`,
+                    err
+                  );
+                  deviceObserver.error(err);
+                },
+              });
+            });
+          });
+
+          // Wait for all devices to be forgotten
+          forkJoin(forgetDeviceObservables).subscribe({
+            next: () => {
+              observer.next();
+              observer.complete();
+            },
+            error: (err) => {
+              observer.error(err);
+            },
+          });
+        },
+        error: (err) => {
+          observer.error(err);
+        },
+      });
+    });
   }
 }

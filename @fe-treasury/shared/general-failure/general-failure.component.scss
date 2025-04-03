@@ -36,3 +36,19 @@
     visibility: visible;
   }
 }
+
+@media screen and (max-width: 800px) {
+  .general-failure{
+    height: 85vh;
+    .text-content{
+      p,h2{
+        width: 100%;
+      }
+    }
+    .button-container{
+      margin-bottom: 2em;
+      gap: 0.5em;
+      width: 100%;
+    }
+  }
+}

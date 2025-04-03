@@ -7,6 +7,7 @@ import {
   HostListener,
   OnInit,
 } from '@angular/core';
+import { Clipboard } from '@angular/cdk/clipboard';
 import { TreasuryService } from 'src/app/services/treasury.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,6 +23,7 @@ import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { SidePanelFooterComponent } from '@fe-treasury/shared/side-panel/side-panel-footer/side-panel-footer.component';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { SafeHtml } from '@angular/platform-browser';
 import { MatError } from '@angular/material/form-field';
 @Component({
@@ -34,6 +36,7 @@ import { MatError } from '@angular/material/form-field';
     MatProgressBar,
     MatFormFieldModule,
     ReactiveFormsModule,
+    MatTooltipModule,
     FormatNamePipe,
     MatInputModule,
     CommonModule,
@@ -70,6 +73,7 @@ export class TransferContactsComponent implements OnInit {
   contacts: any[] = [];
   isValid: boolean = false;
   notFoundOwner: boolean = false;
+  notValidInput: boolean = false;
   accountOwner: any = null;
   selectedContactId: number | null = null;
   processingDeleteContact: boolean = false;
@@ -171,7 +175,8 @@ export class TransferContactsComponent implements OnInit {
   constructor(
     private svgLibrary: SvgLibraryService,
     private treasuryService: TreasuryService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private clipboard: Clipboard
   ) {}
 
   ngOnInit() {
@@ -212,6 +217,22 @@ export class TransferContactsComponent implements OnInit {
       });
     }
   }
+
+  pasteFromClipboard() {
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        if (text.length > 22) {
+          text = text.substring(0, 22); // ✅ Trim to 22 characters
+        }
+        this.cbuInput = text;
+        this.validateInput();
+      })
+      .catch((err) => {
+        console.error('Failed to read clipboard:', err);
+      });
+  }
+
   selectOption(option: string) {
     this.typeDestination = option;
     this.filteredContacts = this.getFilteredContacts();
@@ -219,23 +240,40 @@ export class TransferContactsComponent implements OnInit {
 
   searchAccountOwner() {
     console.log('searching for: ', this.cbuInput);
+
+    // Check if cbuInput is valid (more than 6 characters and less than 22)
+    if (
+      !this.cbuInput ||
+      this.cbuInput.length < 6 ||
+      this.cbuInput.length > 22
+    ) {
+      console.log(
+        'Invalid input: CBU must be more than 6 characters and less than 22'
+      );
+      this.notValidInput = true; // Show error message or handle invalid input
+      this.isLoading = false; // Ensure loader is not active
+      this.isLoadingContacts.emit(false);
+      return; // Exit the function early
+    }
+
     this.isLoading = true;
     this.notFoundOwner = false;
+    this.notValidInput = false;
     this.isLoadingContacts.emit(true);
-    console.log('searching for: ', this.cbuInput);
+
     if (this.isValid) {
       this.treasuryService.getAccountOwner(this.cbuInput).subscribe({
         next: (accountOwner) => {
           console.log('Account Owner fetched:', accountOwner);
           this.selectedContact.emit(accountOwner); // Call stepCompleted method
           this.contactType.emit('new'); // Call stepCompleted method
-          this.accountOwner = accountOwner; // Almacenar los detalles del propietario de la cuenta
+          this.accountOwner = accountOwner; // Store account owner details
           this.isLoading = false;
           this.isLoadingContacts.emit(false);
         },
         error: (err) => {
           console.error('Error fetching account owner:', err);
-          this.accountOwner = null; // Si hay un error, no se encuentra el propietario
+          this.accountOwner = null; // If there's an error, no owner is found
           this.notFoundOwner = true;
           this.isLoading = false;
           this.isLoadingContacts.emit(false);
@@ -265,11 +303,19 @@ export class TransferContactsComponent implements OnInit {
   }
 
   validateInput() {
-    this.isValid = this.cbuInput.length >= 6;
-    if (this.notFoundOwner) {
-      this.notFoundOwner = false;
-    }
-    // if (this.cbuInput.length >= 6){this.searchAccountOwner()}
+    this.notValidInput = false;
+    this.notFoundOwner = false;
+    // Check if cbuInput is valid (more than 6 characters and less than 22)
+    this.isValid =
+      !!this.cbuInput &&
+      this.cbuInput.length >= 6 &&
+      this.cbuInput.length <= 22;
+    // Optionally, you can also update the UI to show/hide error messages here
+    // if (!this.isValid) {
+    //   this.notValidInput = true; // Show error message
+    // } else {
+    //   this.notValidInput = false; // Hide error message
+    // }
   }
 
   toggleFavorite(contact: any): void {

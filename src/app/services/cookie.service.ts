@@ -21,13 +21,13 @@ export class CookieService {
    */
   private getCookieOptions(): string {
     let options = 'Secure; ';
-    
+
     if (this.isInIframe()) {
-      options += 'SameSite=None;';
+      options += 'SameSite=None; Partitioned;';
     } else {
       options += 'SameSite=Strict;';
     }
-    
+
     return options.trim();
   }
 
@@ -45,7 +45,9 @@ export class CookieService {
       expires = `; expires=${date.toUTCString()}`;
     }
     // Se añade explícitamente el path y luego las opciones restantes.
-    document.cookie = `${name}=${value || ''}${expires}; path=/; ${this.getCookieOptions()}`;
+    document.cookie = `${name}=${
+      value || ''
+    }${expires}; path=/; ${this.getCookieOptions()}`;
   }
 
   /**
@@ -66,7 +68,9 @@ export class CookieService {
       if (timeLeft > 0) {
         const expiresDate = new Date(currentTime + timeLeft);
         document.cookie = `${name}=${token}; expires=${expiresDate.toUTCString()}; path=/; ${this.getCookieOptions()}`;
-        console.log(`${name} cookie set to expire at ${expiresDate.toUTCString()}.`);
+        console.log(
+          `${name} cookie set to expire at ${expiresDate.toUTCString()}.`
+        );
       } else {
         console.error(`Token for ${name} is already expired.`);
       }

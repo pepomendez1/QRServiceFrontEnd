@@ -4,5 +4,5 @@
     [arrowBackEnabled]="true"
     (arrowBack)="handleArrowBack()"
   ></app-side-panel-header>
-  <div class="content-file">{{ fileContent }}</div>
+  <div class="content-file" [innerHTML]="fileContent"></div>
 </div>

@@ -9,7 +9,7 @@
     <span class="contact-title heading-5-600"> Nuevo contacto</span>
     <div
       class="cbu-input-container"
-      [ngClass]="{ 'error-border': notFoundOwner }"
+      [ngClass]="{ 'error-border': notFoundOwner || notValidInput }"
     >
       <div class="input-data">
         <input
@@ -18,9 +18,19 @@
           [(ngModel)]="cbuInput"
           (input)="validateInput()"
           (keyup.enter)="searchAccountOwner()"
+          maxlength="22"
         />
       </div>
       <div class="actions-button">
+        <button
+          mat-icon-button
+          (click)="pasteFromClipboard()"
+          class="outline-button"
+          matTooltip="Pegar"
+          matTooltipPosition="above"
+        >
+          <mat-icon class="material-symbols-outlined">content_paste</mat-icon>
+        </button>
         <button
           mat-icon-button
           (click)="searchAccountOwner()"
@@ -34,6 +44,10 @@
     <mat-error *ngIf="notFoundOwner" class="form-error">
       <mat-icon class="material-symbols-outlined">error</mat-icon>
       Los datos ingresados son incorrectos. Revisalos y volvé a ingresarlos.
+    </mat-error>
+    <mat-error *ngIf="notValidInput" class="form-error">
+      <mat-icon class="material-symbols-outlined">error</mat-icon>
+      El dato ingresado no es válido
     </mat-error>
   </div>
   <!-- Lista de contactos -->

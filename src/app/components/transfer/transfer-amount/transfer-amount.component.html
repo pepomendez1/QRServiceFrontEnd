@@ -5,9 +5,12 @@
       <span class="symbol">$</span>
       <input
         type="text"
+        inputmode="numeric"
         class="amount-input heading-4-700"
         placeholder="0,00"
         [value]="amount"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
         (keydown)="handleKeyDown($event)"
         #amountInput
         autofocus

@@ -4,13 +4,39 @@
     mat-icon-button
     (click)="sidenav.toggle()"
     aria-label="Menu icon"
+    onclick="this.blur()"
+    [ngClass]="{ 'no-focus': isSidenavClosed }"
+    #hamburgerButton
   >
     <mat-icon>menu</mat-icon>
   </button>
   <h1 class="heading-2">{{ currentRouteName }}</h1>
   <div class="header-buttons">
+    <div
+      *ngIf="toggleModuleEnabled"
+      [matMenuTriggerFor]="menuPeriod"
+      class="rounded-box clickable"
+    >
+      <mat-icon>storefront</mat-icon>
+      <p class="body-2 m-0">Módulos</p>
+    </div>
+
+    <mat-menu #menuPeriod="matMenu" class="filter-mat-menu">
+      <mat-radio-group
+        [(ngModel)]="selectedModule"
+        (change)="onModuleChange($event)"
+      >
+        <mat-radio-button value="basic_modules"
+          >Módulos Básicos</mat-radio-button
+        >
+        <mat-radio-button value="international_account"
+          >Cuenta Internacional</mat-radio-button
+        >
+      </mat-radio-group>
+    </mat-menu>
+
     <app-slider-button
-      *ngIf="toggleModeEnabled"
+      *ngIf="toggleThemeEnabled"
       [iconOptions]="true"
       [sizeHeight]="'48px'"
       [sizeWidth]="'100px'"
@@ -29,7 +55,7 @@
     <!-- <notifications-menu></notifications-menu> -->
 
     <button
-      *ngIf="!(sidenav && sidenav.mode === 'over')"
+      *ngIf="(!(sidenav && sidenav.mode === 'over') && !isIframe) || isIframe"
       (click)="goToAccountInfo()"
       class="rounded-button"
       fxFlex="grow"

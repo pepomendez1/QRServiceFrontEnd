@@ -13,7 +13,7 @@ import {
   MatSnackBarModule,
 } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
-import { Card } from '../services-payment.service';
+import { Card, NotificationsResponse, Notification, DebtsApiResponse, DebtResponse, PaymentInfo } from '../services-payment.service';
 import { MyCardsService } from '../my-services-and-taxes/my-services-and-taxes.component';
 import { ServicesPaymentService } from '../services-payment.service';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
@@ -24,8 +24,10 @@ import createFuzzySearch from '@nozbe/microfuzz';
 import { RefreshService } from '@fe-treasury/shared/refresh-service/refresh-service';
 import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.service';
 import { FiltersComponent } from './filters/filters.component';
-
-
+import { NewServiceComponent } from '../my-services-and-taxes/new-services/new-services.component';
+import { SharedService } from '../services-payment.shared-service';
+import { SvgLibraryService } from 'src/app/services/svg-library.service';
+import { SafeHtml } from '@angular/platform-browser';
 
 type TransactionType = 'PURCHASE' | 'DEBIT' | 'CREDIT' | 'REFUND';
 
@@ -55,12 +57,12 @@ type TransactionType = 'PURCHASE' | 'DEBIT' | 'CREDIT' | 'REFUND';
   templateUrl: './expirations.component.html',
   styleUrls: ['./expirations.component.scss'],
 })
-export class CardsActivityComponent implements OnInit {
+export class ExpirationsHistoryComponent implements OnInit {
   selectedPeriod = 'Todo';
   currentPage = 1;
   pageSize = 5;
   totalItems = 0;
-  expirations: any[] = [];
+  expirations: NotificationsResponse = {notifications: [], tx: '', mainTx: ''};
   filteredExpirations: any[] = [];
   history: any[] = [];
   filteredHistory: any[] = [];
@@ -123,42 +125,46 @@ export class CardsActivityComponent implements OnInit {
     },
   };
 
+  currentPayDetail:any;
+
+  problemImg: SafeHtml | null = null;
+
   constructor(
+    private svgLibrary: SvgLibraryService,
     private snackBar: MatSnackBar,
     private refreshService: RefreshService,
     private expirationsService: ServicesPaymentService,
-    private sidePanelService: SidePanelService
-
+    private sidePanelService: SidePanelService,
+    private sharedService: SharedService
   ) {
     this.loadExpirations();
     this.loadHistory();
   }
 
   ngOnInit(): void {
+
+    this.svgLibrary.getSvg('problem').subscribe((svgContent) => {
+      this.problemImg = svgContent; // SafeHtml type to display SVG dynamically
+      //console.log('Dynamically loaded SVG with store color:', svgContent);
+    });
+
   // Subscribe to the refresh signal
   this.refreshService.refresh$.subscribe(() => {
     this.loadExpirations();
     this.loadHistory();
   });
 
-   /*  this.fuzzySearch = createFuzzySearch(this.expirations, {
-                  getText: (item: any) => [
-                    item.merchant_name,
-                    item.description,
-                    item.amount.toString(),
-                  ],
-                  strategy: 'aggressive',
-                });*/
-    //this.getExpirations(true);
-    //this.filterExpirations()
-    //this.filterHistory()
+  this.loading = false;
 
-   /* this.history = [
-      {description: "Telefonía - Nro de Cuenta 123456", merchant_name: "Claro", vencido: true, autodebito: true, fechaAutodebito :'20 de enero',amount:1000,date: '2024-01-01',},
-      {description: "Telefonía - Nro de Cuenta 666899", merchant_name: "Claro", vencido: false, autodebito: true, fechaAutodebito :'21 de enero',amount:2000,date: '2024-01-05',},
-      {description: "Gas - Nro de Cuenta 78544", merchant_name: "Ecogas", vencido: false, autodebito: true, fechaAutodebito :'24 de enero',amount:3000,date: '2024-01-10',}
-    ];*/
-    this.loading = false;
+    this.sharedService.accion$.subscribe((msg) => {
+      if(msg == SharedService.UPDATE_HISTORY){
+        this.loadHistory();
+        console.log(msg)
+      } else if(msg == SharedService.UPDATE_EXPIRATIONS){
+        this.loadExpirations();
+        console.log(msg)
+      }
+    });
   }
 
   loadExpirations() {
@@ -170,34 +176,12 @@ export class CardsActivityComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response) {
-            let transactions = response;
 
-            // Apply transaction limit if the flag is true
-            /*if (this.limitTransactions && this.transactionLimit > 0) {
-              transactions = transactions.slice(0, this.transactionLimit); // Limit the transactions
-            }*/
-            // Add icons to transactions
+            this.expirations = response; // Asignar la lista de movimientos a la propiedad `transactions`
+            console.log('expirations: ', this.expirations);
 
-            this.expirations = transactions; // Asignar la lista de movimientos a la propiedad `transactions`
-            /*this.expirations = transactions.map((transaction: any) => ({
-              ...transaction,
-              icon: this.iconLookupService.getIcon(
-                transaction.type,
-                transaction.source
-              ),
-            }));*/
-            /*console.log('example: ', transactions[0]);
-            this.fuzzySearch = createFuzzySearch(this.expirations, {
-              getText: (item: any) => [
-                item.contact_name,
-                item.description,
-                item.amount.toString(),
-              ],
-              strategy: 'aggressive',
-            });
-            this.filterExpirations(); */// Apply the search filter whenever transactions are loaded
           } else {
-            this.expirations = []; // Si no hay movimientos, aseguramos que sea un array vacío
+            this.expirations = {notifications: [], tx: '', mainTx: '' }; // Si no hay movimientos, aseguramos que sea vacío
             this.noExpirations = true;
           }
           this.loading = false; // Asegúrate de detener el spinner después de cargar los datos
@@ -240,7 +224,7 @@ export class CardsActivityComponent implements OnInit {
                 item.contact_name,
                 item.description,
                 item.merchant_name,
-                item.amount.toString(),
+                item.amount ? item.amount.toString() : '', // Manejar null/undefined
               ],
               strategy: 'aggressive',
             });
@@ -258,52 +242,29 @@ export class CardsActivityComponent implements OnInit {
       });
   }
 
-  showMoreTransactions(): void {
-    if (this.expirations.length >= this.totalItems || this.loadingMore) return;
+  /*showMoreTransactions(): void {
+    if (this.expirations.notifications.length >= this.totalItems || this.loadingMore) return;
     this.currentPage++;
     this.loadExpirations();
-  }
+  }*/
 
    // Calcula el total dinámico
    get totalSeleccionado(): number {
-    return this.expirations
+    if(!this.expirations.notifications){
+      return 0;
+    }
+    return this.expirations.notifications
       .filter(item => item.checked) // Filtrar solo los seleccionados
       .reduce((sum, item) => sum + item.amount, 0); // Sumar los montos
   }
 
   // Contador de ítems seleccionados
   get cantidadSeleccionada(): number {
-    return this.expirations.filter(item => item.checked).length;
+    if(!this.expirations.notifications){
+      return 0;
+    }
+    return this.expirations.notifications.filter(item => item.checked).length;
   }
-
-/*openFiltersPanel() {
-    const filtersPanelRef = this.sidePanelService.open(
-      FiltersComponent,
-      'Filtros',
-      {
-        periodsList: this.periodsList,
-        selectedPeriod: this.selectedPeriod,
-        typesList: this.typesList,
-        selectedTypes: this.selectedTypes,
-        statesList: this.statesList,
-        selectedStates: this.selectedStates,
-      }
-    );
-
-    filtersPanelRef?.instance.applyFilters.subscribe(
-      (data: {
-        selectedPeriod: string;
-        selectedTypes: string[];
-        selectedStates: string[];
-      }) => {
-        console.log('Filters Applied:', data);
-        this.selectedPeriod = data.selectedPeriod;
-        this.selectedTypes = data.selectedTypes;
-        this.selectedStates = data.selectedStates;
-        this.loadTransactions();
-      }
-    );
-  }*/
 
     openFiltersPanel() {
       const filtersPanelRef = this.sidePanelService.open(
@@ -332,150 +293,7 @@ export class CardsActivityComponent implements OnInit {
       );
     }
 
-    /*filterHistory() {
-      // First, filter by type and state
-      const now = new Date();
-
-      this.filteredHistory = this.history.filter((transaction) => {
-        const matchesType =
-          this.selectedTypes.includes('Todas') ||
-          this.selectedTypes.some(
-            (category) => category === transaction.category
-          );
-
-        // Filtrar por período
-        let matchesPeriod = true; // Por defecto, no filtra si 'Todos' está seleccionado
-
-        if (this.selectedPeriod !== 'Todos') {
-          const transactionDate = new Date(transaction.date);
-          let startDate: Date;
-
-          startDate = new Date();
-          switch (this.selectedPeriod) {
-            case 'Hoy':
-              startDate.setDate(now.getDate() - 1);
-              break;
-            case 'Última semana':
-              startDate.setDate(now.getDate() - 7);
-              break;
-            case 'Último mes':
-              startDate.setMonth(now.getMonth() - 1);
-              break;
-            case 'Último año':
-              startDate.setFullYear(now.getFullYear() - 1);
-              break;
-          }
-
-          if (startDate) {
-            matchesPeriod = transactionDate >= startDate;
-          }
-        }
-        return matchesType && matchesPeriod;
-      });
-
-      //this.filteredHistory = this.history;
-      console.log('search input history', this.searchQuery);
-
-      console.log(
-        'Filtered history after type and state filter:',
-        this.filteredHistory
-      );
-
-      // Only proceed with search if there is a search term
-      if (this.searchQuery.trim().length > 0) {
-        this.searching = true;
-        console.log('searching...');
-
-        const searchResults = this.fuzzySearch(this.searchQuery);
-        console.log('searchResults...', searchResults);
-        if (searchResults) {
-          this.filteredHistory = searchResults.map(
-            (result: { item: any }) => result.item
-          );
-          this.noHistory = this.filteredHistory.length === 0;
-          console.log(
-            'Transactions match query:',
-            this.filteredHistory.length
-          );
-          setTimeout(() => {
-            this.searching = false;
-          }, 1000);
-        } else {
-          console.log('No search results');
-          this.noHistory = this.filteredHistory.length === 0;
-          setTimeout(() => {
-            this.searching = false;
-          }, 1000);
-        }
-      } else {
-        // If no search term, simply set noTransactions based on filtered transactions
-        this.noHistory = this.filteredHistory.length === 0;
-      }
-
-      console.log('Final filtered History:', this.filteredHistory);
-    }*/
-
- // filterExpirations() {
-    // First, filter by type and state
-    /*this.filteredExpirations = this.transactions.filter((transaction) => {
-      const matchesType =
-        this.selectedTypes.includes('Todas') ||
-        this.selectedTypes.some(
-          (type) => this.typesMap[type] === transaction.type
-        );
-
-      const matchesState =
-        this.selectedStates.includes('Todos') ||
-        this.selectedStates.some(
-          (state) => this.statesMap[state] === transaction.status
-        );
-
-      return matchesType && matchesState;
-    });*/
-
-   /* this.filteredExpirations = this.expirations;
-    console.log('search input', this.searchQuery );
-
-    console.log(
-      'Filtered expirations after type and state filter:',
-      this.filteredExpirations
-    );
-
-    // Only proceed with search if there is a search term
-    if (this.searchQuery.trim().length > 0) {
-      this.searching = true;
-      console.log('searching...');
-
-      const searchResults = this.fuzzySearch(this.searchQuery);
-      console.log('searchResults...', searchResults);
-      if (searchResults) {
-        this.filteredExpirations = searchResults.map(
-          (result: { item: any }) => result.item
-        );
-        this.noExpirations = this.filteredExpirations.length === 0;
-        console.log(
-          'Transactions match query:',
-          this.filteredExpirations.length
-        );
-        setTimeout(() => {
-          this.searching = false;
-        }, 1000);
-      } else {
-        console.log('No search results');
-        this.noExpirations = this.filteredExpirations.length === 0;
-        setTimeout(() => {
-          this.searching = false;
-        }, 1000);
-      }
-    } else {
-      // If no search term, simply set noTransactions based on filtered transactions
-      this.noExpirations = this.filteredExpirations.length === 0;
-    }
-
-    console.log('Final filtered expirations:', this.filteredExpirations);
-  }*/
-
-    filterHistory() {
+  filterHistory() {
       // First, filter by type and state
       const now = new Date();
 
@@ -555,66 +373,110 @@ export class CardsActivityComponent implements OnInit {
         this.noHistory = this.filteredHistory.length === 0;
       }
 
+      this.filteredHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
       console.log('Final filtered History:', this.filteredHistory);
     }
 
-  filterHistory1() {
-    // First, filter by type and state
-    /*this.filteredExpirations = this.transactions.filter((transaction) => {
-      const matchesType =
-        this.selectedTypes.includes('Todas') ||
-        this.selectedTypes.some(
-          (type) => this.typesMap[type] === transaction.type
-        );
+  onActivityClick(activity: any) {
+    console.log("Actividad seleccionada:", activity);
+    // Aquí puedes navegar a otra vista, abrir un modal, etc.
+    this.currentPayDetail = activity;
 
-      const matchesState =
-        this.selectedStates.includes('Todos') ||
-        this.selectedStates.some(
-          (state) => this.statesMap[state] === transaction.status
-        );
+    this.openPayPanel();
+  }
 
-      return matchesType && matchesState;
-    });*/
-
-    this.filteredHistory = this.history;
-    console.log('search input history', this.searchQuery );
-
-    console.log(
-      'Filtered history after type and state filter:',
-      this.filteredHistory
+  openPayPanel() {
+    const filtersPanelRef = this.sidePanelService.open(
+      NewServiceComponent,
+      'Filtros',
+      {
+        //popularServices: this.popularServices,
+        //selectedCompany: this.selectedAcitivy,
+        currentPayDetail: this.currentPayDetail,
+        currentStep: 3
+      },
+      true
     );
 
-    // Only proceed with search if there is a search term
-    if (this.searchQuery.trim().length > 0) {
-      this.searching = true;
-      console.log('searching...');
+    filtersPanelRef?.instance.applyFilters.subscribe(
+      (data: {
+        currentPayDetail: any;
+        currentStep: number
+      }) => {
+        console.log('Filters Applied:', data);
+        //this.selectedPeriod = data.selectedPeriod;
+        //this.selectedTypes = data.selectedTypes;
 
-      const searchResults = this.fuzzySearch(this.searchQuery);
-      console.log('searchResults...', searchResults);
-      if (searchResults) {
-        this.filteredHistory = searchResults.map(
-          (result: { item: any }) => result.item
-        );
-        this.noHistory = this.filteredHistory.length === 0;
-        console.log(
-          'Transactions match query:',
-          this.filteredHistory.length
-        );
-        setTimeout(() => {
-          this.searching = false;
-        }, 1000);
-      } else {
-        console.log('No search results');
-        this.noHistory = this.filteredHistory.length === 0;
-        setTimeout(() => {
-          this.searching = false;
-        }, 1000);
+        //this.loadHistory();
       }
-    } else {
-      // If no search term, simply set noTransactions based on filtered transactions
-      this.noHistory = this.filteredHistory.length === 0;
+    );
+  }
+
+  today(): string {
+    return new Date().toISOString().split('T')[0]; // Obtiene la fecha en formato "YYYY-MM-DD"
+  }
+
+  isToday(expirationDate: string): boolean {
+    return expirationDate === this.today();
+  }
+
+  paySelectedItem(){
+
+    const selectedNotifications: Notification[] = this.expirations.notifications.filter(item => item.checked);
+    if(selectedNotifications.length > 1){
+      alert('Solo podes pagar de a un servicio a la vez, disculpa las molestias')
+      return;
     }
 
-    console.log('Final filtered History:', this.filteredHistory);
+    this.loading = true;
+    this.expirationsService
+      .preparePayment(selectedNotifications[0])
+      .subscribe({
+        next: (response: DebtsApiResponse) => {
+          if (response) {
+            console.log('preparePayment: ', response);
+
+            const debts: DebtResponse[] = response.debtsResponse;
+
+            if(debts.length == 0){
+              alert('error al preparar el pago');
+            }
+            const debt: DebtResponse = debts[0];
+            const paymentInfo: PaymentInfo = debt.response;
+            paymentInfo.debts[0].debtId;
+
+            const parts = selectedNotifications[0].agendaId.split("#");
+            const clientId = parts.length > 1 ? parts[1] : ""; // Toma el valor después del primer `#`
+
+            //alert('vas a pagar ' + paymentInfo.debts[0].debtId);
+            const filtersPanelRef = this.sidePanelService.open(
+              NewServiceComponent,
+              'Filtros',
+              {
+                //popularServices: this.popularServices,
+                //selectedCompany: this.selectedAcitivy,
+                //currentPayDetail: this.currentPayDetail,
+                preparePayment: paymentInfo,
+                companyLogo: selectedNotifications[0].companyLogo,
+                clientId: clientId,
+                currentStep: 2
+              },
+              true
+            );
+            this.loading = false;
+          } else {
+            this.loading = false;
+            alert('error al preparar el pago');
+          }
+        },
+        error: (err) => {
+          console.error('Error preparePayment:', err);
+          this.loading = false; // También detener el spinner en caso de error
+        },
+      });
+
   }
 }
+
+

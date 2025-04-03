@@ -7,6 +7,8 @@ import { CookieService } from './cookie.service';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { AuthService } from './auth.service';
+import { StoreDataService } from './store-data.service';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +19,9 @@ export class ApiService {
   constructor(
     private http: HttpClient,
     private cookieService: CookieService,
-    private authService: AuthService
+    private authService: AuthService,
+    private tokenService: TokenService,
+    private storeDataService: StoreDataService
   ) {}
 
   /**
@@ -26,16 +30,30 @@ export class ApiService {
    * @param skipAuth Indicates if authentication cookies should be skipped.
    * @returns Observable of the HTTP response.
    */
-  get<T>(endpoint: string, skipAuth: boolean = false): Observable<T> {
+  get<T>(
+    endpoint: string,
+    skipAuth: boolean = false,
+    otpTokens?: boolean
+  ): Observable<T> {
     const url = `${this.apiUrl}${endpoint}`;
-
-    return this.createHeaders(skipAuth).pipe(
-      switchMap((headers) =>
-        this.http
-          .get<T>(url, { headers })
-          .pipe(catchError((error) => this.handleError(error)))
-      )
-    );
+    if (otpTokens) {
+      return this.createHeadersOTP(skipAuth).pipe(
+        switchMap((headers) =>
+          this.http.get<T>(url, { headers }).pipe(
+            catchError((error) => this.handleError(error)) // Now properly catches errors
+          )
+        ),
+        catchError((error) => this.handleError(error)) // Also catches errors from createHeadersOTP()
+      );
+    } else {
+      return this.createHeaders(skipAuth).pipe(
+        switchMap((headers) =>
+          this.http
+            .get<T>(url, { headers })
+            .pipe(catchError((error) => this.handleError(error)))
+        )
+      );
+    }
   }
 
   /**
@@ -147,21 +165,32 @@ export class ApiService {
     if (
       !accessToken ||
       !idToken ||
-      !this.isTokenValid(accessToken) ||
-      !this.isTokenValid(idToken)
+      this.tokenService.isTokenExpired(accessToken) ||
+      this.tokenService.isTokenExpired(idToken)
     ) {
       console.warn(
         'Tokens are missing, invalid, or expired. Attempting to refresh...'
       );
-      return this.refreshTokens().pipe(
-        map(({ accessToken, idToken }) =>
-          new HttpHeaders()
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('Wibond-Id', idToken)
-        )
-      );
+      // Check if the app is in iframe mode
+      if (this.storeDataService.checkIframe()) {
+        return this.handleIframeToken().pipe(
+          map(({ accessToken, idToken }) =>
+            new HttpHeaders()
+              .set('Authorization', `Bearer ${accessToken}`)
+              .set('Wibond-Id', idToken)
+          )
+        );
+      } else {
+        return this.refreshTokens().pipe(
+          map(({ accessToken, idToken }) =>
+            new HttpHeaders()
+              .set('Authorization', `Bearer ${accessToken}`)
+              .set('Wibond-Id', idToken)
+          )
+        );
+      }
     }
-
+    // console.log('headers: ', `Bearer ${accessToken}`, 'Wibond-Id', idToken);
     // Tokens are valid, return headers
     return of(
       new HttpHeaders()
@@ -178,13 +207,14 @@ export class ApiService {
     const accessTokenOTP = this.cookieService.getCookie('access_token_otp');
     const idTokenOTP = this.cookieService.getCookie('id_token_otp');
 
+    // Use TokenService's isTokenExpired method to check token validity
     if (
       !accessTokenOTP ||
       !idTokenOTP ||
-      !this.isTokenValid(accessTokenOTP) ||
-      !this.isTokenValid(idTokenOTP)
+      this.tokenService.isTokenExpired(accessTokenOTP) ||
+      this.tokenService.isTokenExpired(idTokenOTP)
     ) {
-      // console.log('Invalid access token for OTP challenge');
+      console.log('Invalid access token for OTP challenge');
       return throwError(() => new Error('Token inválido para uso de OTP')); // Return Observable error
     }
 
@@ -222,17 +252,29 @@ export class ApiService {
     );
   }
 
-  private isTokenValid(token: string | null): boolean {
-    if (!token) return false;
-
-    try {
-      const decodedToken: { exp: number } = jwtDecode(token);
-      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-      return decodedToken.exp > currentTime;
-    } catch (err) {
-      console.error('Error decoding token', err);
-      return false;
-    }
+  /**
+   * Handles token fetching in iframe mode.
+   * @returns Observable containing access and ID tokens.
+   */
+  private handleIframeToken(): Observable<{
+    accessToken: string;
+    idToken: string;
+  }> {
+    return this.authService.getTokenFromParent().pipe(
+      map((authData) => {
+        if (!authData || !authData.access_token || !authData.id_token) {
+          throw new Error('Failed to fetch tokens from parent.');
+        }
+        return {
+          accessToken: authData.access_token,
+          idToken: authData.id_token,
+        };
+      }),
+      catchError((error) => {
+        console.error('Error fetching tokens from parent:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   /**
