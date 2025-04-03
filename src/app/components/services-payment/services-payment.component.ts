@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { CardsActivityComponent } from "./expirations/expirations.component";
+import { ExpirationsHistoryComponent } from "./expirations/expirations.component";
 import { MyCardsComponent,  } from "./my-services-and-taxes/my-services-and-taxes.component";
 
 @Component({
   selector: 'app-services-payment',
   standalone: true,
   imports: [
-    CardsActivityComponent,
+    ExpirationsHistoryComponent,
     MyCardsComponent,
   ],
   templateUrl: './services-payment.component.html',

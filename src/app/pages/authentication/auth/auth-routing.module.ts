@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthComponent } from './auth.component'; // Main wrapper component
-
+import { PinValidationComponent } from '../pin-validation/pin-validation.component';
 const routes: Routes = [
   {
     path: '',
@@ -23,6 +23,10 @@ const routes: Routes = [
           import('../password-recovery/password-recovery.module').then(
             (m) => m.PasswordRecoveryModule
           ),
+      },
+      {
+        path: 'pin-validation',
+        component: PinValidationComponent,
       },
       {
         path: '',

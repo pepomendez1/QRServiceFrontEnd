@@ -7,13 +7,19 @@ import {
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OnboardingService } from 'src/app/services/onboarding.service';
 import { SnackBarMessage } from 'src/app/components/common/snackbar/snackbar';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { StoreDataService } from 'src/app/services/store-data.service';
 import { TermsDialogComponent } from 'src/app/utils/terms-dialog';
 import { TERMS_AND_CONDITIONS_INV_SALDOS } from './terms-cond/terms-inv.constant';
 //import { TERMS_AND_CONDITIONS_CONTENT } from './terms-cond/terms-and-cond.constant';
 import { DISCLAIMER_CONTENT } from './terms-cond/disclaimer-text.constant';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import {
+  BreakpointObserver,
+  Breakpoints,
+  BreakpointState,
+} from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
+import { DocumentService } from 'src/app/services/documents.service';
 @Component({
   selector: 'app-affidavit-terms',
   templateUrl: './affidavit-terms.component.html',
@@ -22,11 +28,17 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 export class AffidavitTermsComponent {
   @Output() stepCompleted = new EventEmitter<void>();
   currentStep: number = 5;
+  dialogRef!: MatDialogRef<TermsDialogComponent> | null;
   AffForm: FormGroup;
   fileContent: string = '';
+  affidavitContent: string = '';
+  termsInvestmentContent: string = '';
   warningMessage: string | null = null;
+  breakpointSubscription!: Subscription;
   errorMessage: string | null = null;
+
   isProcessing = false; // Tracks the processing state
+  isMobile: boolean = false;
   constructor(
     private storeDataService: StoreDataService,
     private cdr: ChangeDetectorRef,
@@ -34,7 +46,8 @@ export class AffidavitTermsComponent {
     private dialog: MatDialog,
     private snackBarMessage: SnackBarMessage,
     private onboardingService: OnboardingService,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private documentService: DocumentService
   ) {
     this.AffForm = this.fb.group({
       ocde: ['no'],
@@ -55,68 +68,68 @@ export class AffidavitTermsComponent {
     });
   }
 
-  openTermDialog(): void {
-    let dialogWidth = '65%'; // Default width for desktop
-    this.breakpointObserver
-      .observe([Breakpoints.Handset])
-      .subscribe((result) => {
-        if (result.matches) {
-          dialogWidth = '100%'; // Set width to 100% for mobile
-        }
-        this.dialog.open(TermsDialogComponent, {
-          width: dialogWidth,
-          hasBackdrop: true,
-          disableClose: false,
-          data: {
-            title: 'Términos y Condiciones Generales de Uso',
-            content: this.fileContent,
-          },
-        });
-      });
+  openDialog(type: string): void {
+    let title: string;
+    let content: string;
+
+    // Determine title and content based on the type
+    switch (type) {
+      case 'terms':
+        title = 'Términos y Condiciones Generales de Uso';
+        content = this.fileContent;
+        break;
+      case 'terms_balance_investment':
+        title = 'Términos y Condiciones de la cuenta remunerada';
+        content = this.termsInvestmentContent;
+        break;
+      case 'disclaimer':
+        title = 'Declaración Jurada';
+        content = this.affidavitContent;
+        break;
+      default:
+        console.error('Invalid dialog type');
+        return;
+    }
+
+    const dialogWidth = this.breakpointObserver.isMatched('(max-width: 840px)')
+      ? '100%'
+      : '65%';
+    this.dialogRef = this.dialog.open(TermsDialogComponent, {
+      width: dialogWidth,
+      hasBackdrop: true,
+      disableClose: false,
+      data: {
+        title: title,
+        content: content,
+      },
+    });
+    this.dialogRef.afterClosed().subscribe(() => {
+      this.dialogRef = null; // Reset dialogRef when dialog is closed
+    });
   }
 
-  openAffidavitDialog(): void {
-    let dialogWidth = '65%'; // Default width for desktop
-    this.breakpointObserver
-      .observe([Breakpoints.Handset])
-      .subscribe((result) => {
-        if (result.matches) {
-          dialogWidth = '100%'; // Set width to 100% for mobile
-        }
-        this.dialog.open(TermsDialogComponent, {
-          width: dialogWidth,
-          hasBackdrop: true,
-          disableClose: false,
-          data: {
-            title: 'Declaración Jurada',
-            content: DISCLAIMER_CONTENT,
-          },
-        });
-      });
-  }
-  openAccountTerms(): void {
-    let dialogWidth = '65%'; // Default width for desktop
-    this.breakpointObserver
-      .observe([Breakpoints.Handset])
-      .subscribe((result) => {
-        if (result.matches) {
-          dialogWidth = '100%'; // Set width to 100% for mobile
-        }
-        this.dialog.open(TermsDialogComponent, {
-          width: dialogWidth,
-          hasBackdrop: true,
-          disableClose: false,
-          data: {
-            title: 'Términos y Condiciones de la cuenta remunerada',
-            content: TERMS_AND_CONDITIONS_INV_SALDOS,
-          },
-        });
-      });
-  }
-
-  ngOnInit(): void {
+  async ngOnInit() {
     // Initialize form validity on component load
-    this.loadTermsAndConditions();
+
+    this.breakpointSubscription = this.breakpointObserver
+      .observe(['(max-width: 840px)'])
+      .subscribe((result: BreakpointState) => {
+        this.isMobile = result.matches;
+        // Dynamically update dialog size if it's already open
+        if (this.dialogRef) {
+          this.dialogRef.updateSize(
+            this.isMobile ? '100vw' : '50%',
+            this.isMobile ? '100vh' : '600px'
+          );
+        }
+      });
+
+    this.fileContent = await this.documentService.loadTermsAndConditions();
+    this.termsInvestmentContent =
+      await this.documentService.loadTermsAndConditionsBalanceInvestment();
+    this.affidavitContent = await this.documentService.loadDisclaimer();
+    // Reset scroll position after content is loaded
+
     this.updateFormValidity();
     this.cdr.detectChanges(); // Trigger change detection manually
   }
@@ -146,36 +159,6 @@ export class AffidavitTermsComponent {
       //this.AffForm.get(controlName)?.reset({ onlySelf: true });
     }
     this.AffForm.get(controlName)?.updateValueAndValidity({ emitEvent: false });
-  }
-
-  private loadTermsAndConditions(): void {
-    this.storeDataService.getStore().subscribe((storeData) => {
-      // Get the URL from the store or fallback to a local file
-      const termsUrl =
-        storeData.init_config?.terms_and_conditions ||
-        '/assets/docs/terms_and_conditions.docx';
-
-      // Fetch the document content
-      this.fetchDocxContent(termsUrl);
-    });
-  }
-
-  private async fetchDocxContent(url: string) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const arrayBuffer = await response.arrayBuffer();
-
-      // Lazy load mammoth
-      const Mammoth = await import('mammoth');
-      const result = await Mammoth.extractRawText({ arrayBuffer });
-      this.fileContent = result.value;
-    } catch (error) {
-      console.error('Error fetching or parsing terms and conditions:', error);
-      this.fileContent = 'Error loading terms and conditions.';
-    }
   }
 
   checkValidity(): void {

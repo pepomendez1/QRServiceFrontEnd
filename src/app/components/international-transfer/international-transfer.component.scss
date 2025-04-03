@@ -1,0 +1,179 @@
+.transfer-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  .content {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1; /* Allow the content to grow and fill the available space */
+    gap: 1em;
+
+  }
+
+  .step-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    justify-content: space-between;
+  }
+
+  .transfer-details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    .account-owner-details {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      // .account-name {
+      //   padding-bottom: 1em;
+      // }
+    }
+  }
+
+  .confirm-transfer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow-x: hidden;
+    gap: 24px;
+  }
+  .summary-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+  .info-section {
+    margin-bottom: 4px;
+  }
+  .recipient-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .input-container {
+    height: 40px;
+    width: 100%;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #dbdbdb;
+  }
+  .input-description {
+    background-color: transparent;
+    width: 100%;
+    border: none;
+    outline: none;
+    // &::placeholder {
+    //   color: #a3a3a3; // Set a different color for the placeholder
+    // }
+    // & {
+    //   color: #000;
+    // }
+    &:hover,
+    &:focus,
+    &:active {
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+
+
+    .otp-content{
+      padding-top: 2em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      //justify-content: center;
+      text-align: center;
+      flex:1;
+      p {
+        width: 80%;
+      }
+      .otp-form{
+        padding-top: 1.5em;
+      }
+  }
+
+  .success-container {
+    color: white;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    background-color: #26ae5f;
+    mat-icon {
+      font-size: 60px;
+      width: 60px;
+      height: 60px;
+    }
+  }
+  .error-container {
+    color: white;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    gap: 1em;
+    background-color: #e44b52;
+    mat-icon {
+      font-size: 60px;
+      width: 60px;
+      height: 60px;
+    }
+    .error-text {
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+
+}
+.loading-transfer-container {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  height: 90vh;
+  width: 100%;
+  .spinner-wait {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+
+    mat-spinner {
+      width: 50px !important; /* Ajustar el ancho del spinner */
+      height: 50px !important; /* Ajustar la altura del spinner */
+    }
+  }
+
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh; /* Altura específica y más pequeña para el spinner */
+  width: 100%;
+  mat-spinner {
+    width: 50px !important; /* Ajustar el ancho del spinner */
+    height: 50px !important; /* Ajustar la altura del spinner */
+  }
+}

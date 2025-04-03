@@ -45,3 +45,6 @@ jobs:
 
       - name: Deploy to S3
         run: aws s3 sync ./dist/fe-treasury s3://975050267840-fe-treasury-bucket
+
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id E38SDJEAFG4TU5 --paths "/*"

@@ -3,13 +3,14 @@ import { DOCUMENT } from '@angular/common';
 import { ThemeService } from './services/layout/theme-service';
 import { SidenavService } from './app-layout/sidenav/sidenav.service';
 import { SidenavItem } from './app-layout/sidenav/sidenav-item.interface';
-import { filter, firstValueFrom, Subscription } from 'rxjs';
+import { filter, firstValueFrom, Subscription, take } from 'rxjs';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Platform } from '@angular/cdk/platform';
 import { AuthService } from './services/auth.service';
 import { Title } from '@angular/platform-browser';
 import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.service';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { getGuardProcessingState } from './services/route-guards/app.guard';
 import { SessionManagementService } from './services/session.service';
 import { StoreDataService } from './services/store-data.service'; // ✅ Import StoreDataService
 import { FeatureFlagsService } from './services/modules.service';
@@ -20,11 +21,14 @@ import { FeatureFlagsService } from './services/modules.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private featureFlagsSubscription!: Subscription;
+  private routeSubscription!: Subscription;
+
+  private currentRoute: string = '';
   title = 'fe-treasury';
   isInIframe = false; // Determina si estamos en un iframe
-  isLoading = false; // Bandera para manejar el estado de carga
+  isLoading = true; // Bandera para manejar el estado de carga
   private focusListener: any; // Reference to the focus event listener
-  private routeSubscription!: Subscription;
 
   private featureFlags = {
     international_account: false,
@@ -32,7 +36,10 @@ export class AppComponent implements OnInit, OnDestroy {
     balance_investments_module: false,
     services_payment: false,
     insurance_module: false,
+    payment_link_module: false,
   };
+
+  private isAppRoute: boolean = false; // Track if the current route starts with /app
 
   constructor(
     private sessionManagementService: SessionManagementService,
@@ -131,11 +138,24 @@ export class AppComponent implements OnInit, OnDestroy {
     this.authService.logoutUser();
   }
   async ngOnInit(): Promise<void> {
-    await this.featureFlagsService.loadFeatureFlags();
+    this.themeService.updateHeadContent();
+    // Subscribe to feature flag changes
 
-    this.buildNavigationMenu(); // ✅ Dynamically build the menu
+    this.buildNavigationMenu();
 
-    // Monitor route changes and activate/deactivate session monitoring
+    this.featureFlagsSubscription =
+      this.featureFlagsService.featureFlags$.subscribe(() => {
+        this.buildNavigationMenu(); // Rebuild menu when flags change
+
+        if (this.router.url.startsWith('/app')) {
+          this.router
+            .navigateByUrl('/app/home', { skipLocationChange: true })
+            .then(() => {
+              this.router.navigate([this.router.url]); // Force a navigation to the same route
+            });
+        }
+      });
+
     this.routeSubscription = this.router.events
       .pipe(
         filter(
@@ -146,12 +166,19 @@ export class AppComponent implements OnInit, OnDestroy {
         const resolvedUrl = event.urlAfterRedirects; // Use the final resolved URL
         console.log(`Route changed to: ${resolvedUrl}`);
 
-        if (resolvedUrl.startsWith('/app')) {
-          // Start monitoring session for app routes
-          this.sessionManagementService.startMonitoring();
-        } else {
-          // Stop monitoring session for non-app routes
-          this.sessionManagementService.stopMonitoring();
+        const newIsAppRoute = resolvedUrl.startsWith('/app');
+
+        // Check if the route prefix has changed (e.g., from non-/app to /app or vice versa)
+        if (this.isAppRoute !== newIsAppRoute) {
+          this.isAppRoute = newIsAppRoute;
+
+          // Start or stop the monitor based on the new route prefix
+          this.handleRouteChange(newIsAppRoute);
+        }
+
+        // Stop token expiration monitoring for /app routes
+        if (newIsAppRoute) {
+          this.sessionManagementService.stopTokenExpirationMonitoring();
         }
       });
 
@@ -164,22 +191,22 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Solo si estamos en un iframe, pedimos el token al parent
-    if (this.isInIframe) {
-      this.isLoading = true; // Activar estado de carga
-      this.authService.getTokenFromParent().subscribe(
-        (authData) => {
-          if (authData && authData.access_token) {
-            this.isLoading = false; // Token recibido, quitar estado de carga
-          }
-        },
-        (error) => {
-          console.error('Error al recibir el token del parent:', error);
-          //  this.router.navigate(['/auth/login']); // Redirigir a login si hay error
-        }
-      );
-    }
-    this.themeService.updateHeadContent();
+    getGuardProcessingState().subscribe((isProcessing) => {
+      this.isLoading = isProcessing;
+    });
+  }
+
+  private handleRouteChange(isAppRoute: boolean): void {
+    this.storeDataService.getStore().subscribe((storeData) => {
+      const inactivityMonitorStatus =
+        storeData.init_config?.inactivity_monitor_status !== 'false'; // Defaults to true if not 'false'
+
+      if (isAppRoute && inactivityMonitorStatus) {
+        this.sessionManagementService.startInactivityMonitoring();
+      } else {
+        this.sessionManagementService.stopInactivityMonitoring();
+      }
+    });
   }
 
   private buildNavigationMenu(): void {
@@ -249,16 +276,36 @@ export class AppComponent implements OnInit, OnDestroy {
             },
           ]
         : []),
-      ...(featureFlags.international_account
+      ...(featureFlags.payment_link_module
         ? [
             {
+              name: 'Link de Pago',
+              routeOrFunction: '/app/payment-link',
+              icon: 'link',
+              position: 6,
+              navigation: true,
+              enabled: true,
+            },
+            {
+              name: 'Configurar cobros',
+              routeOrFunction: '/app/costs',
+              icon: 'settings',
+              position: 6,
+              navigation: true,
+              enabled: true,
+            },
+          ]
+        : []),
+      ...(featureFlags.international_account
+        ? [
+            /*             {
               name: 'Facturas',
               routeOrFunction: '/app/invoice',
               icon: 'description',
               position: 2,
               navigation: true,
               enabled: true,
-            },
+            }, */
             {
               name: 'Operaciones',
               routeOrFunction: '/app/operations',
@@ -270,18 +317,10 @@ export class AppComponent implements OnInit, OnDestroy {
           ]
         : []),
       {
-        name: 'Cerrar sesión', // Always enabled
-        action: () => this.logoutUser(), // ✅ Explicitly use an arrow function
-        enabled: true,
-        position: 7,
-        navigation: true,
-        icon: 'logout',
-      },
-      {
         name: 'Mi perfil', // Always enabled
         routeOrFunction: '/app/account-info',
         icon: 'groups',
-        position: 8,
+        position: 9,
         navigation: false,
         enabled: false,
       },
@@ -289,12 +328,21 @@ export class AppComponent implements OnInit, OnDestroy {
         name: 'Ayuda', // Always enabled
         routeOrFunction: '/app/help',
         icon: 'groups',
-        position: 9,
+        position: 10,
         navigation: false,
         enabled: false,
       },
     ];
-
+    if (!this.isInIframe) {
+      menuItems.push({
+        name: 'Cerrar sesión', // Always enabled
+        action: () => this.logoutUser(), // ✅ Explicitly use an arrow function
+        enabled: true,
+        position: 6,
+        navigation: true,
+        icon: 'logout',
+      });
+    }
     this.sidenavService.addItems(menuItems);
   }
 
@@ -303,7 +351,12 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
     }
-    this.sessionManagementService.stopMonitoring();
+    if (this.featureFlagsSubscription) {
+      this.featureFlagsSubscription.unsubscribe();
+    }
+    // Stop both inactivity and token expiration monitoring
+    this.sessionManagementService.stopInactivityMonitoring();
+    this.sessionManagementService.stopTokenExpirationMonitoring();
   }
 
   private addFocusListener(): void {

@@ -1,0 +1,11 @@
+<div class="filter-modal">
+    <h2>{{ data.title }}</h2>
+    <div class="filter-options">
+      <button *ngFor="let option of data.options"
+              (click)="selectOption(option)"
+              [class.selected]="option === data.selected">
+        {{ option }}
+      </button>
+    </div>
+  </div>
+  

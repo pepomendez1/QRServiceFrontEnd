@@ -44,80 +44,95 @@ export class NewPasswordComponent {
     private cd: ChangeDetectorRef,
     private breakpointObserver: BreakpointObserver
   ) {
-    this.authForm = this.fb.group({
-      // username: ['', [Validators.required, Validators.email]],
-      // password: ['', [Validators.required, Validators.minLength(8)]],
-      newPassword: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(12),
-          specialCharacterValidator(),
-          numberValidator(),
-          uppercaseValidator(),
-          lowercaseValidator(),
+    this.authForm = this.fb.group(
+      {
+        // username: ['', [Validators.required, Validators.email]],
+        // password: ['', [Validators.required, Validators.minLength(8)]],
+        newPassword: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(12),
+            specialCharacterValidator(),
+            numberValidator(),
+            uppercaseValidator(),
+            lowercaseValidator(),
+          ],
         ],
-      ],
-      confirmPassword: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(12),
-          specialCharacterValidator(),
-          numberValidator(),
-          uppercaseValidator(),
+        confirmPassword: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(12),
+            specialCharacterValidator(),
+            numberValidator(),
+            uppercaseValidator(),
+          ],
         ],
-      ],
-    });
+      },
+      { validator: this.passwordMatchValidator } // Add custom validator here
+    );
     this.authForm.valueChanges.subscribe(() => {
       this.checkFormValidity();
     });
   }
+
+  // Custom validator to check if passwords match
+  passwordMatchValidator(form: FormGroup) {
+    const password = form.get('newPassword')?.value;
+    const confirmPassword = form.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { passwordMismatch: true };
+  }
+
   ngOnInit(): void {
     this.checkFormValidity();
   }
   checkFormValidity(): void {
-    this.incorrectPass = false;
-    //const password = this.authForm.get('newPassword')?.value;
-    this.isSubmitEnabled =
-      this.authForm.get('newPassword')!.valid &&
-      this.authForm.get('confirmPassword')!.valid &&
-      !this.authForm.hasError('passwordMismatch');
+    const newPasswordValid = this.authForm.get('newPassword')!.valid;
+    const confirmPasswordValid = this.authForm.get('confirmPassword')!.valid;
+
+    // Enable the button if both fields meet the requirements
+    this.isSubmitEnabled = newPasswordValid && confirmPasswordValid;
   }
   hasFormError(controlName: string, errorName: string): boolean {
     return this.authForm.controls[controlName].hasError(errorName);
   }
   onSubmit(): void {
-    if (
-      this.authForm.value.newPassword !== this.authForm.value.confirmPassword
-    ) {
-      this.incorrectPass = true;
-      this.isProcessing = false;
-      return;
+    const newPassword = this.authForm.get('newPassword')!.value;
+    const confirmPassword = this.authForm.get('confirmPassword')!.value;
+
+    // Check if passwords match
+    if (newPassword !== confirmPassword) {
+      // Manually set the error for passwordMismatch
+      this.authForm
+        .get('confirmPassword')!
+        .setErrors({ passwordMismatch: true });
+      return; // Stop form submission
+    }
+
+    // If passwords match, proceed with submission
+    this.errorMessage = null;
+    this.isProcessing = true;
+
+    if (this.debugMode) {
+      console.log('password OK --- Debug Mode');
+      setTimeout(() => {
+        this.isProcessing = false;
+        this.router.navigate(['/pin-code']);
+      }, 3000); // 3-second delay
     } else {
-      this.errorMessage = null;
-      this.isProcessing = true;
-      console.log('Form submitted', this.authForm.value);
-      if (this.debugMode) {
-        console.log('password OK --- Debug Mode');
-        setTimeout(() => {
+      this.authService.completeNewPassword(this.authForm.value).subscribe({
+        next: (response) => {
+          console.log('Autenticación completada exitosamente:', response);
           this.isProcessing = false;
           this.router.navigate(['/pin-code']);
-        }, 3000); // 3-second delay
-      } else {
-        this.authService.completeNewPassword(this.authForm.value).subscribe({
-          next: (response) => {
-            console.log('Autenticación completada exitosamente:', response);
-            this.isProcessing = false;
-            this.router.navigate(['/pin-code']);
-          },
-          error: (error) => {
-            this.errorMessage = 'Error completando nueva contraseña: ' + error;
-            console.error('Error completando nueva contraseña:', error);
-            this.isProcessing = false;
-          },
-        });
-      }
+        },
+        error: (error) => {
+          this.errorMessage = 'Error completando nueva contraseña: ' + error;
+          console.error('Error completando nueva contraseña:', error);
+          this.isProcessing = false;
+        },
+      });
     }
   }
 

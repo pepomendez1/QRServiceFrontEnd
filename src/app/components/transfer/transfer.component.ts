@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TransferContactsComponent } from './transfer-contacts/transfer-contacts.component';
 import { TransferAmountComponent } from './transfer-amount/transfer-amount.component';
-import { ActivityDetailsComponent } from '../treasury/activity-details/activity-details.component';
-import { OtpFormModule } from '@fe-treasury/shared/otp-form/otp-form.module';
+import { ActivityDetailsComponent } from '../activity-details/activity-details.component';
+import { OtpInputModule } from '@fe-treasury/shared/otp-input/otp-input.module';
 import { OTPService } from 'src/app/services/otp.service';
 import { FormatNamePipe } from 'src/app/pipes/format-name.pipe';
 import { ChangeDetectorRef } from '@angular/core';
@@ -18,6 +18,7 @@ import { MessageService } from '@fe-treasury/shared/messages/messages.service';
 import { MessagesModule } from '@fe-treasury/shared/messages/messages.module';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { OtpInputComponent } from '@fe-treasury/shared/otp-input/otp-input.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
 // Side Panel Imports
 import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.service';
@@ -25,6 +26,7 @@ import { SidePanelHeaderComponent } from '@fe-treasury/shared/side-panel/side-pa
 import { SidePanelFooterComponent } from '@fe-treasury/shared/side-panel/side-panel-footer/side-panel-footer.component';
 import { SafeHtml } from '@angular/platform-browser';
 import { finalize } from 'rxjs';
+import { SnackbarService } from '@fe-treasury/shared/snack-bar/snackbar.service';
 @Component({
   selector: 'app-transfer',
   standalone: true,
@@ -36,7 +38,7 @@ import { finalize } from 'rxjs';
     FormsModule,
     MatIconModule,
     MessagesModule,
-    OtpFormModule,
+    OtpInputModule,
     FormatNamePipe,
     MatDialogModule,
     MatProgressSpinnerModule,
@@ -48,6 +50,7 @@ import { finalize } from 'rxjs';
   styleUrls: ['./transfer.component.scss'],
 })
 export class TransferComponent {
+  @ViewChild(OtpInputComponent) otpInputComponent!: OtpInputComponent;
   isLoading: boolean = true;
   userAccountId: number = 0; // ID de la cuenta del usuario
   showContacts: boolean = true;
@@ -72,11 +75,6 @@ export class TransferComponent {
   public buttonEnabled = false;
   public waitingForOtp: boolean = false;
   public userEmail: string | null = null;
-  public otpError: string = '';
-  public incorrectOTP: boolean = false;
-  public clearForm = false;
-  public timeOut: boolean = false;
-  public resetTimer: boolean = false; // Reset timer signal
 
   // Header and Footer
   headerEnable: boolean = true;
@@ -96,16 +94,13 @@ export class TransferComponent {
     private refreshService: RefreshService,
     public treasuryService: TreasuryService,
     private otpService: OTPService,
+    private snackbarService: SnackbarService,
     private messageService: MessageService
   ) {
     this.loadInitialData();
   }
 
   loadInitialData() {
-    this.svgLibrary.getSvg('enter-password').subscribe((svgContent) => {
-      this.passwordImg = svgContent; // SafeHtml type to display SVG dynamically
-      //console.log('Dynamically loaded SVG with store color:', svgContent);
-    });
     this.sidePanelService.togglePadding(false);
     this.isLoading = true;
     this.getUserId();
@@ -174,107 +169,52 @@ export class TransferComponent {
     //   //this.step = 1;
     // }
   }
-  handleButtonEnabled(status: boolean) {
-    this.buttonDisabled = !status;
-  }
 
   askForOtp() {
     this.isLoading = true;
     this.buttonDisabled = true;
     this.userEmail = this.authService.getEmail();
     // first send code to email
-    this.otpService.sendOtp(this.userEmail).subscribe((data: any) => {
-      console.log('Otp sent:', data);
-      this.session = data.Session;
-      this.challengeName = data.ChallengeName;
-      this.waitingForOtp = true;
-      this.isLoading = false;
-    });
-  }
-  handleOtpEvent(otp?: string) {
-    if (otp) {
-      this.otpObject = otp;
-    }
-    return;
-  }
-
-  restartValues(): void {
-    this.session = localStorage.getItem('otpSession');
-    this.challengeName = localStorage.getItem('challengeName');
-
-    if (!this.userEmail || !this.session) {
-      console.error('Missing email or session in localStorage');
-      this.messageService.showMessage('Código incorrecto', 'error');
-      // Optionally, redirect the user back to the request OTP screen or show an error message
-    }
-  }
-  resendCode() {
-    this.incorrectOTP = false;
-    this.buttonDisabled = true;
-
     this.otpService.sendOtp(this.userEmail).subscribe({
-      next: (response) => {
-        console.log('OTP Sent:', response);
-        //localStorage.setItem('otpEmail', this.email || '');
-        localStorage.setItem('otpSession', response.Session);
-        localStorage.setItem('challengeName', response.ChallengeName);
-        this.timeOut = false;
-
-        // Reset timer and force change detection
-        this.resetTimer = true;
-        setTimeout(() => (this.resetTimer = false), 0);
-        this.messageService.showMessage('Código enviado!', 'success');
-        this.clearForm = true;
-        setTimeout(() => (this.clearForm = false), 0);
-
-        setTimeout(() => {
-          this.messageService.clearMessage();
-        }, 5000);
-        this.buttonDisabled = false;
-        this.restartValues();
+      next: (data: any) => {
+        console.log('Otp sent:', data);
+        this.session = data.Session;
+        this.challengeName = data.ChallengeName;
+        this.waitingForOtp = true;
+        this.isLoading = false;
       },
       error: (error: any) => {
         console.error('Error sending OTP:', error);
-        this.messageService.showMessage(
-          'Error en el envío de mail!: ',
-          'error'
-        );
+        this.snackbarService.openError('Error enviando OTP', true, 3000);
+        this.isLoading = false;
+        this.buttonText = 'Continuar';
+        this.waitingForOtp = false;
+        this.accountDetails = true;
         this.buttonDisabled = false;
+        this.step = 2;
       },
     });
   }
-  submitOtp() {
-    this.buttonDisabled = true;
-    const otpString = Object.values(this.otpObject).join('');
 
-    this.otpService
-      .verifyOtp(
-        this.userEmail,
-        otpString,
-        this.session,
-        this.challengeName || ''
-      )
-      .subscribe({
-        next: (data: any) => {
-          console.log('Otp verified:', data);
-          this.waitingForOtp = false;
-          this.confirmTransfer();
-        },
-        error: (error: any) => {
-          this.incorrectOTP = true;
-        },
-      });
+  handleButtonEnabled(status: boolean) {
+    this.buttonDisabled = !status;
   }
-  handleTimeOut(): void {
-    console.log('Time Out');
-    this.timeOut = true;
-    this.messageService.showMessage(
-      'El tiempo de validez del código ha caducado - ',
-      'warning',
-      'Reenviar código',
-      () => this.resendCode()
-    );
+
+  handleButtonText(text: string): void {
+    this.buttonText = text;
   }
+
+  otpValidatedOK() {
+    this.waitingForOtp = false;
+    this.confirmTransfer();
+  }
+
+  submitOtp(): void {
+    if (!this.buttonDisabled) {
+      this.otpInputComponent.submitOtp();
+    }
+  }
+
   confirmTransfer() {
     this.isProcessingTransfer = true;
     this.headerEnable = false;

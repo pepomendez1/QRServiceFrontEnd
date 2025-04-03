@@ -90,6 +90,7 @@ export class CreateCardComponent {
   ];
   shippingCardData: any;
   addressFields: any = [];
+  isIframe: boolean = false;
   public addressForm: FormGroup;
   public provinceList: SimpleSelectValuesId[] = provinceList;
   public selectedCardTypeControl: FormControl;
@@ -122,6 +123,7 @@ export class CreateCardComponent {
   }
 
   ngOnInit(): void {
+    this.isIframe = this.storeDataService.checkIframe();
     this.svgLibrary.getSvg('finances').subscribe((svgContent) => {
       this.financesImg = svgContent; // SafeHtml type to display SVG dynamically
     });

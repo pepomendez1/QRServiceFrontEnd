@@ -1,0 +1,22 @@
+<div class="otp-validation">
+  <div class="otp-content">
+    <div *ngIf="enterOTPImg" [innerHTML]="enterOTPImg"></div>
+    <h1 class="heading-4-700 m-0 p-0">
+      Te enviamos un código al e-mail {{ userMail }}
+    </h1>
+    <p class="paragraph-500 m-0 p-1">{{ OTPdescription }}</p>
+    <app-otp-form
+      class="otp-form"
+      [timeLeft]="timeLeftOTP"
+      [resetTimer]="resetTimer"
+      [clearForm]="clearForm"
+      [incorrectOTP]="incorrectOTP"
+      (otpSubmit)="handleOtpEvent($event)"
+      (timeOut)="handleTimeOut()"
+      (enableButton)="handleButtonState($event)"
+    ></app-otp-form>
+    <button mat-ripple class="btn-link-primary" (click)="resendCode()">
+      <span class="secondary-600-primary">Reenviar código</span>
+    </button>
+  </div>
+</div>

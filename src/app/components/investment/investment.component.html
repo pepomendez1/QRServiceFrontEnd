@@ -4,25 +4,7 @@
 <div class="content" *ngIf="!isMobile; else mobileLayout">
   <span class="left-side">
     <app-available (generalFailure)="getFailureStatus($event)"></app-available>
-    <div class="know-more custom-card">
-      <div class="main-content">
-        <div class="cupons-img" *ngIf="svg" [innerHTML]="svg"></div>
-
-        <div class="information">
-          <h2 class="caption-500">INVERSIONES</h2>
-          <h2 class="heading-5-700-primary">Hacé que tu plata rinda</h2>
-          <p class="secondary-500">
-            Seguí tus rendimientos diarios, invertí tu dinero fácilmente y usalo
-            cuando quieras.
-          </p>
-        </div>
-      </div>
-      <div class="know-more-button">
-        <button class="btn-ghost-color btn-lg" (click)="openFAQPanel()">
-          Conocer más
-        </button>
-      </div>
-    </div>
+    <app-know-more-investments></app-know-more-investments>
   </span>
 
   <span class="right-side">
@@ -34,24 +16,7 @@
   <div class="content">
     <app-available (generalFailure)="getFailureStatus($event)"></app-available>
     <app-returns class="returns"></app-returns>
-    <div class="know-more custom-card">
-      <div class="main-content">
-        <div class="cupons-img" *ngIf="svg" [innerHTML]="svg"></div>
-        <div class="information">
-          <h2 class="caption-500">INVERSIONES</h2>
-          <h2 class="heading-5-700-primary">Hacé que tu plata rinda</h2>
-          <p class="secondary-500">
-            Seguí tus rendimientos diarios, invertí tu dinero fácilmente y usalo
-            cuando quieras.
-          </p>
-        </div>
-      </div>
-      <div class="know-more-button">
-        <button class="btn btn-ghost-color" (click)="openFAQPanel()">
-          Conocer más
-        </button>
-      </div>
-    </div>
+    <app-know-more-investments></app-know-more-investments>
   </div>
 </ng-template>
 }

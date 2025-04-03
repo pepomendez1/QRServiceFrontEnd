@@ -1,4 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,37 +38,62 @@ import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-
 export class ManageDevicesComponent {
   @Output() backToOptions = new EventEmitter<void>();
   devices: any[] = []; // Store device list here
+  paginationToken: string | null = null;
+  loadingMore = false;
+  hasMoreDevices: boolean = true;
   loading = true; // Show loading indicator
   errorMessage: string | null = null;
   currentDeviceKey: string | null = null;
   constructor(
     private snackBarService: SnackbarService,
     private authService: AuthService,
+    private cdr: ChangeDetectorRef,
     private dialog: MatDialog,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.getActiveDevices();
+    this.getActiveDevices(true);
   }
 
-  private getActiveDevices(): void {
-    this.loading = true;
-    this.authService.listActiveDevices().subscribe({
-      next: (devices) => {
-        this.devices = devices;
-        console.log('dispositivos ', devices);
+  // Fetch devices (initial or additional)
+  private getActiveDevices(initialLoad = false): void {
+    if (initialLoad) {
+      this.loading = true; // Show main loader for initial load
+      this.devices = []; // Clear the existing devices list
+      this.paginationToken = null; // Reset pagination token
+    } else {
+      this.loadingMore = true; // Show "Load More" spinner
+    }
+
+    this.authService.listActiveDevices(10, this.paginationToken).subscribe({
+      next: (result) => {
+        // Append new devices to the existing list
+        this.devices = this.devices.concat(result.devices);
+        this.paginationToken = result.paginationToken;
+        this.hasMoreDevices = !!this.paginationToken; // Check if there are more devices to load
         this.currentDeviceKey = sessionStorage.getItem('currentDeviceKey');
+        // Update loading states
         this.loading = false;
+        this.loadingMore = false;
       },
       error: (error) => {
         console.error('Error fetching devices:', error);
         this.errorMessage =
           'Error cargando dispositivos. Intente en otro momento';
         this.handleError(this.errorMessage);
+
+        // Update loading states in case of error
         this.loading = false;
+        this.loadingMore = false;
       },
     });
+  }
+
+  loadMoreDevices(): void {
+    if (this.hasMoreDevices && !this.loadingMore) {
+      this.getActiveDevices(); // Fetch additional devices
+    }
   }
 
   handleArrowBack() {
@@ -175,15 +205,15 @@ export class ManageDevicesComponent {
     console.log(`Logging out from device: ${deviceKey}`);
     this.authService.logoutCognitoDevice(deviceKey).subscribe({
       next: () => {
-        console.log(`Logged out from device with key: ${deviceKey}`);
-        // Update UI by removing the logged-out device
-        if (deviceKey === this.currentDeviceKey) {
-          // Clearing auth tokens
-          sessionStorage.removeItem('auth_data');
-          sessionStorage.removeItem('currentDeviceKey');
-          // Redirect to login page
-          this.router.navigate(['/auth/login']);
-        } else this.getActiveDevices(); // Refresh the device list
+        // Clear the local devices list and refetch
+        this.devices = []; // Clear the existing list
+        this.paginationToken = null; // Reset pagination token
+        this.hasMoreDevices = true; // Reset pagination state
+
+        // Refetch the devices list
+        this.getActiveDevices(true); // Pass `true` to indicate initial load
+        // Trigger change detection
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al olvidar dispositivo: ', err);
@@ -213,15 +243,25 @@ export class ManageDevicesComponent {
       this.errorMessage = 'Failed to identify the current device.';
       return;
     }
+
+    this.loading = true;
     this.authService.logoutAllDevices().subscribe({
       next: () => {
         console.log('Logged out from all devices');
-        this.getActiveDevices();
-        // Update UI by removing the logged-out device
-        // localStorage.removeItem('auth_data');
-        // localStorage.removeItem('currentDeviceKey');
-        // Redirect to login page
-        // this.router.navigate(['/auth/login']);
+
+        // Clear the existing devices list
+        this.devices = [];
+        this.paginationToken = null; // Reset pagination token
+        this.hasMoreDevices = true; // Reset pagination state
+        this.loading = false;
+
+        // Refetch the devices list
+        // this.getActiveDevices(true); // Pass `true` to indicate initial load
+
+        // Optionally, clear storage and redirect to login
+        // sessionStorage.removeItem('auth_data');
+        sessionStorage.removeItem('currentDeviceKey');
+        this.authService.logoutUser();
       },
       error: (err: any) => {
         console.error('Error al olvidar dispositivos: ', err);
