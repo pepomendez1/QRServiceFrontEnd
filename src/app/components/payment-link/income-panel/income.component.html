@@ -1,0 +1,111 @@
+<div class="right-panel">
+  <!-- btn-ghost-color btn-lg clear-filters -->
+<div class="income-filters">
+  <button mat-button class="btn-filter" [matMenuTriggerFor]="linkMenu">
+    {{ selectedFilters.link || 'Link' }} <mat-icon>expand_more</mat-icon>
+  </button>
+  <mat-menu #linkMenu="matMenu">
+    <button mat-menu-item *ngFor="let option of linkOptions" (click)="setFilter('link', option)">
+      {{ option }}
+    </button>
+  </mat-menu>
+
+  <button mat-button class="btn-filter" [matMenuTriggerFor]="periodMenu">
+    {{ selectedFilters.period || 'Período' }} <mat-icon>expand_more</mat-icon>
+  </button>
+  <mat-menu #periodMenu="matMenu">
+    <button mat-menu-item *ngFor="let option of periodOptions" (click)="setFilter('period', option)">
+      {{ option }}
+    </button>
+  </mat-menu>
+
+  <button mat-button class="btn-filter" [matMenuTriggerFor]="statusMenu">
+    {{ selectedFilters.status || 'Estado' }} <mat-icon>expand_more</mat-icon>
+  </button>
+  <mat-menu #statusMenu="matMenu">
+    <button mat-menu-item *ngFor="let option of statusOptions" (click)="setFilter('status', option)">
+      {{ option }}
+    </button>
+  </mat-menu>
+
+  <button class="btn-ghost-color btn-lg clear-filters" (click)="clearFilters()">Borrar filtros</button>
+</div>
+
+<!-- ✅ Tabla en Desktop -->
+<table class="income-table">
+  <thead>
+    <tr>
+      <th class="desktop-only">Link</th>
+      <th>Venta</th>
+      <th>Liquidación</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let income of filteredTransactions">
+      <td class="desktop-only">{{ income.payment_link_description || "N/A" }}</td>
+      <td>
+        <div class="secondary-500">{{ income.created_at | date: 'dd/MM/yyyy' }}</div>
+        <div class="paragraph-600">{{ income.formattedTotalAmount }}</div>
+      </td>
+      <td>
+        <div class="secondary-500">{{ income.settlement_date | date: 'dd/MM/yyyy' }}</div>
+        <div class="paragraph-600">{{ income.formattedMerchantAmount }}</div>
+      </td>
+      <td>
+        <span class="status-label"
+          [ngClass]="{ 'liquidado': income.status === 'Liquidado', 'por-liquidar': income.status === 'Por liquidar' }">
+          {{ income.status }}
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ✅ Tarjetas en Mobile con Header Fijo -->
+<div class="income-mobile-container">
+  <div class="income-mobile-header">
+    <span>Venta</span>
+    <span>Liquidación</span>
+    <span>Estado</span>
+  </div>
+
+  <div class="income-card" *ngFor="let income of filteredTransactions">
+    <div class="income-column">
+      <span class="secondary-500">{{ income.created_at | date: 'dd/MM/yyyy' }}</span>
+      <span class="paragraph-600">{{ income.formattedTotalAmount }}</span>
+    </div>
+    <div class="income-column">
+      <span class="secondary-500">{{ income.settlement_date | date: 'dd/MM/yyyy' }}</span>
+      <span class="paragraph-600">{{ income.formattedMerchantAmount }}</span>
+    </div>
+    <div class="income-status">
+      <span class="status-label"
+        [ngClass]="{ 'liquidado': income.status === 'Liquidado', 'por-liquidar': income.status === 'Por liquidar' }">
+        {{ income.status }}
+      </span>
+    </div>
+  </div>
+</div>
+
+
+<!-- Pagination -->
+<div class="pagination-container">
+  <select [(ngModel)]="pageSize" (change)="fetchTransactions()" class="page-size-dropdown">
+    <option *ngFor="let size of [10, 25, 50, 100]" [value]="size">{{ size }}</option>
+  </select>
+
+  <span class="rows-label">filas por página</span>
+
+  <span class="page-info">
+    {{ getStartIndex() }}-{{ getEndIndex() }} de {{ totalRecords }}
+  </span>
+
+  <button (click)="previousPage()" [disabled]="currentPage === 1" class="nav-button">
+    ←
+  </button>
+  <button (click)="nextPage()" [disabled]="currentPage * pageSize >= totalRecords" class="nav-button">
+    →
+  </button>
+</div>
+

@@ -1,1 +1,152 @@
-<p>international-transfer works!</p>
+<div class="transfer-wrapper">
+  <app-side-panel-header
+    *ngIf="headerEnable"
+    [title]="'Enviar dinero'"
+    [arrowBackEnabled]="arrowBackEnabled"
+    (arrowBack)="handleArrowBack()"
+    [closeButtonEnabled]="true"
+    [confirmRequired]="true"
+    (closePressed)="openConfirmationDialog()"
+  ></app-side-panel-header>
+
+  <div class="content">
+    @if (isLoading) {
+    <div class="loading-container">
+      <mat-spinner class="center-spinner"></mat-spinner>
+    </div>
+    } @else { @switch (step) { @case (0) {
+    <div class="step-container">
+      @if (showContacts) {
+      <app-transfer-contacts
+        (selectedContact)="handleSelectedContact($event)"
+        (selectedContactTemp)="handleSelectedContactTemp($event)"
+        (enableButton)="handleButtonEnabled($event)"
+        (contactType)="handleContactType($event)"
+        (isLoadingContacts)="handleIsLoadingContacts($event)"
+      ></app-transfer-contacts>
+      } @else if (typeDestination === 'new' && !showContacts && accountOwner){
+      <!-- Mostrar los detalles del propietario de la cuenta si es encontrado -->
+      <div class="transfer-details">
+        <span class="heading-5-600"
+          >¿Esta es la persona a quién querés trasferirle?
+        </span>
+        <div class="account-owner-details">
+          <span class="heading-5-700 account-name">{{
+            accountOwner.name | formatName
+          }}</span>
+
+          <span class="secondary-400"
+            >CUIT: {{ accountOwner.document_number }}</span
+          >
+          <span class="secondary-400">{{ accountOwner.bank_name }}</span>
+          <span class="secondary-400"
+            >CBU/CVU:
+            {{ accountOwner.cbu ? accountOwner.cbu : accountOwner.cvu }}</span
+          >
+          <span class="secondary-400">Alias: {{ accountOwner.alias }}</span>
+          <span class="secondary-400">
+            {{
+              accountOwner.type === "CC" ? "Cuenta Corriente" : "Caja de Ahorro"
+            }}</span
+          >
+        </div>
+      </div>
+      }
+    </div>
+    } @case (1) {
+    <div class="step-container">
+      <app-transfer-amount
+        [availableFunds]="availableFunds"
+        (enableButton)="handleButtonEnabled($event)"
+        (confirmAmount)="nextStep()"
+        (setAmount)="getAmount($event)"
+      ></app-transfer-amount>
+    </div>
+    } @case (2) {
+    <!-- Paso 2: Confirmación de Transferencia -->
+    <div class="step-container">
+      @if (!isProcessingTransfer && !waitingForOtp && accountDetails) {
+      <div class="confirm-transfer">
+        <span class="heading-5-600"> Revisá si está todo bien</span>
+        <div class="summary-wrapper">
+          <div class="amount-summary">
+            <span class="info-section secondary-400">Monto</span>
+            <div class="heading-5-700">$&nbsp;{{ amount }}</div>
+          </div>
+
+          <hr width="100%" size="1px" color="#EBEBEB" />
+
+          <div class="recipient-info">
+            <span class="info-section secondary-400">Destino</span>
+            <span class="subheading-700">{{
+              accountOwner.name | formatName
+            }}</span>
+            <span class="secondary-400-dark">
+              CUIT: {{ accountOwner.document_number }}</span
+            >
+            <span class="secondary-400-dark"
+              >Banco: {{ accountOwner.bank_name }}</span
+            >
+            <span class="secondary-400-dark"
+              >CBU/Alias: {{ accountOwner.cbu || accountOwner.alias }}</span
+            >
+          </div>
+          <hr width="100%" size="1px" color="#EBEBEB" />
+
+          <div class="recipient-info">
+            <span class="info-section secondary-400">Motivo (Opcional)</span>
+            <div class="input-container paragraph-500">
+              <input
+                class="input-description paragraph-500"
+                type="text"
+                placeholder="Ej: varios"
+                [(ngModel)]="transferMotive"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      } @else if (waitingForOtp) {
+      <div class="otp-content">
+        <app-otp-input></app-otp-input>
+      </div>
+      <app-messages class="w-100"></app-messages>
+      } @else if (isProcessingTransfer) {
+      <div class="loading-transfer-container">
+        <div class="spinner-wait">
+          <mat-spinner></mat-spinner>
+          <span class="heading-5-700"
+            >Esta operación puede demorar unos minutos</span
+          >
+        </div>
+      </div>
+      }
+    </div>
+    } @case (3) { @if (transferSuccess) {
+    <div class="success-container">
+      <mat-icon>check</mat-icon>
+      <span class="heading-5-700">Transferencia realizada</span>
+    </div>
+    } @else if (!transferSuccess) {
+    <div class="error-container">
+      <mat-icon>close</mat-icon>
+      <div class="error-text">
+        <span class="heading-5-700">Transferencia rechazada</span>
+        <span class="paragraph-600">
+          No pudimos realizar tu transferencia. Por favor revisa los datos e
+          intenta nuevamente</span
+        >
+      </div>
+    </div>
+    } } } }
+  </div>
+
+  <app-side-panel-footer
+    *ngIf="footerEnable && !isLoading"
+    class="w-100"
+    [buttonText]="buttonText"
+    buttonStyle="filled"
+    [buttonDisabled]="buttonDisabled"
+    (buttonClicked)="nextStep()"
+  ></app-side-panel-footer>
+</div>

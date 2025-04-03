@@ -1,0 +1,37 @@
+.amount-display {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex-direction: row; // Change to row so $ and amount are inline
+    gap: 4px; // Adds spacing between currency symbol and input
+  }
+  
+  .symbol {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .amount-input {
+    border: none;
+    background: transparent;
+    font-size: 32px;
+    width: 100%;
+    text-align: left;
+    outline: none;
+    font-weight: bold;
+    padding: 4px 0;
+  }
+  
+  .amount-container {
+    display: flex;
+    align-items: baseline; // Aligns decimals with the main amount
+    gap: 2px;
+  }
+
+  .separator {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ebebeb;
+    margin-top: 4px;
+  }
+  

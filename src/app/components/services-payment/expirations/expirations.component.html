@@ -34,14 +34,15 @@
         </div>
 
         <!-- No transactions message -->
-        <div *ngIf="!loading && !expirations.length" class="no-transactions">
-          <img src="../../../../assets/images/problem.svg" alt="No hay transacciones" />
+        <div *ngIf="!loading && !expirations.notifications?.length" class="no-transactions">
+          <div *ngIf="problemImg" [innerHTML]="problemImg"></div>
+          <!-- <img src="../../../assets/images/problem.svg" alt="No hay transacciones" /> -->
           <p class="secondary-500-light">Aún no tenés vencimientos.</p>
         </div>
 
         <!-- List of transactions -->
-        <div *ngIf="!loading && expirations.length" class="activities-container">
-          <div class="activity-item" *ngFor="let activity of expirations">
+        <div *ngIf="!loading && expirations.notifications?.length" class="activities-container">
+          <div class="activity-item" *ngFor="let activity of expirations.notifications">
             <mat-checkbox color="primary" required [(ngModel)]="activity.checked"></mat-checkbox>
 
             <div class="activity-info">
@@ -50,10 +51,10 @@
 
               <div class="details">
                 <div class="paragraph-600">
-                  {{ activity.description ? activity.description : "Sin descripción" }}
+                  {{ activity.type ? activity.type : "Sin descripción" }}
                 </div>
                 <div class="secondary-500-light">
-                  {{ activity.merchant_name ? activity.merchant_name : "Comercio desconocido" }}
+                  {{ activity.companyName ? activity.companyName : "Comercio desconocido" }}
                 </div>
               </div>
 
@@ -64,13 +65,12 @@
               </div>
               <div class="activity-date">
 
-                <div *ngIf="activity.vencido" class="vencimiento">
+                <div *ngIf="isToday(activity.expirationDate)" class="vencimiento">
                   <span class="hightlight-text">Vence hoy</span>
                   <mat-icon color="primary">notifications</mat-icon>
                 </div>
 
-                <span *ngIf="!activity.vencido && activity.autodebito">Se autodebita el {{ activity.fechaAutodebito
-                  }}</span>
+                <!-- <span *ngIf="!activity.vencido && activity.autodebito">Se autodebita el {{ activity.fechaAutodebito }}</span> -->
               </div>
             </div>
           </div>
@@ -78,10 +78,10 @@
 
         <!-- Show More Button with loader -->
 
-        <div class="btn-cta-ghost" (click)="showMoreTransactions()" *ngIf="expirations.length < totalItems">
+        <!-- <div class="btn-cta-ghost" (click)="showMoreTransactions()" *ngIf="expirations.length < totalItems">
           <span *ngIf="!loadingMore" class="paragraph-600">Mostrar más consumos</span>
           <mat-spinner *ngIf="loadingMore" mode="indeterminate" [diameter]="24"></mat-spinner>
-        </div>
+        </div> -->
 
         <!-- <div *ngIf="activities.length < totalItems" class="show-more-container">
           <button
@@ -106,7 +106,7 @@
         <div class="total">
           <span>Total a pagar <strong>{{ totalSeleccionado | currency:'ARS':'symbol':'1.0-0' }}</strong></span>
         </div>
-        <button mat-flat-button class="btn-cta-filled w-100 btn-lg" [disabled]="cantidadSeleccionada === 0">
+        <button mat-flat-button class="btn-cta-filled w-100 btn-lg" [disabled]="loading || cantidadSeleccionada === 0" (click)="paySelectedItem()">
           Pagar {{ cantidadSeleccionada }} seleccionado{{ cantidadSeleccionada > 1 ? 's' : '' }}
         </button>
       </div>
@@ -141,7 +141,7 @@
         <!-- Contenido de la segunda pestaña -->
         <!-- List of history -->
         <div *ngIf="!loading && filteredHistory.length" class="history-container">
-          <div class="activity-item" *ngFor="let activity of filteredHistory">
+          <div class="activity-item" *ngFor="let activity of filteredHistory" (click)="onActivityClick(activity)">
 
             <div class="activity-info">
 

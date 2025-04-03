@@ -6,7 +6,7 @@ import { MaterialModule } from '@fe-treasury/shared/material-components.module';
 import { BiometricValidationModule } from '@fe-treasury/shared/biometric-validation/biometric-validation.module';
 import { CustomHeaderOnbModule } from '@fe-treasury/shared/custom-header-onb/custom-header-onb.module';
 import { MessagesModule } from '@fe-treasury/shared/messages/messages.module';
-import { OtpFormModule } from '@fe-treasury/shared/otp-form/otp-form.module';
+import { OtpInputModule } from '@fe-treasury/shared/otp-input/otp-input.module';
 import { SecondsToTimeStringPipe } from 'src/app/pipes/seconds-to-time-string.pipe';
 
 import { RecoverySelectionComponent } from './recovery-selection/recovery-selection.component';
@@ -24,7 +24,7 @@ import { PinCodeValidationComponent } from './pin-code-validation/pin-code-valid
   imports: [
     CommonModule,
     OnbFooterComponent,
-    OtpFormModule,
+    OtpInputModule,
     FormsModule,
     PasswordRecoveryRoutingModule,
     MessagesModule,

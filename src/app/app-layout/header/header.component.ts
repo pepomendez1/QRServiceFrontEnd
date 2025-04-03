@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+
 import { MatSidenav } from '@angular/material/sidenav';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -8,6 +9,8 @@ import { ThemeService } from 'src/app/services/layout/theme-service';
 import { SidenavService } from '../sidenav/sidenav.service';
 import { SidenavItem } from '../sidenav/sidenav-item.interface';
 import { StoreDataService } from 'src/app/services/store-data.service';
+import { FeatureFlagsService } from 'src/app/services/modules.service';
+import { FocusMonitor } from '@angular/cdk/a11y';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -19,18 +22,29 @@ export class HeaderComponent implements OnInit {
   currentRouteName: string = ''; // This will store the name of the current route
   sideNavigation$!: Observable<boolean>;
   topNavigation$!: Observable<boolean>;
-  toggleModeEnabled: boolean = false; // To store the value of toggle_mode_enable
+  toggleThemeEnabled: boolean = false; // To store the value of toggle_mode_enable
+  toggleModuleEnabled: boolean = false; // To store the value of toggle_mode_enable
   defaultOption: string = 'left'; // Default option for the slider button
-
+  featureFlags: any = null;
+  selectedModule: any;
+  isSidenavClosed = true; // Track whether the sidenav is closed
+  isIframe: boolean = false;
   constructor(
+    private featureFlagsService: FeatureFlagsService,
     private router: Router,
-    private activatedRoute: ActivatedRoute,
     private storeService: StoreDataService,
+    private storeDataService: StoreDataService,
     private themeService: ThemeService,
     private sidenavService: SidenavService
   ) {}
 
   ngOnInit(): void {
+    this.selectedModule = this.featureFlagsService.getFeatureFlags()
+      .international_account
+      ? 'international_account'
+      : 'basic_modules';
+    console.log('selected module for dropdon----', this.selectedModule);
+    this.isIframe = this.storeDataService.checkIframe();
     // Listen for route changes
     this.sideNavigation$ = this.themeService.config$.pipe(
       map((config) => config.navigation === 'side')
@@ -51,8 +65,11 @@ export class HeaderComponent implements OnInit {
     this.updateRouteName();
     this.storeService.getStore().subscribe((config) => {
       const initConfig = config.init_config;
-      this.toggleModeEnabled = initConfig?.toggle_mode_enable || false;
 
+      this.toggleThemeEnabled =
+        initConfig?.toggle_mode_enable === 'true' ? true : false;
+      this.toggleModuleEnabled =
+        initConfig?.select_module_enable === 'true' ? true : false;
       const defaultMode = initConfig?.default_mode || 'light'; // Default to light if not provided
       this.defaultOption = defaultMode === 'dark' ? 'right' : 'left'; // Moon for dark, Sun for light
     });
@@ -80,10 +97,27 @@ export class HeaderComponent implements OnInit {
     });
   }
   goToAccountInfo(): void {
-    this.router.navigate(['/app/account-info']);
+    this.router.navigate(['app/account-info']);
   }
 
   goToHelp(): void {
     this.router.navigate(['app/help']);
+  }
+
+  onModuleChange(event: {
+    value: 'basic_modules' | 'international_account';
+  }): void {
+    const selectedModule = event.value;
+
+    // Update feature flags based on the selected module
+    if (selectedModule === 'international_account') {
+      this.featureFlagsService.updateFeatureFlags({
+        international_account: true,
+      });
+    } else {
+      this.featureFlagsService.updateFeatureFlags({
+        basic_modules: true,
+      });
+    }
   }
 }

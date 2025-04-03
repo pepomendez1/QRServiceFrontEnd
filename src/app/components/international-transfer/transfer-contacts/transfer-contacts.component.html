@@ -1,0 +1,176 @@
+@if (isLoading) {
+<div class="loading-container">
+  <mat-spinner></mat-spinner>
+  <!-- Spinner de Material -->
+</div>
+} @else {
+<div class="transfer-contacts-container">
+  <div class="input-search">
+    <span class="contact-title heading-5-600"> Nuevo contacto</span>
+
+    <div class="add-input-container" (click)="searchAccountOwner()">
+      <div class="add-contact-button">
+        <mat-icon class="material-symbols-outlined">add_circle</mat-icon>
+        <button
+          mat-icon-button
+          class="outline-button"
+          [disabled]="!isValid"
+        ></button>
+        <div class="contact-info">
+          <span class="paragraph-600"> Añadir un nuevo contacto </span>
+        </div>
+
+        <mat-icon class="material-symbols-outlined"
+          >keyboard_arrow_right</mat-icon
+        >
+      </div>
+    </div>
+    <mat-error *ngIf="notFoundOwner" class="form-error">
+      <mat-icon class="material-symbols-outlined">error</mat-icon>
+      Los datos ingresados son incorrectos. Revisalos y volvé a ingresarlos.
+    </mat-error>
+  </div>
+  <!-- Lista de contactos -->
+  <div class="contact-list">
+    <div class="contact-selector">
+      <span class="heading-5-600"> Contactos frecuentes</span>
+
+      <div class="button-group">
+        <!-- The slider for background animation -->
+        <div
+          class="slider"
+          [ngClass]="{
+            favourites: typeDestination === 'favourites',
+            last: typeDestination === 'last'
+          }"
+        ></div>
+        <div
+          class="option body-2"
+          [class.active]="typeDestination === 'last'"
+          (click)="selectOption('last')"
+        >
+          Últimos
+        </div>
+        <div
+          class="option body-2"
+          [class.active]="typeDestination === 'favourites'"
+          (click)="selectOption('favourites')"
+        >
+          Favoritos
+        </div>
+      </div>
+    </div>
+    <div class="contact-list-container">
+      <ng-container *ngIf="filteredContacts.length > 0; else noContacts">
+        <div
+          *ngFor="let contact of filteredContacts"
+          class="contact-item"
+          (click)="onSelect(contact)"
+        >
+          <div
+            @fadeStart
+            class="contact-row"
+            [ngClass]="{
+              'selected-contact': contact.id === selectedContactId
+            }"
+          >
+            <div class="contact-info-wrapper">
+              <ng-container *ngIf="!contact.isDeleteMode; else confirmDelete">
+                <div *ngIf="!contact.isFavMode" class="contact-info">
+                  <span class="paragraph-600">{{
+                    contact.name | formatName
+                  }}</span>
+                  <span class="secondary-500-light"
+                    >Cuenta en {{ contact.currency }} acabada en
+                    {{ contact.accountNumber | slice : -4 }}</span
+                  >
+                </div>
+                <div
+                  *ngIf="contact.isFavMode"
+                  class="paragraph-600 confirm-delete"
+                >
+                  <span>{{ favProcessingMessage }}</span>
+                  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                </div>
+              </ng-container>
+              <ng-template #confirmDelete>
+                <div
+                  *ngIf="!processingDeleteContact"
+                  class="paragraph-600 confirm-delete"
+                >
+                  <span
+                    >Eliminar a {{ contact.name | formatName }} de tu lista de
+                    contactos?</span
+                  >
+                </div>
+                <div
+                  *ngIf="processingDeleteContact"
+                  class="paragraph-600 confirm-delete"
+                >
+                  <span>Eliminando contacto ...</span>
+                  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                </div>
+              </ng-template>
+            </div>
+            <div class="actions-button">
+              <ng-container *ngIf="!contact.isDeleteMode; else deleteActions">
+                <button
+                  mat-icon-button
+                  class="outline-button"
+                  (click)="toggleFavorite(contact)"
+                >
+                  <mat-icon
+                    [ngClass]="
+                      contact.favorite
+                        ? 'material-symbols-filled'
+                        : 'material-symbols-outlined'
+                    "
+                    >star</mat-icon
+                  >
+                </button>
+                <button
+                  mat-icon-button
+                  class="outline-button"
+                  (click)="enableDeleteMode(contact)"
+                >
+                  <mat-icon class="material-symbols-outlined">delete</mat-icon>
+                </button>
+              </ng-container>
+              <ng-template #deleteActions>
+                <button
+                  mat-icon-button
+                  class="outline-button"
+                  (click)="confirmDeleteContact(contact)"
+                  [disabled]="processingDeleteContact"
+                >
+                  <mat-icon class="material-symbols-outlined">check</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  class="outline-button"
+                  (click)="cancelDeleteMode(contact)"
+                  [disabled]="processingDeleteContact"
+                >
+                  <mat-icon class="material-symbols-outlined">close</mat-icon>
+                </button>
+              </ng-template>
+            </div>
+          </div>
+          <hr width="100%" size="1px" margin="0" color="#F4F4F4" />
+        </div>
+      </ng-container>
+      <ng-template #noContacts>
+        <div class="no-contacts">
+          <div
+            *ngIf="problemImg"
+            [innerHTML]="problemImg"
+            alt="No Contacts"
+          ></div>
+          <!-- <img src="assets/images/problem.svg" alt="No Contacts" /> -->
+          <p class="message paragraph-500">{{ getNoContactsMessage() }}</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+}

@@ -1,0 +1,16 @@
+<div class="amount-display">
+    <span class="symbol">$</span>
+    <div class="amount-container">
+      <input
+        type="text"
+        class="amount-input heading-4-700"
+        placeholder="0,00"
+        [value]="amount"
+        (keydown)="handleKeyDown($event)"
+        [disabled]="disabled"
+        #amountInput
+      />
+    </div>
+  </div>
+  <hr class="separator" />
+  

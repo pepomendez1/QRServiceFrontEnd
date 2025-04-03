@@ -2,8 +2,9 @@
   align-items: center;
   justify-content: space-between;
   display: flex;
-  height: 100vh; /* Full viewport height */
+  height: 100dvh; /* Full viewport height */
   flex-direction: column;
+  overflow: hidden; /* Prevent content from overflowing */
 }
 
 .pin-code-main-container {
@@ -14,7 +15,8 @@
 
 }
 .pin-code-container {
-
+  display: flex;
+  flex-direction: column;
   width: 100%;
 
   .section-content {
@@ -24,6 +26,18 @@
     flex-direction: column;
     overflow: hidden;
     justify-content: space-between;
+
+    .pin-form {
+      flex:1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .pin-form-container{
+        flex:1;
+      display: flex;
+      flex-direction: column;
+      }
+    }
   }
 
   .button-container {
@@ -40,62 +54,66 @@
   }
 }
 @media screen and (max-width: 840px) {
+  .pin-code-container-full {
+    height: 100dvh;
+  }
 
   .pin-code-main-container {
-    margin-top: 0em;
-    height: unset;
     max-width: unset;
     width: 100%;
+    box-shadow: none;
     padding: 0;
     border-radius: 0;
-    box-shadow: none;
-    .pin-code-container {
-      padding: 20px;
-      justify-content: center;
-      height: 100vh;
-    .pin-form, .confirm-pin-form{
+    margin-top: 0;
+    flex-grow: 1; // Allow the main container to grow
+  }
+
+  .pin-code-container {
+    padding: 1.5em;
+    justify-content: space-between; // Space between pin inputs and button
+    flex-grow: 1; // Allow the container to grow
+
+    .pin-form {
+      height: 100%;
+      flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
 
-      .pin-form-container{
-        flex:1
+      .pin-form-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; // Align pin inputs to the top
       }
+
       .button-container {
-      bottom: 0;
-      left: 0;
-      width: 100%;
-    }
-    }
-    .pin-form{
-      height: 73vh
-    }
-    .confirm-pin-form {
-      height: 80vh;
-    }
-
-
-  }
-}
-}
-
-@media screen and (max-width: 362px) {
-  .pin-code-main-container {
-    margin-top: 0;
-    height: unset;
-    max-width: unset;
-    width: 100%;
-    padding: 0;
-    border-radius: 0;
-    box-shadow: none;
-    height: 100vh;
-    .pin-code-container {
-    .pin-form{
-      height: 65vh
-    }
-    .confirm-pin-form {
-      height: 75vh;
+        position: sticky; // Stick the button to the bottom
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%; // Full width for the button container
+      }
     }
   }
 }
+// iPhone-specific adjustments
+@media only screen and (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 3) {
+  .pin-code-container-full {
+    height: 100dvh; /* Ensure dynamic viewport height is used */
+  }
+
+  .pin-code-container {
+    padding: 20px; /* Reduce padding for smaller iPhone screens */
+
+    .pin-form {
+      .pin-form-container {
+        padding-top: 10px; /* Reduce padding for smaller iPhone screens */
+      }
+
+      .button-container {
+        padding: 10px; /* Reduce padding for smaller iPhone screens */
+      }
+    }
+  }
 }

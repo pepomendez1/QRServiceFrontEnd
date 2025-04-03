@@ -1,0 +1,16 @@
+.voucher-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.overlay-icons {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px;
+  border-radius: 4px;
+}

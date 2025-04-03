@@ -34,6 +34,7 @@ import { EndOnboardingSuccessComponent } from './end-onb-success/end-onb-succes.
     OnboardingRoutingModule,
     MaterialModule,
     ReactiveFormsModule,
+    OnHoldScreenModule,
     LineStepperModule,
   ],
   providers: [],

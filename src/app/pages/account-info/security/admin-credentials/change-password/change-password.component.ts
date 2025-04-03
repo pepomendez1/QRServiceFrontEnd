@@ -30,7 +30,8 @@ import {
   lowercaseValidator,
 } from 'src/app/utils/form-validators';
 
-import { OtpFormModule } from '@fe-treasury/shared/otp-form/otp-form.module';
+import { OtpInputModule } from '@fe-treasury/shared/otp-input/otp-input.module';
+import { OtpInputComponent } from '@fe-treasury/shared/otp-input/otp-input.component';
 import { SafeHtml } from '@angular/platform-browser';
 @Component({
   selector: 'app-change-password',
@@ -41,7 +42,7 @@ import { SafeHtml } from '@angular/platform-browser';
     MatIconModule,
     MatInputModule,
     MatCardModule,
-    OtpFormModule,
+    OtpInputModule,
     FormsModule,
     ReactiveFormsModule,
     MessagesModule,
@@ -54,22 +55,24 @@ import { SafeHtml } from '@angular/platform-browser';
   styleUrl: './change-password.component.scss',
 })
 export class ChangePasswordComponent {
+  @ViewChild(OtpInputComponent) otpInputComponent!: OtpInputComponent;
+  @ViewChild('digit1') firstInput!: ElementRef; // Reference to the first input
   @Output() backToCredentials = new EventEmitter<void>();
   @Output() backToSecurityPanel = new EventEmitter<void>();
   isProcessing: boolean = false;
   pinForm: FormGroup;
   authForm: FormGroup;
-  OTPinputImg: SafeHtml | null = null;
+
   successImg: SafeHtml | null = null;
-  otp: string = ''; // OTP input by the user
+
   session: string | null = ''; // Session retrieved from localStorage
   challengeName: string | null = ''; // Challenge name used in OTP verification
-  timeLeft: number = 300;
-  timeOut: boolean = false;
-  incorrectPin: boolean = false;
-  clearForm = false;
-  resetTimer: boolean = false; // Reset timer signal
   email: any = '';
+  buttonText: string = 'Continuar'; // Default button text
+  buttonEnabled: boolean = false; // Default button state
+
+  incorrectPin: boolean = false;
+
   hidePassword: boolean = true;
   hideNewPassword: boolean = true;
   hideConfirm: boolean = true;
@@ -77,9 +80,7 @@ export class ChangePasswordComponent {
   debugMode: boolean = false;
   isResetPasswordSubmitEnabled: boolean = false;
   passwordToValidate: any = '';
-  @ViewChild('digit1') firstInput!: ElementRef; // Reference to the first input
-  isSubmitButtonEnabled = false;
-  public otpObject: string = '';
+
   // --- States list Referencia ---------------------------------------------//
   // insertPIN: Validación de PIN
   // insertOTP: Formulario para ingresar OTP del mail
@@ -151,9 +152,6 @@ export class ChangePasswordComponent {
     return this.authForm.controls[controlName].hasError(errorName);
   }
   ngOnInit() {
-    this.svgLibrary.getSvg('enter-password').subscribe((svgContent) => {
-      this.OTPinputImg = svgContent; // SafeHtml type to display SVG dynamically
-    });
     this.svgLibrary.getSvg('congrats').subscribe((svgContent) => {
       this.successImg = svgContent; // SafeHtml type to display SVG dynamically
     });
@@ -255,8 +253,8 @@ export class ChangePasswordComponent {
       next: (response) => {
         console.log('OTP Sent:', response);
         //localStorage.setItem('otpEmail', email);
-        localStorage.setItem('otpSession', response.Session);
-        localStorage.setItem('challengeName', response.ChallengeName);
+        this.session = response.Session;
+        this.challengeName = response.ChallengeName;
         this.isProcessing = false;
         this.viewState = 'insertOTP';
       },
@@ -268,127 +266,25 @@ export class ChangePasswordComponent {
     });
   }
 
-  handleOtpEvent(otp?: string) {
-    if (otp) {
-      this.otpObject = otp;
-    }
-    return;
-  }
-  handleTimeOut(): void {
-    console.log('Time Out');
-    this.timeOut = true;
-    this.messageService.showMessage(
-      'El tiempo de validez del código ha caducado - ',
-      'warning',
-      'Reenviar código',
-      () => this.resendCode()
-    );
-  }
-  restartValues(): void {
-    //this.email = localStorage.getItem('otpEmail');
-    this.session = localStorage.getItem('otpSession');
-    this.challengeName = localStorage.getItem('challengeName');
-
-    if (!this.email || !this.session) {
-      console.error('Missing email or session in localStorage');
-      this.messageService.showMessage('Código incorrecto', 'error');
-      // Optionally, redirect the user back to the request OTP screen or show an error message
-    }
-  }
-  resendCode() {
-    this.isProcessing = true;
-    if (this.debugMode) {
-      this.timeOut = false;
-      this.resetTimer = true;
-      setTimeout(() => (this.resetTimer = false), 0);
-      this.messageService.showMessage('Código enviado!', 'success');
-      setTimeout(() => {
-        this.messageService.clearMessage();
-      }, 5000);
-      this.isProcessing = false;
-      this.restartValues();
-    } else {
-      this.otpService.sendOtp(this.email).subscribe({
-        next: (response) => {
-          console.log('OTP Sent:', response);
-          //localStorage.setItem('otpEmail', this.email || '');
-          localStorage.setItem('otpSession', response.Session);
-          localStorage.setItem('challengeName', response.ChallengeName);
-          this.timeOut = false;
-
-          // Reset timer and force change detection
-          this.resetTimer = true;
-          setTimeout(() => (this.resetTimer = false), 0);
-          this.messageService.showMessage('Código enviado!', 'success');
-          this.clearForm = true;
-          setTimeout(() => (this.clearForm = false), 0);
-
-          setTimeout(() => {
-            this.messageService.clearMessage();
-          }, 5000);
-          this.isProcessing = false;
-          //this.cdr.detectChanges(); // Force change detection to update the child component
-          this.restartValues();
-        },
-        error: (error: any) => {
-          console.error('Error sending OTP:', error);
-          this.messageService.showMessage(
-            'Error en el envío de mail!: ',
-            'error'
-          );
-          this.isProcessing = false;
-        },
-      });
-    }
-  }
-  handleButtonState(isEnabled: boolean): void {
-    this.isSubmitButtonEnabled = isEnabled;
+  handleButtonText(text: string): void {
+    this.buttonText = text;
   }
 
-  submitOtpForm(): void {
-    console.log('submitted: ', this.otpObject);
-    this.isProcessing = true;
-    const otpString = Object.values(this.otpObject).join('');
-    if (this.debugMode) {
-      setTimeout(() => {
-        this.isProcessing = false;
-        this.viewState = 'insertPassword';
-      }, 3000); // 3-second delay
-    } else {
-      this.session = localStorage.getItem('otpSession');
-      this.challengeName = localStorage.getItem('challengeName');
-      this.otpService
-        .verifyOtp(
-          this.email || '',
-          otpString,
-          this.session || '',
-          this.challengeName || ''
-        )
-        .subscribe({
-          next: (response) => {
-            console.log('OTP Verified:', response);
-            // Handle success, maybe redirect the user or proceed with onboarding, etc.
-            //localStorage.removeItem('otpEmail');
-            localStorage.removeItem('otpSession');
-            localStorage.removeItem('challengeName');
-            this.isProcessing = false;
-            this.viewState = 'insertPassword';
-            //this.otpValid.emit(); // Call stepCompleted method
-          },
-          error: (error: any) => {
-            console.error('Error verifying OTP:', error);
-            this.messageService.showMessage(
-              'Código incorrecto o utilizado - ',
-              'error',
-              'Reenviar código',
-              () => this.resendCode()
-            );
-            this.isProcessing = false;
-            // Handle error, show message to the user
-          },
-        });
+  handleButtonEnabled(isEnabled: boolean): void {
+    this.buttonEnabled = isEnabled;
+  }
+
+  otpValidatedOK() {
+    this.viewState = 'insertPassword';
+    this.isProcessing = false;
+  }
+
+  submitOtp(): void {
+    if (this.buttonEnabled) {
+      this.otpInputComponent.submitOtp();
     }
   }
+
   validatePasswordForm(): void {
     console.log('validate password');
     this.isProcessing = true;

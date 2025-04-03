@@ -1,0 +1,101 @@
+<div class="right-panel">
+    <!-- Search Bar -->
+    <div class="utilities-wrapper">
+      <div class="rounded-box search-box" [ngClass]="{ focused: isFocused }">
+        <mat-icon class="search-icon-light">search</mat-icon>
+        <input
+          class="input-search paragraph-500"
+          placeholder="Buscar"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="filterPaymentLink()"
+          (focus)="isFocused = true"
+          (blur)="isFocused = false"
+        />
+        <mat-spinner class="search-spinner" [class.show]="searching"></mat-spinner>
+      </div>
+    </div>
+  
+    <!-- Loading State -->
+    <div class="mat-spinner-container">
+        <mat-spinner
+          *ngIf="isLoading"
+          mode="indeterminate"
+          [diameter]="80"
+        ></mat-spinner>
+    </div>
+  
+    <!-- Error State -->
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+  
+    <!-- Links List -->
+    <div class="links-container" *ngIf="filteredLinks.length > 0 && !isLoading">
+      <div *ngFor="let link of filteredLinks" class="link-item">
+        <div class="link-info">
+          <mat-icon class="link-icon">link</mat-icon>
+          <div class="link-text">
+            <div class="paragraph-600">
+              {{ link.description || 'Link de pago' }}
+              <span *ngIf="link.status === 'DELETED' || link.status === 'PAUSED'"
+                [ngClass]="{'text-red': link.status === 'DELETED', 'text-warning': link.status === 'PAUSED'}">
+                {{ link.status === 'DELETED' ? ' - Link eliminado' : ' - Link pausado' }}
+              </span>
+            </div>
+            <div class="secondary-500-light">
+              {{ link.currency }} {{ formatAmount(link.amount) }} - 
+              Expira el {{ link.expirationDate || 'Sin fecha' }}
+            </div>
+          </div>
+        </div>
+  
+        <!-- Actions -->
+        <div class="link-actions">
+          <button 
+            class="btn-ghost-color btn-lg" 
+            (click)="copyLink(link.url, link.id)"
+            *ngIf="link.status !== 'DELETED'">
+            {{ copiedLinkId === link.id ? 'Copiado' : 'Copiar link' }}
+          </button>
+          <button mat-icon-button class="menu-button no-bg" [matMenuTriggerFor]="menu" *ngIf="link.status !== 'DELETED'">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="link.id ? openEditPaymentLinkModal(link) : null">
+              <mat-icon>edit</mat-icon>
+              <span>Editar</span>
+            </button>
+            <button  mat-menu-item class="red-button"
+              (click)="link.id ? deleteLink(link) : null">
+              <mat-icon>delete</mat-icon>
+              <span>Eliminar</span>
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+    </div>
+    <div class="pagination-container">
+      <!-- Page Size Dropdown -->
+      <select [(ngModel)]="pageSize" (change)="loadPaymentLinks()" class="page-size-dropdown">
+        <option *ngFor="let size of [10, 25, 50, 100]" [value]="size">{{ size }}</option>
+      </select>
+    
+      <span class="rows-label">filas por página</span>
+    
+      <!-- Page Info -->
+      <span class="page-info">
+        {{ getStartIndex() }}-{{ getEndIndex() }} de {{ totalLinks }}
+      </span>
+    
+      <!-- Navigation Buttons -->
+      <button (click)="previousPage()" [disabled]="currentPage === 1" class="nav-button">
+        ←
+      </button>
+      <button (click)="nextPage()" [disabled]="currentPage * pageSize >= totalLinks" class="nav-button">
+        →
+      </button>
+    </div>
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredLinks.length === 0" class="no-links-message">
+      No tienes links de pago creados aún.
+    </div>
+  </div>
+  

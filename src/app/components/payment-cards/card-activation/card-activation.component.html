@@ -1,7 +1,8 @@
 <div class="activate-card-container">
   <app-side-panel-header
-    title="Activar tarjeta"
-    [arrowBackEnabled]="false"
+    [title]="'Activar tarjeta'"
+    [arrowBackEnabled]="steps[currentStep] !== 'activateCard'"
+    (arrowBack)="handleArrowBack()"
   ></app-side-panel-header>
 
   <div class="activate-content">
@@ -10,7 +11,27 @@
       <mat-spinner></mat-spinner>
     </div>
     } @else {
-    <div class="activate-form">
+    <div *ngIf="steps[currentStep] === 'otp'" class="otp-validation">
+      <app-otp-input
+        [OTPdescription]="'Copia acá ese código para poder activar tu tarjeta'"
+        [userMail]="email"
+        [session]="session"
+        [challengeName]="challengeName"
+        (buttonText)="handleButtonText($event)"
+        (buttonEnabled)="handleButtonEnabled($event)"
+        (otpValidated)="otpValidatedOK()"
+      ></app-otp-input>
+      <app-messages class="w-100"></app-messages>
+      <app-side-panel-footer
+        class="w-100"
+        [buttonText]="buttonText"
+        buttonStyle="filled"
+        [buttonDisabled]="!buttonEnabled || isLoading"
+        (buttonClicked)="submitOtp()"
+      ></app-side-panel-footer>
+    </div>
+
+    <div *ngIf="steps[currentStep] === 'activateCard'" class="activate-form">
       <iframe
         *ngIf="!isLoading"
         [src]="iframeUrl"
@@ -25,11 +46,4 @@
     </div>
     }
   </div>
-  <!-- <app-side-panel-footer
-    class="w-100"
-    [buttonText]="'Activar'"
-    buttonStyle="filled"
-    [buttonDisabled]="isLoading"
-    (buttonClicked)="activateCard()"
-  ></app-side-panel-footer> -->
 </div>

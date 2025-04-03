@@ -27,6 +27,13 @@
     width: 4ch;
     min-width: 4ch; /* Initial width for empty input */
     transition: width 0.1s ease-out; /* Smooth transition for width change */
+    &::placeholder {
+      opacity: 1; // Show placeholder by default
+      transition: opacity 0.2s ease; // Smooth transition
+    }
+    &:focus::placeholder {
+      opacity: 0; // Hide placeholder on focus
+    }
   }
 }
 

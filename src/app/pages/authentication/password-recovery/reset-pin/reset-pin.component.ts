@@ -122,7 +122,7 @@ export class ResetPinComponent {
       else {
         if (this.debugMode) this.pinResetCompleted.emit(); //exit pin code
         else {
-          this.pinCodeService.setPinCode(Number(pinConfirmed)).subscribe(
+          this.pinCodeService.resetPinCodeOTP(Number(pinConfirmed)).subscribe(
             () => {
               console.log('pin code reset OK');
               this.pinResetCompleted.emit(); //exit pin code

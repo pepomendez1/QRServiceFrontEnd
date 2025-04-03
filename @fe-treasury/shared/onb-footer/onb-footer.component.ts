@@ -7,15 +7,13 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import {
-  BreakpointObserver,
-  Breakpoints,
-  BreakpointState,
-} from '@angular/cdk/layout';
+import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { HelpDialogComponent } from 'src/app/utils/help-dialog';
 import { TermsDialogComponent } from 'src/app/utils/terms-dialog';
 import { StoreDataService } from 'src/app/services/store-data.service';
+
 import { Subscription } from 'rxjs';
+import { DocumentService } from 'src/app/services/documents.service';
 
 @Component({
   selector: 'app-onb-footer',
@@ -24,19 +22,19 @@ import { Subscription } from 'rxjs';
   templateUrl: './onb-footer.component.html',
   styleUrl: './onb-footer.component.scss',
 })
-export class OnbFooterComponent {
+export class OnbFooterComponent implements OnInit, OnDestroy {
   @Output() showHelp = new EventEmitter<boolean>();
   dialogRef!: MatDialogRef<HelpDialogComponent> | null;
   breakpointSubscription!: Subscription;
-  private termsDialogSubscription!: Subscription;
-  private privacyDialogSubscription!: Subscription;
 
   fileContent: string = '';
   privacyContent: string = '';
   isMobile: boolean = false;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private storeDataService: StoreDataService,
+    private documentService: DocumentService, // Inject DocumentService
     private breakpointObserver: BreakpointObserver,
     private dialog: MatDialog
   ) {}
@@ -54,10 +52,12 @@ export class OnbFooterComponent {
           );
         }
       });
+
     this.loadTermsAndConditions();
     this.loadPrivacy();
     this.cdr.detectChanges(); // Trigger change detection manually
   }
+
   public goToHelp() {
     this.showHelp.emit(true);
     const isMobile = this.breakpointObserver.isMatched('(max-width: 840px)');
@@ -107,54 +107,13 @@ export class OnbFooterComponent {
       },
     });
   }
-  private loadTermsAndConditions(): void {
-    this.storeDataService.getStore().subscribe((storeData) => {
-      const termsUrl =
-        storeData.init_config?.terms_and_conditions ||
-        '/assets/docs/terms_and_conditions.docx';
 
-      this.fetchDocxContent(
-        termsUrl,
-        (content) => (this.fileContent = content),
-        'Error loading terms and conditions.'
-      );
-    });
+  private async loadTermsAndConditions(): Promise<void> {
+    this.fileContent = await this.documentService.loadTermsAndConditions();
   }
 
-  private loadPrivacy(): void {
-    this.storeDataService.getStore().subscribe((storeData) => {
-      const privacyUrl =
-        storeData.init_config?.privacy_policy ||
-        '/assets/docs/privacy_policy.docx';
-
-      this.fetchDocxContent(
-        privacyUrl,
-        (content) => (this.privacyContent = content),
-        'Error loading privacy policy.'
-      );
-    });
-  }
-
-  private async fetchDocxContent(
-    url: string,
-    contentUpdater: (content: string) => void,
-    errorMessage: string
-  ) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const arrayBuffer = await response.arrayBuffer();
-
-      // Lazy load Mammoth
-      const Mammoth = await import('mammoth');
-      const result = await Mammoth.extractRawText({ arrayBuffer });
-      contentUpdater(result.value);
-    } catch (error) {
-      console.error('Error fetching or parsing document:', error);
-      contentUpdater(errorMessage);
-    }
+  private async loadPrivacy(): Promise<void> {
+    this.privacyContent = await this.documentService.loadPrivacyPolicy();
   }
 
   ngOnDestroy(): void {

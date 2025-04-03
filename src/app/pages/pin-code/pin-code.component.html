@@ -21,7 +21,7 @@
             : 'El PIN es el número de seguridad con el que podrás mantener el control sobre todas las operaciones que realices con tu cuenta.'
         "
         (arrowBack)="arrowBack()"
-        [arrowBackEnabled]="true"
+        [arrowBackEnabled]="!isIframe || (isIframe && confirmPinForm)"
       ></app-custom-header-onb>
 
       <div class="section-content">
@@ -138,7 +138,7 @@
         </form>
 
         <form
-          class="confirm-pin-form"
+          class="pin-form"
           *ngIf="confirmPinForm"
           [formGroup]="pinConfirm"
           (ngSubmit)="submitPinConfirm()"

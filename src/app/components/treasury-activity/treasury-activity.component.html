@@ -74,14 +74,7 @@
           </div>
           <div class="details">
             <div class="paragraph-600">
-              {{
-                transaction.description
-                  ? transaction.description
-                  : descriptionTable.getDescription(
-                      transaction.type,
-                      transaction.source
-                    )
-              }}
+              {{ transaction.description }}
             </div>
             <div class="secondary-500-light" *ngIf="transaction.contact_name">
               {{ transaction.contact_name }}

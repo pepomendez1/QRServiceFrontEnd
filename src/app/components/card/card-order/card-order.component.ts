@@ -6,6 +6,7 @@ import { SvgLibraryService } from 'src/app/services/svg-library.service';
 import { Router } from '@angular/router';
 import { SafeHtml } from '@angular/platform-browser';
 import { CardConfigService } from 'src/app/services/card-config.service';
+import { StoreDataService } from 'src/app/services/store-data.service';
 
 @Component({
   selector: 'app-card-order',
@@ -15,7 +16,7 @@ import { CardConfigService } from 'src/app/services/card-config.service';
 export class CardOrderComponent {
   public loading = true;
   public errors: string[] = [];
-
+  isIframe: boolean = false;
   public canCreateVirtual = true;
   public canCreatePhysical = true;
 
@@ -24,10 +25,12 @@ export class CardOrderComponent {
     private svgLibrary: SvgLibraryService,
     private sidePanelService: SidePanelService,
     private cardConfigService: CardConfigService,
+    private storeDataService: StoreDataService,
     private snackbarService: SnackbarService,
     private router: Router
   ) {}
   ngOnInit(): void {
+    this.isIframe = this.storeDataService.checkIframe();
     this.svgLibrary.getSvg('card-order').subscribe((svgContent) => {
       this.cardOrder = svgContent;
     });

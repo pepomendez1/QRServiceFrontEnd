@@ -1,0 +1,17 @@
+<div class="pop-over-content">
+  <h1 class="heading-4-700">
+    {{ data.messageTitle }}
+  </h1>
+  <span class="secondary-500"> {{ data.messageContent }}</span>
+
+  <div class="buttons-container">
+    <div mat-dialog-actions>
+      <button class="btn-link-primary btn-lg" (click)="onCancel()">
+        No, no quiero salir
+      </button>
+      <button class="btn-cta-filled btn-lg" (click)="onConfirm()">
+        Si, quiero salir
+      </button>
+    </div>
+  </div>
+</div>

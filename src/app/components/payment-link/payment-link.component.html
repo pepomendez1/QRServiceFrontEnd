@@ -1,0 +1,21 @@
+<div class="payment-container">
+    <!-- Card para crear link de pago -->
+    <div class="left-panel custom-card">
+        <app-payment-link-card (linkCreated)="onLinkCreated()"></app-payment-link-card>
+    </div>
+    
+    <!-- Panel derecho sin doble card -->
+    <div class="right-panel custom-card">
+      <mat-tab-group>
+        <mat-tab>
+          <ng-template mat-tab-label>Tus links</ng-template>
+          <app-payment-links-list></app-payment-links-list>
+        </mat-tab>
+        
+        <mat-tab>
+          <ng-template mat-tab-label>Ingresos</ng-template>
+          <app-payment-link-income></app-payment-link-income>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+</div>
