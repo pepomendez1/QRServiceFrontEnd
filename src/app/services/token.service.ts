@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthResponse } from './auth.service';
+import { AuthResponse, AuthResponseOTP } from './auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { CookieService } from './cookie.service';
 import { AuthDataOTP } from './otp.service';
@@ -78,6 +78,22 @@ export class TokenService {
     return null;
   }
 
+  getAuthDataOTP(): AuthResponseOTP | null {
+    const accessToken = this.cookieService.getCookie('access_token_otp');
+    const idToken = this.cookieService.getCookie('id_token_otp');
+
+    if (accessToken && idToken) {
+      return {
+        access_token_otp: accessToken,
+        id_token_otp: idToken,
+        // expires_in: null, // Managed by cookie expiration
+        token_type: 'Bearer', // Default type
+      };
+    }
+
+    return null;
+  }
+
   /**
    * Retrieves a specific token from cookies.
    * @param name The name of the token to retrieve (e.g., 'access_token', 'id_token', 'refresh_token').
@@ -88,6 +104,22 @@ export class TokenService {
     if (!token) {
       console.warn(`Token "${name}" not found in cookies.`);
     }
+    // console.log('token requested ... ', name, 'token returned: ', token);
+    // const accessToken = this.cookieService.getCookie('access_token');
+    // const idToken = this.cookieService.getCookie('id_token');
+    // const refreshToken = this.cookieService.getCookie('refresh_token');
+    // const username = this.cookieService.getCookie('username');
+
+    // console.log(
+    //   'coookiesss ..... ',
+    //   accessToken,
+    //   '  ',
+    //   idToken,
+    //   '  ',
+    //   refreshToken,
+    //   '  ',
+    //   username
+    // );
     return token;
   }
 

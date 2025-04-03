@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { FormatNamePipe } from 'src/app/pipes/format-name.pipe';
 import { RefreshService } from '@fe-treasury/shared/refresh-service/refresh-service';
 import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.service';
-import { ActivityDetailsComponent } from '../treasury/activity-details/activity-details.component';
+import { ActivityDetailsComponent } from '../activity-details/activity-details.component';
 import { FiltersComponent } from './filters/filters.component';
 import createFuzzySearch from '@nozbe/microfuzz';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
@@ -143,26 +143,45 @@ export class TreasuryActivityComponent {
     // Proceed with fuzzy search if there is a search query
     if (this.searchQuery.trim().length > 0) {
       this.searching = true;
-      console.log('searching...');
+      console.log('Searching for:', this.searchQuery);
 
       const searchResults = this.fuzzySearch(this.searchQuery);
+      console.log('Fuzzy search results:', searchResults);
 
-      if (searchResults) {
-        this.filteredTransactions = searchResults.map(
+      if (searchResults && searchResults.length > 0) {
+        // Filter out irrelevant matches
+        const relevantResults = searchResults.filter(
+          (result: { item: any }) => {
+            const descriptionMatch = result.item.description
+              .toLowerCase()
+              .includes(this.searchQuery.toLowerCase());
+            const contactNameMatch = result.item.contact_name
+              .toLowerCase()
+              .includes(this.searchQuery.toLowerCase());
+            return descriptionMatch || contactNameMatch;
+          }
+        );
+
+        this.filteredTransactions = relevantResults.map(
           (result: { item: any }) => result.item
         );
         this.noTransactions = this.filteredTransactions.length === 0;
         console.log(
-          'Transactions match query:',
+          'Relevant transactions matching query:',
           this.filteredTransactions.length
         );
       } else {
         console.log('No search results');
         this.noTransactions = true;
       }
-      this.searching = false;
+      setTimeout(() => {
+        this.searching = false;
+      }, 1000);
     } else {
       this.noTransactions = this.filteredTransactions.length === 0;
+      setTimeout(() => {
+        this.searching = false;
+      }, 1000);
     }
 
     console.log('Final filtered transactions:', this.filteredTransactions);
@@ -183,8 +202,8 @@ export class TreasuryActivityComponent {
   }
 
   loadTransactions() {
-    this.loading = true; // Mostrar el loader
-    this.noTransactions = false; // Resetear el mensaje de "sin transacciones"
+    this.loading = true; // Show loader
+    this.noTransactions = false; // Reset "no transactions" message
 
     this.treasuryService
       .getTransactionsByPeriod(this.selectedPeriod)
@@ -192,44 +211,52 @@ export class TreasuryActivityComponent {
         next: (response) => {
           if (response?.movements) {
             let transactions = response.movements;
-            //let transactions = <any>[];
+
             // Apply transaction limit if the flag is true
             if (this.limitTransactions && this.transactionLimit > 0) {
-              transactions = transactions.slice(0, this.transactionLimit); // Limit the transactions
+              transactions = transactions.slice(0, this.transactionLimit);
             }
-            // Add icons to transactions
 
-            this.transactions = transactions; // Asignar la lista de movimientos a la propiedad `transactions`
+            // Add icons and descriptions to transactions
             this.transactions = transactions.map((transaction: any) => ({
               ...transaction,
               icon: this.iconLookupService.getIcon(
                 transaction.type,
                 transaction.source
               ),
+              // Add description if it doesn't exist
+              description: transaction.description
+                ? transaction.description
+                : this.descriptionTable.getDescription(
+                    transaction.type,
+                    transaction.source
+                  ),
             }));
-            console.log('example: ', transactions[0]);
+
+            console.log('Transactions loaded:', this.transactions);
+
+            // Initialize fuzzy search with only relevant fields
             this.fuzzySearch = createFuzzySearch(this.transactions, {
               getText: (item: any) => [
-                item.contact_name,
-                item.description,
-                item.amount.toString(),
+                item.description, // Prioritize description
+                item.contact_name, // Prioritize description
               ],
-              strategy: 'aggressive',
+              strategy: 'aggressive', // Use smart matching strategy
             });
-            this.filterTransactions(); // Apply the search filter whenever transactions are loaded
+
+            this.filterTransactions(); // Apply initial filters
           } else {
-            this.transactions = []; // Si no hay movimientos, aseguramos que sea un array vacío
+            this.transactions = []; // Ensure transactions is an empty array if no data
             this.noTransactions = true;
           }
-          this.loading = false; // Asegúrate de detener el spinner después de cargar los datos
+          this.loading = false; // Hide loader
         },
         error: (err) => {
-          console.error('Error al cargar las transacciones:', err);
-          this.loading = false; // También detener el spinner en caso de error
+          console.error('Error loading transactions:', err);
+          this.loading = false; // Hide loader on error
         },
       });
   }
-
   goToActivity() {
     this.router.navigate(['/app/activity']);
   }
@@ -257,6 +284,22 @@ export class TreasuryActivityComponent {
 
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`; // Devuelve el color en formato HSL
   }
+
+  getStatus(status: string) {
+    switch (status) {
+      case 'processing':
+        return 'EN PROCESO';
+      case 'processed':
+        return 'APROBADA';
+      case 'rejected':
+        return 'RECHAZADA';
+      case 'cancelled':
+        return 'CANCELADA';
+      default:
+        return 'STATUS_ERR';
+    }
+  }
+
   exportToCSV() {
     console.log('csv ddownload');
     const csvData = this.filteredTransactions.map((transaction) => ({
@@ -265,7 +308,7 @@ export class TreasuryActivityComponent {
       balance: transaction.balance,
       Moneda: transaction.currency,
       Monto: transaction.amount,
-      Estado: transaction.status,
+      Estado: this.getStatus(transaction.status),
       'fecha operación': `"${new Date(
         transaction.created_at
       ).toLocaleString()}"`,

@@ -1,0 +1,21 @@
+<div class="know-more custom-card">
+  <div class="know-more-content">
+    <div class="know-more-header">
+      <h2 class="caption-500">INVERSIONES</h2>
+      <h2 class="heading-5-700-primary">Hacé que tu plata rinda</h2>
+      <p class="paragraph-500">
+        Seguí tus rendimientos diarios, invertí tu dinero fácilmente y usalo
+        cuando quieras.
+      </p>
+    </div>
+    <div class="know-more-btn">
+      <button
+        class="btn-ghost-color btn-md subheading-700"
+        (click)="openFAQPanel()"
+      >
+        Conocer más
+      </button>
+    </div>
+  </div>
+  <div *ngIf="svg" [innerHTML]="svg"></div>
+</div>

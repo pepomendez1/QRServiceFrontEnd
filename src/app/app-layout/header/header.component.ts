@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { MatCheckboxChange } from '@angular/material/checkbox'; // Import MatCheckboxChange
+
 import { MatSidenav } from '@angular/material/sidenav';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -10,6 +10,7 @@ import { SidenavService } from '../sidenav/sidenav.service';
 import { SidenavItem } from '../sidenav/sidenav-item.interface';
 import { StoreDataService } from 'src/app/services/store-data.service';
 import { FeatureFlagsService } from 'src/app/services/modules.service';
+import { FocusMonitor } from '@angular/cdk/a11y';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -26,12 +27,13 @@ export class HeaderComponent implements OnInit {
   defaultOption: string = 'left'; // Default option for the slider button
   featureFlags: any = null;
   selectedModule: any;
-
+  isSidenavClosed = true; // Track whether the sidenav is closed
+  isIframe: boolean = false;
   constructor(
     private featureFlagsService: FeatureFlagsService,
     private router: Router,
-    private activatedRoute: ActivatedRoute,
     private storeService: StoreDataService,
+    private storeDataService: StoreDataService,
     private themeService: ThemeService,
     private sidenavService: SidenavService
   ) {}
@@ -42,6 +44,7 @@ export class HeaderComponent implements OnInit {
       ? 'international_account'
       : 'basic_modules';
     console.log('selected module for dropdon----', this.selectedModule);
+    this.isIframe = this.storeDataService.checkIframe();
     // Listen for route changes
     this.sideNavigation$ = this.themeService.config$.pipe(
       map((config) => config.navigation === 'side')
@@ -94,7 +97,7 @@ export class HeaderComponent implements OnInit {
     });
   }
   goToAccountInfo(): void {
-    this.router.navigate(['/app/account-info']);
+    this.router.navigate(['app/account-info']);
   }
 
   goToHelp(): void {

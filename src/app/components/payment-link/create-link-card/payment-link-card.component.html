@@ -1,0 +1,32 @@
+<div class="payment-link-card">
+  <!-- Title -->
+  <p class="secondary-500-light">Nuevo link de pago</p>
+
+  <!-- Amount Input Component -->
+  <app-amount-input
+    [(ngModel)]="amount"
+    [disabled]="isAmountUndefined"
+    (setAmount)="setAmount($event)"
+  ></app-amount-input>
+
+  <!-- Toggle for Undefined Amount -->
+  <!-- <div class="toggle-container">
+    <span>Sin monto definido</span>
+    <mat-slide-toggle [(ngModel)]="isAmountUndefined" (change)="toggleAmountUndefined()"></mat-slide-toggle>
+  </div>
+ -->
+  <!-- Product Name Input -->
+  <input
+    type="text"
+    class="product-input"
+    placeholder="Nombre del producto o servicio"
+    [(ngModel)]="productName"
+  />
+  <hr width="100%" size="1" color="#EBEBEB" />
+  <!-- Sticky Button Container -->
+  <div class="sticky-button-container">
+    <button class="btn-cta-filled w-100 btn-lg" (click)="createLink()" [disabled]="isLoading">
+      {{ isLoading ? 'Creando...' : 'Crear link' }}
+    </button>    
+  </div>
+</div>

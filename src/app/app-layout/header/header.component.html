@@ -4,6 +4,9 @@
     mat-icon-button
     (click)="sidenav.toggle()"
     aria-label="Menu icon"
+    onclick="this.blur()"
+    [ngClass]="{ 'no-focus': isSidenavClosed }"
+    #hamburgerButton
   >
     <mat-icon>menu</mat-icon>
   </button>
@@ -52,7 +55,7 @@
     <!-- <notifications-menu></notifications-menu> -->
 
     <button
-      *ngIf="!(sidenav && sidenav.mode === 'over')"
+      *ngIf="(!(sidenav && sidenav.mode === 'over') && !isIframe) || isIframe"
       (click)="goToAccountInfo()"
       class="rounded-button"
       fxFlex="grow"

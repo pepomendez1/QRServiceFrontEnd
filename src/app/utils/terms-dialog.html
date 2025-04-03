@@ -1,6 +1,7 @@
 <div class="pop-over-content">
   <h1 class="pop-over-title">{{ data.title }}</h1>
-  <span class="pop-over-text" mat-dialog-content> {{ data.content }} </span>
+  <span class="pop-over-text" mat-dialog-content [innerHTML]="data.content">
+  </span>
 
   <div class="buttons-container">
     <div mat-dialog-actions>

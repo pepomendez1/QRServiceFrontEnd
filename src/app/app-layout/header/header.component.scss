@@ -30,11 +30,20 @@
   }
 
 }
-
+.no-focus:focus {
+  outline: none; /* Remove the default focus outline */
+  background-color: transparent; /* Remove any background color change on focus */
+}
 }
 @media screen and (max-width: 600px) {
   .toolbar{
+    position: fixed; /* Fix the toolbar at the top */
+    height: 5em;
+    top: 0;
+    left: 0;
+    right: 0;
     padding: 20px;
+    z-index: $toolbar-z-index; /* Ensure it stays above other content */
     margin: 0;
   }
 }

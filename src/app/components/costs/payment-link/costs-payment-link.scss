@@ -1,0 +1,157 @@
+.costs-container {
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+
+    .btn-update {
+        font-weight: 600;
+    }
+}
+
+.cost-section {
+    margin-bottom: 32px;
+
+    .options-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: flex-start;
+
+        .cost-option {
+                width: 248px;
+                height: 56px;
+                padding: 0 10px;
+                border: 1px solid #ddd;
+                border-radius: 12px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                transition: border-color 0.2s, background-color 0.2s;
+        
+                .label {
+                    font-size: 12px;
+                }
+        
+                .fee {
+                    font-size: 12px;
+                    font-weight: 700;
+                }
+        
+                &.selected {
+                    border-color: #080808;
+                    border: 2px solid #080808;
+                }
+            }
+                        .options-row {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 16px;
+                        }
+    }
+}
+
+// Prevent horizontal scroll on any wrapper
+:host {
+    display: block;
+    overflow-x: hidden;
+}
+
+.installments-section {
+    margin-top: 24px;
+
+    .installments-toggle {
+        flex-direction: row;
+        align-items: center;
+        //margin-bottom: 16px;
+    }
+
+.installment-options {
+    display: flex;
+    justify-content: flex-start; // Align to the left of the panel
+    padding-top: 5px;
+}
+
+.installment-grid {
+    width: 248px; // Match cost card width
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.installment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 40px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+}
+    
+        .custom-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #bbb;
+            margin-right: 12px;
+            position: relative;
+    
+            &.selected::after {
+                content: '';
+                position: absolute;
+                top: 4px;
+                left: 4px;
+                width: 12px;
+                height: 12px;
+                background-color: #8b005d; // or use your primary brand color
+                border-radius: 50%;
+            }
+        }
+    
+        .installment-label {
+            flex-grow: 1;
+            font-size: 12px;
+        }
+    
+        .percentage {
+            font-size: 12px;
+            font-weight: 500;
+            color: #555;
+        }
+}
+
+
+.additional-cost {
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+    margin-top: 0px;
+    width: 248px; // Default width
+
+    @media (min-width: 768px) {
+        width: 100%; // ✅ Full width on desktop
+        border-bottom: 0px;
+    }
+}
+
+.sticky-button-container {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 16px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.button-container {
+    max-width: 250px;
+}

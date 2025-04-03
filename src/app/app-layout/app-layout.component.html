@@ -75,40 +75,21 @@
             </div>
           </a>
         </ng-container>
+        <!-- Inactivity Monitor Toggle -->
+        <ng-container *ngIf="toggleInactivityMonitor$ | async">
+          <mat-list-item>
+            <div class="nav-item-wrapper-extra">
+              <mat-icon class="material-symbols-outlined">timer</mat-icon>
+              <span class="name">Mon. de inactividad</span>
+              <mat-slide-toggle
+                class="slide-toggle"
+                [(ngModel)]="inactivityMonitorStatus"
+                (change)="onToggleInactivityMonitor()"
+              ></mat-slide-toggle>
+            </div>
+          </mat-list-item>
+        </ng-container>
       </mat-nav-list>
-      <!--
-      <mat-nav-list class="sidenav-menu-list">
-        <a
-          class="sidenav-item-link paragraph-500"
-          mat-list-item
-          *ngFor="let item of menuItems"
-          [routerLink]="item.enabled ? item.routeOrFunction : null"
-          routerLinkActive="active"
-          [ngClass]="{ 'disabled-link': !item.enabled }"
-          matRipple
-        >
-          <div class="nav-item-wrapper">
-            <mat-icon class="material-symbols-outlined" *ngIf="item.icon">{{
-              item.icon
-            }}</mat-icon>
-            <span class="name">{{ item.name }}</span>
-          </div>
-        </a>
-      </mat-nav-list> -->
-
-      <!-- <mat-nav-list class="sidenav-menu-list">
-        <a
-          class="sidenav-item-link paragraph-500"
-          mat-list-item
-          (click)="logoutUser()"
-          matRipple
-        >
-          <div class="nav-item-wrapper">
-            <mat-icon class="material-symbols-outlined">logout</mat-icon>
-            <span class="name">Cerrar sesión</span>
-          </div>
-        </a>
-      </mat-nav-list> -->
     </div>
 
     <!-- <app-sidenav></app-sidenav> -->
@@ -124,7 +105,9 @@
     [class.padding-zero]="isPaddingZero"
     [disableClose]="disableClose"
   >
-    <ng-template #dynamicComponentContainer></ng-template>
+    <div class="side-panel-container">
+      <ng-template #dynamicComponentContainer></ng-template>
+    </div>
   </mat-sidenav>
   <!-- END SIDEPANEL -->
 

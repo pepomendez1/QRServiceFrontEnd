@@ -1,4 +1,11 @@
-<div class="register-wrapper-container">
+<div *ngIf="isLoading">
+  <div class="progress">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+  <!-- Puedes agregar aquí un spinner o una animación de carga -->
+</div>
+
+<div *ngIf="!isLoading" class="register-wrapper-container">
   <ng-container [ngSwitch]="currentStep">
     <div
       *ngIf="!isMobile && logoUrl && currentStep !== RegisterSteps.START_AUTH"

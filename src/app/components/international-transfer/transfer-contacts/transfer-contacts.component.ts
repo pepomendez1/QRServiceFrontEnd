@@ -12,18 +12,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { UserService } from 'src/app/services/user.service';
 import { FormsModule } from '@angular/forms';
 import { trigger, style, transition, animate } from '@angular/animations';
 import { FormatNamePipe } from 'src/app/pipes/format-name.pipe';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { SnackbarService } from '@fe-treasury/shared/snack-bar/snackbar.service';
-import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
-import { SidePanelFooterComponent } from '@fe-treasury/shared/side-panel/side-panel-footer/side-panel-footer.component';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
 import { SafeHtml } from '@angular/platform-browser';
 import { MatError } from '@angular/material/form-field';
+import { InternationalAccountService } from 'src/app/services/international-account.service';
 @Component({
   selector: 'app-transfer-contacts',
   standalone: true,
@@ -41,7 +40,6 @@ import { MatError } from '@angular/material/form-field';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinner,
-    SidePanelFooterComponent,
   ],
   templateUrl: './transfer-contacts.component.html',
   styleUrl: './transfer-contacts.component.scss',
@@ -78,99 +76,10 @@ export class TransferContactsComponent implements OnInit {
   public filteredContacts: any[] = [];
   public isLoading: boolean = true;
   useMockData: boolean = false;
-  mockDataContacts: any[] = [
-    {
-      id: 3,
-      name: 'Parker, Peter',
-      cbu: '3220001805000040970014',
-      cvu: '',
-      alias: 'hola.prueba',
-      initials: '',
-      bank_name: 'BANCO INDUSTRIAL S.A.',
-      additional_info: '',
-      favorite: true,
-    },
-    {
-      id: 4,
-      name: 'Stark, Tony',
-      cbu: '3220004782023055910025',
-      cvu: '',
-      alias: 'JUAN.ROMERO.RIO',
-      initials: '',
-      bank_name: 'BANCO INDUSTRIAL S.A.',
-      additional_info: '',
-      favorite: false,
-    },
-    {
-      id: 2,
-      name: 'Diaz, Bruno',
-      cbu: '3220001823000055910025',
-      cvu: '',
-      alias: 'holaprueba',
-      initials: '',
-      bank_name: 'BANCO INDUSTRIAL S.A.',
-      additional_info: '',
-      favorite: false,
-    },
-    {
-      id: 5,
-      name: 'Rogers, Steve',
-      cbu: '3220001823000099776025',
-      cvu: '',
-      alias: 'JUAN.ROMERO.RIO',
-      initials: '',
-      bank_name: 'BANCO INDUSTRIAL S.A.',
-      additional_info: '',
-      favorite: false,
-    },
-    {
-      id: 6,
-      name: 'Grimm, Ben',
-      cbu: '3220001823765455910025',
-      cvu: '',
-      alias: 'ana.castro',
-      initials: '',
-      bank_name: 'BANCO INDUSTRIAL S.A.',
-      additional_info: '',
-      favorite: false,
-    },
-    {
-      id: 7,
-      name: 'García, Pepe',
-      cbu: '3220001823765466910025',
-      cvu: '',
-      alias: 'ana.castro',
-      initials: '',
-      bank_name: 'BANCO INDUSTRIAL S.A.',
-      additional_info: '',
-      favorite: false,
-    },
-    {
-      id: 8,
-      name: 'Perez, Juan',
-      cbu: '3220001828865455910025',
-      cvu: '',
-      alias: 'ana.castro',
-      initials: '',
-      bank_name: 'BANCO INDUSTRIAL S.A.',
-      additional_info: '',
-      favorite: false,
-    },
-    {
-      id: 9,
-      name: 'Castro, Ana',
-      cbu: '32200018237654559100012',
-      cvu: '',
-      alias: 'ana.castro2',
-      initials: '',
-      bank_name: 'BANCO INDUSTRIAL S.A.',
-      additional_info: '',
-      favorite: false,
-    },
-  ];
+
   constructor(
     private svgLibrary: SvgLibraryService,
-    private treasuryService: TreasuryService,
+    private internationalService: InternationalAccountService,
     private snackbarService: SnackbarService
   ) {}
 
@@ -188,14 +97,14 @@ export class TransferContactsComponent implements OnInit {
 
   getContacts() {
     if (this.useMockData) {
-      this.contacts = this.mockDataContacts;
+      this.contacts = [];
       this.filteredContacts = this.getFilteredContacts();
       setTimeout(() => {
         this.isLoading = false;
         this.isLoadingContacts.emit(false);
       }, 1000);
     } else {
-      this.treasuryService.getContacts().subscribe({
+      this.internationalService.getContacts().subscribe({
         next: (response) => {
           console.log('Contacts fetched:', response);
           this.contacts = response.contacts; // Asegúrate de acceder a la propiedad "contacts"
@@ -219,29 +128,29 @@ export class TransferContactsComponent implements OnInit {
 
   searchAccountOwner() {
     console.log('searching for: ', this.cbuInput);
-    this.isLoading = true;
-    this.notFoundOwner = false;
-    this.isLoadingContacts.emit(true);
-    console.log('searching for: ', this.cbuInput);
-    if (this.isValid) {
-      this.treasuryService.getAccountOwner(this.cbuInput).subscribe({
-        next: (accountOwner) => {
-          console.log('Account Owner fetched:', accountOwner);
-          this.selectedContact.emit(accountOwner); // Call stepCompleted method
-          this.contactType.emit('new'); // Call stepCompleted method
-          this.accountOwner = accountOwner; // Almacenar los detalles del propietario de la cuenta
-          this.isLoading = false;
-          this.isLoadingContacts.emit(false);
-        },
-        error: (err) => {
-          console.error('Error fetching account owner:', err);
-          this.accountOwner = null; // Si hay un error, no se encuentra el propietario
-          this.notFoundOwner = true;
-          this.isLoading = false;
-          this.isLoadingContacts.emit(false);
-        },
-      });
-    }
+    // this.isLoading = true;
+    // this.notFoundOwner = false;
+    // this.isLoadingContacts.emit(true);
+    // console.log('searching for: ', this.cbuInput);
+    // if (this.isValid) {
+    //   this.treasuryService.getAccountOwner(this.cbuInput).subscribe({
+    //     next: (accountOwner) => {
+    //       console.log('Account Owner fetched:', accountOwner);
+    //       this.selectedContact.emit(accountOwner); // Call stepCompleted method
+    //       this.contactType.emit('new'); // Call stepCompleted method
+    //       this.accountOwner = accountOwner; // Almacenar los detalles del propietario de la cuenta
+    //       this.isLoading = false;
+    //       this.isLoadingContacts.emit(false);
+    //     },
+    //     error: (err) => {
+    //       console.error('Error fetching account owner:', err);
+    //       this.accountOwner = null; // Si hay un error, no se encuentra el propietario
+    //       this.notFoundOwner = true;
+    //       this.isLoading = false;
+    //       this.isLoadingContacts.emit(false);
+    //     },
+    //   });
+    // }
   }
 
   getNoContactsMessage(): string {
@@ -279,7 +188,7 @@ export class TransferContactsComponent implements OnInit {
       ? 'Agregando a favoritos ...'
       : 'Eliminando de favoritos ...';
 
-    this.treasuryService
+    this.internationalService
       .toggleFavoriteContact(contact.id, !contact.favorite)
       .subscribe({
         next: () => {
@@ -342,7 +251,7 @@ export class TransferContactsComponent implements OnInit {
   confirmDeleteContact(contact: any) {
     this.processingDeleteContact = true;
     console.log('eliminar contacto: ', contact);
-    this.treasuryService.deleteContact(contact.id).subscribe({
+    this.internationalService.deleteContact(contact.id).subscribe({
       next: () => {
         console.log('Contacto eliminado! ');
         this.contacts = this.contacts.filter((c) => c.id !== contact.id);

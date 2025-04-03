@@ -40,6 +40,8 @@ export class LoginComponent {
   passwordErrors: string[] = [];
   pinCodeErrors: string[] = [];
   timeoutLogout: boolean = false;
+  tokenExpirationLogoutCredentials: boolean = false;
+  tokenExpirationLogoutOnboarding: boolean = false;
 
   isGuardProcessing: boolean = false;
 
@@ -132,6 +134,16 @@ export class LoginComponent {
         console.log('Session expired due to inactivity.');
         this.timeoutLogout = true;
         // Display a message to the user
+      } else if (reason === 'token_expired_credentials') {
+        console.log(
+          'Session expired due to inactivity during credentials configuration.'
+        );
+        this.tokenExpirationLogoutCredentials = true;
+      } else if (reason === 'token_expired_onb') {
+        console.log(
+          'Session expired due to inactivity during credentials onboarding.'
+        );
+        this.tokenExpirationLogoutOnboarding = true;
       }
     });
 
@@ -155,11 +167,11 @@ export class LoginComponent {
       return;
     }
 
-    console.log('Form Submitted:', this.authForm.value);
+    //console.log('Form Submitted:', this.authForm.value);
 
     this.isProcessing = true;
     const pinCode = this.authForm.get('pinCode')!.value;
-    const email = this.authForm.get('username')!.value; // Extraemos el email del formulario
+    const email = this.authForm.get('username')!.value.toLowerCase();
 
     // Primero obtenemos el clientId utilizando el ConfigService
     this.configService.getConfig().subscribe({

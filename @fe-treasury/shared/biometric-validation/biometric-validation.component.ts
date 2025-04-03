@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { ThemeService } from 'src/app/services/layout/theme-service';
-
+import { environment } from 'src/environments/environment';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { OnboardingService } from 'src/app/services/onboarding.service';
 import { StoreDataService } from 'src/app/services/store-data.service';
-
+import { TokenService } from 'src/app/services/token.service';
+import { catchError, tap, throwError } from 'rxjs';
 @Component({
   selector: 'app-biometric-validation',
   templateUrl: './biometric-validation.component.html',
@@ -12,9 +14,12 @@ import { StoreDataService } from 'src/app/services/store-data.service';
 export class BiometricValidationComponent {
   ownerId: string | null = null;
   metadata: string | null = null;
+  private apiUrl = environment.apiUrl;
   public primaryColor: string = '#0000CC'; // Default color or get from the theme
   isProcessing = false; // Tracks the processing state
   theme: string | null = null;
+  OnbURL = `${this.apiUrl}/public/wibond-connect/onboarding/kyc-histories`;
+  OnbHistoryURL = `${this.apiUrl}/public/wibond-connect//wibond-connect/onboarding`; // URL de tu backend
   isDarkMode: boolean = false;
   @Input() isMobile: boolean = false;
   @Output() verificationCompleted = new EventEmitter<boolean>(); // Emit when verification is finished
@@ -23,10 +28,13 @@ export class BiometricValidationComponent {
   validationOK: boolean = false;
   validationFailed: boolean = false;
   showMetamapButton: boolean = false;
+  public flowId: string = '';
   constructor(
     private themeService: ThemeService,
     private storeDataService: StoreDataService,
-    private onboardingService: OnboardingService
+    private onboardingService: OnboardingService,
+    private tokenService: TokenService,
+    private http: HttpClient
   ) {}
 
   forceOK(): void {
@@ -42,11 +50,15 @@ export class BiometricValidationComponent {
     this.returnToEmailForm.emit();
   }
   ngOnInit() {
+    console.log('biometric validation for password and pin recovery');
     this.theme = this.themeService.getCurrentTheme();
     this.isDarkMode = this.theme === 'app-dark';
+
     this.storeDataService.getStore().subscribe((data) => {
       if (data.init_config) {
         this.primaryColor = data.init_config.primary_color || '#0000CC';
+        this.flowId =
+          data.init_config.metamap_flow_id || '67b745d899b525001ca94b0c';
       }
     });
 
@@ -56,25 +68,26 @@ export class BiometricValidationComponent {
         fixedLanguage: 'es',
       });
     } else {
-      this.onboardingService.getOnboardingStatus().subscribe({
+      console.log('getting onboarding status.....');
+      this.onboardingService.getOnboardingStatusOTP().subscribe({
         next: (response) => {
-          //console.log('onboarding status ', response);
-          this.ownerId = response.owner_id; // return the getOnboardingStatus
+          this.ownerId = response.owner_id; // Set the ownerId from the response
           this.metadata = JSON.stringify({
             owner_id: this.ownerId,
             fixedLanguage: 'es',
           });
-          //this.validateMetamapVerification();
-          console.log('metada: ', this.metadata);
-          //this.isLoading = false;
+          console.log('metadata: ', this.metadata);
         },
         error: (error) => {
-          console.error('Error:', error);
+          console.error(
+            'Error obteniendo datos de owner id de onboarding:',
+            error
+          );
+          // Handle the error as needed
         },
       });
     }
   }
-
   validateMetamapVerification() {
     this.onboardingService.startKycHistoryRegister().subscribe({
       next: (response: any) => {

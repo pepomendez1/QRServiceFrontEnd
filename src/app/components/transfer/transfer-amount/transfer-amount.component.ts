@@ -26,6 +26,16 @@ export class TransferAmountComponent {
     this.enableButton.emit(false);
     this.setAmount.emit(this.amount);
   }
+
+  onFocus() {
+    console.log('Input focused');
+    // Add any additional logic here
+  }
+
+  onBlur() {
+    console.log('Input blurred');
+    // Add any additional logic here
+  }
   handleKeyDown(event: KeyboardEvent) {
     console.log('handleKeyDown: Event:', this.amount);
     const inputElement = event.target as HTMLInputElement;

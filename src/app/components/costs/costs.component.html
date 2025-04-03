@@ -1,0 +1,21 @@
+<div class="costs-container">
+  
+    <!-- Panel derecho sin doble card -->
+    <div class="right-panel custom-card">
+      <mat-tab-group>
+        <mat-tab>
+          <ng-template mat-tab-label>Link de pago</ng-template>
+          <app-costs-payment-link [config]="config" *ngIf="!loading"></app-costs-payment-link>
+          
+        </mat-tab>
+        <!-- AGREGAR TABS ACA PARA MAS CONFIGURACIONES FUTURAS
+        <mat-tab>
+          <ng-template mat-tab-label>Ingresos</ng-template>
+          <app-payment-link-income></app-payment-link-income>
+        </mat-tab> -->
+      </mat-tab-group>
+    </div>
+    <div class="spinner-container">
+      <mat-spinner *ngIf="loading" class="m-3"></mat-spinner>
+    </div>
+</div>

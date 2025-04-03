@@ -133,8 +133,8 @@ export class ThemeService {
     console.log('setting title and favicon...');
     this.storeService.getStore().subscribe((store) => {
       const initConfig = store.init_config;
-      console.log('favicon ', initConfig?.favicon_url);
-      console.log('title ', initConfig?.web_title);
+      //console.log('favicon ', initConfig?.favicon_url);
+      // console.log('title ', initConfig?.web_title);
       if (initConfig) {
         // Update the title
         if (initConfig.web_title) {

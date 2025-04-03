@@ -7,44 +7,50 @@
       class="svg-logo-container"
     ></div>
 
-    <!-- Swiper Container -->
-    <swiper-container
-      [pagination]="pagination"
-      [navigation]="navigation"
-      [keyboard]="{ enabled: true, onlyInViewport: true }"
-      space-between="40"
-    >
-      <!-- Dynamic Slides -->
-      <swiper-slide *ngFor="let slide of slides">
-        <div class="swiper-card-container">
-          <div class="swiper-card">
-            <!-- Dynamic Background Image -->
-            <div
-              class="image-container"
-              [style.backgroundImage]="'url(' + slide.slideImage + ')'"
-              [style.background-color]="primaryColor"
-            ></div>
-
-            <!-- Content -->
-            <div class="content">
-              <div class="text-content">
-                <h2 class="heading-4-700">{{ slide.slideTitle }}</h2>
-                <p class="paragraph-400">
-                  {{ slide.slideDescription }}
-                </p>
+    <!-- Pseudo-Card Container for the Button -->
+    <div class="pseudo-card-container">
+      <!-- Swiper Container -->
+      <swiper-container
+        #swiper
+        [pagination]="pagination"
+        [navigation]="navigation"
+        [keyboard]="{ enabled: true, onlyInViewport: true }"
+        space-between="40"
+        (slidechange)="onSlideChange()"
+      >
+        <!-- Dynamic Slides -->
+        <swiper-slide *ngFor="let slide of slides">
+          <div class="swiper-card-container">
+            <div class="swiper-card">
+              <!-- Dynamic Background Image -->
+              <div
+                class="image-container"
+                *ngIf="slide.safeSlideImage"
+                [innerHTML]="slide.safeSlideImage"
+                [style.background-color]="primaryColor"
+              ></div>
+              <!-- Content -->
+              <div class="content">
+                <div class="text-content">
+                  <h2 class="heading-4-700">{{ slide.slideTitle }}</h2>
+                  <p class="paragraph-400">
+                    {{ slide.slideDescription }}
+                  </p>
+                </div>
               </div>
-              <!-- Action Button -->
-              <button
-                class="btn btn-cta-filled create-account-btn"
-                (click)="goToSetPassword()"
-              >
-                Continuar
-              </button>
             </div>
           </div>
-        </div>
-      </swiper-slide>
-    </swiper-container>
+        </swiper-slide>
+      </swiper-container>
+
+      <!-- Fixed Button -->
+      <button
+        class="btn btn-cta-filled create-account-btn"
+        (click)="onButtonClick()"
+      >
+        {{ isLastSlide ? "Crear cuenta" : "Continuar" }}
+      </button>
+    </div>
   </div>
   <app-onb-footer></app-onb-footer>
 </div>
