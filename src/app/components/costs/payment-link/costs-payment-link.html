@@ -26,10 +26,12 @@
     </div>
 
     <div class="installments-section">
-        <div class="installments-toggle">
-            <span class="secondary-400">Ofrecer cuotas sin interés</span>
-            <!-- <mat-slide-toggle [(ngModel)]="installmentsEnabled" class="toggle-switch"></mat-slide-toggle> -->
-        </div>
+    <div class="installments-toggle">
+        <span class="subheading-700">Ofrecer cuotas sin interés</span>
+        <p class="additional-cost">
+            El costo por ofrecer cuotas se sumará al {{ getCreditLabel() }} que pagás por cobro con tarjeta de crédito.
+        </p>
+    </div>
 
         <div class="installment-options">
             <div class="installment-grid">
@@ -37,9 +39,9 @@
                     (click)="toggleInstallmentSelection(option.installments)">
                     <div class="custom-dot" [class.selected]="selectedInstallments.includes(option.installments)"></div>
                     <span class="installment-label">
-                        Hasta {{ option.installments }} cuotas
+                        {{ option.installments }} cuotas
                     </span>
-                    <span class="percentage">+ {{ option.factor | number:'1.2-2' }}%</span>
+                    <span class="percentage">+ {{ option.factor | number:'1.2-2' }}% + IVA</span>
                 </div>
             </div>
         </div>

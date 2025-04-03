@@ -47,7 +47,8 @@ export class PaymentLinkIncomeComponent implements OnInit {
             return {
               ...trx,
               formattedTotalAmount: this.formatCurrency(trx.total_amount),
-              formattedMerchantAmount: this.formatCurrency(trx.merchant_amount),
+              formattedMerchantAmount: this.formatMechantCurrency(trx.merchant_amount),
+              formattedMerchantAmountMobile: this.formatMobileCurrency(trx.merchant_amount),
               status: this.getTransactionStatus(trx.settlement_date)
             };
           });
@@ -63,18 +64,35 @@ export class PaymentLinkIncomeComponent implements OnInit {
       });
   }
 
-  formatCurrency(amount: number): string {
+  formatMobileCurrency(amount: number): string {
+    const cleanAmount = Math.floor(amount); // Remove last two digits (centavos)
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
-      minimumFractionDigits: 2
-    }).format(amount / 100); // Convertir de centavos a unidades
+      minimumFractionDigits: 0,
+    }).format(cleanAmount);
   }
 
+  formatCurrency(amount: number): string {
+      return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 2
+      }).format(amount / 100); // Convertir de centavos a unidades
+    }
+
+    formatMechantCurrency(amount: number): string {
+      return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 2
+      }).format(amount); // Convertir de centavos a unidades
+    }
+
   getTransactionStatus(settlementDate: string | null): string {
-    if (!settlementDate) return 'Por liquidar';
+    if (!settlementDate) return 'Pendiente';
     const settlement = new Date(settlementDate);
-    return settlement <= new Date() ? 'Liquidado' : 'Por liquidar';
+    return settlement <= new Date() ? 'Acreditado' : 'Pendiente';
   }
 
   applyFilters() {

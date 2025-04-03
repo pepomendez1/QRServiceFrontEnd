@@ -635,8 +635,9 @@ export class NewServiceComponent implements OnInit {
                 }
               });
 
-              this.sharedService.emitirEvento('update_history');
-              this.sharedService.emitirEvento('update_my_services');
+              this.sharedService.emitirEvento(SharedService.UPDATE_HISTORY);
+              this.sharedService.emitirEvento(SharedService.UPDATE_MY_SERVICES);
+              this.sharedService.emitirEvento(SharedService.UPDATE_EXPIRATIONS);
 
               this.loading = false;
             },

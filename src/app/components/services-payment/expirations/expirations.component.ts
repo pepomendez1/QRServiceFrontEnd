@@ -147,7 +147,6 @@ export class ExpirationsHistoryComponent implements OnInit {
       this.problemImg = svgContent; // SafeHtml type to display SVG dynamically
       //console.log('Dynamically loaded SVG with store color:', svgContent);
     });
-    
   // Subscribe to the refresh signal
   this.refreshService.refresh$.subscribe(() => {
     this.loadExpirations();
@@ -157,8 +156,11 @@ export class ExpirationsHistoryComponent implements OnInit {
   this.loading = false;
 
     this.sharedService.accion$.subscribe((msg) => {
-      if(msg=='update_history'){
+      if(msg == SharedService.UPDATE_HISTORY){
         this.loadHistory();
+        console.log(msg)
+      } else if(msg == SharedService.UPDATE_EXPIRATIONS){
+        this.loadExpirations();
         console.log(msg)
       }
     });

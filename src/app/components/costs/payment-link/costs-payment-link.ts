@@ -42,7 +42,7 @@ export class CostsPaymentLinkComponent implements OnInit {
     ngOnInit(): void {
         const debit = this.getDebitOptions().find(o => o.active);
         this.selectedDebitOption = debit?.id ?? null;
-        this.initialDebitOption = this.selectedDebitOption;        
+        this.initialDebitOption = this.selectedDebitOption;
         const credit = this.getCreditOptions().find(o => o.active);
         this.selectedCreditOption = credit?.id ?? null;
         this.initialCreditOption = this.selectedCreditOption;
@@ -66,9 +66,20 @@ export class CostsPaymentLinkComponent implements OnInit {
     return this.config?.transactional_commission?.credit_card?.options || [];
   }
 
-  getInstallmentOptions(): FinancialCommissionOption[] {
-    return this.config?.financial_commission?.without_interest || [];
+  getCreditLabel(): string {
+    const option = this.getCreditOptions().find(o => o.id === this.selectedCreditOption);
+    return option ? `${(option.commission).toFixed(2)}%` : 'costo base';
   }
+
+
+  getInstallmentOptions(): FinancialCommissionOption[] {
+  const allowedIds = [112, 113, 114, 116, 119, 122];
+  return (
+    this.config?.financial_commission?.without_interest?.filter(option =>
+      allowedIds.includes(option.id)
+    ) || []
+  );
+}
 
   selectDebit(id: number): void {
     this.selectedDebitOption = id;

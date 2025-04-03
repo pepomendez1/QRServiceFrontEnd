@@ -34,19 +34,19 @@
                 align-items: center;
                 justify-content: space-between;
                 transition: border-color 0.2s, background-color 0.2s;
-        
+
                 .label {
                     font-size: 12px;
                 }
-        
+
                 .fee {
                     font-size: 12px;
                     font-weight: 700;
                 }
-        
+
                 &.selected {
-                    border-color: #CCCCCC;
-                    border: 2px solid #CCCCCC;
+                    border-color: #080808;
+                    border: 2px solid #080808;
                 }
             }
                         .options-row {
@@ -67,39 +67,22 @@
     margin-top: 24px;
 
     .installments-toggle {
-        display: flex;
+        flex-direction: row;
         align-items: center;
-        gap: 8px; // ↓ small space between text and toggle
-        margin-bottom: 16px;
-
-        .toggle-label {
-            font-weight: 500;
-            font-size: 16px;
-        }
-
-        .toggle-switch {
-            margin: 0; // remove default margin from mat-slide-toggle
-        }
+        //margin-bottom: 16px;
     }
 
 .installment-options {
-    width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; // Align to the left of the panel
     padding-top: 5px;
 }
 
 .installment-grid {
-    display: grid;
-    width: 100%;
-    max-width: 100%;
-    grid-template-columns: 1fr; // Mobile default
+    width: 248px; // Match cost card width
+    display: flex;
+    flex-direction: column;
     gap: 24px;
-
-    @media (min-width: 768px) {
-        grid-template-columns: repeat(2, 1fr); // 2 equal columns on desktop
-        gap: 24px 32px;
-    }
 }
 
 .installment-item {
@@ -111,7 +94,7 @@
     padding-bottom: 16px;
     border-bottom: 1px solid #ddd;
 }
-    
+
         .custom-dot {
             width: 24px;
             height: 24px;
@@ -119,7 +102,7 @@
             border: 2px solid #bbb;
             margin-right: 12px;
             position: relative;
-    
+
             &.selected::after {
                 content: '';
                 position: absolute;
@@ -131,17 +114,33 @@
                 border-radius: 50%;
             }
         }
-    
+
         .installment-label {
             flex-grow: 1;
             font-size: 12px;
         }
-    
+
         .percentage {
             font-size: 12px;
             font-weight: 500;
             color: #555;
         }
+}
+
+
+.additional-cost {
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+    margin-top: 0px;
+    width: 248px; // Default width
+
+    @media (min-width: 768px) {
+        width: 100%; // ✅ Full width on desktop
+        border-bottom: 0px;
+    }
 }
 
 .sticky-button-container {

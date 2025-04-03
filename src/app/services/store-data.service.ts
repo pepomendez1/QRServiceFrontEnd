@@ -47,6 +47,7 @@ export interface StorageData {
     slide3Description: string;
     slide4Title: string;
     slide4Description: string;
+    payment_portal_url: string;
   };
   isIframe?: boolean; // ✅ Add isIframe flag
   cognitoUser?: CognitoUser | null; // Add cognitoUser to the interface

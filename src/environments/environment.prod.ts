@@ -1,5 +1,5 @@
 export const environment = {
-  production: true,
+  production: false,
   region: 'us-east-2',
   apiUrl: 'https://connect-api.wibond.co',
   debugMode: false,

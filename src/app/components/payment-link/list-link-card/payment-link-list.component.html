@@ -14,7 +14,7 @@
         <mat-spinner class="search-spinner" [class.show]="searching"></mat-spinner>
       </div>
     </div>
-  
+
     <!-- Loading State -->
     <div class="mat-spinner-container">
         <mat-spinner
@@ -23,10 +23,10 @@
           [diameter]="80"
         ></mat-spinner>
     </div>
-  
+
     <!-- Error State -->
     <div *ngIf="error" class="error-message">{{ error }}</div>
-  
+
     <!-- Links List -->
     <div class="links-container" *ngIf="filteredLinks.length > 0 && !isLoading">
       <div *ngFor="let link of filteredLinks" class="link-item">
@@ -41,16 +41,21 @@
               </span>
             </div>
             <div class="secondary-500-light">
-              {{ link.currency }} {{ formatAmount(link.amount) }} - 
-              Expira el {{ link.expirationDate || 'Sin fecha' }}
+              {{ link.currency }} {{ formatAmount(link.amount) }}
+              <ng-container *ngIf="link.expirationDate; else noExpiration">
+                - Expira el {{ link.expirationDate }}
+              </ng-container>
+              <ng-template #noExpiration>
+                - Sin vencimiento
+              </ng-template>
             </div>
           </div>
         </div>
-  
+
         <!-- Actions -->
         <div class="link-actions">
-          <button 
-            class="btn-ghost-color btn-lg" 
+          <button
+            class="btn-ghost-color btn-lg"
             (click)="copyLink(link.url, link.id)"
             *ngIf="link.status !== 'DELETED'">
             {{ copiedLinkId === link.id ? 'Copiado' : 'Copiar link' }}
@@ -77,14 +82,14 @@
       <select [(ngModel)]="pageSize" (change)="loadPaymentLinks()" class="page-size-dropdown">
         <option *ngFor="let size of [10, 25, 50, 100]" [value]="size">{{ size }}</option>
       </select>
-    
+
       <span class="rows-label">filas por página</span>
-    
+
       <!-- Page Info -->
       <span class="page-info">
         {{ getStartIndex() }}-{{ getEndIndex() }} de {{ totalLinks }}
       </span>
-    
+
       <!-- Navigation Buttons -->
       <button (click)="previousPage()" [disabled]="currentPage === 1" class="nav-button">
         ←
@@ -98,4 +103,3 @@
       No tienes links de pago creados aún.
     </div>
   </div>
-  

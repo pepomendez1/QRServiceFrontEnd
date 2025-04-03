@@ -37,7 +37,7 @@
     <tr>
       <th class="desktop-only">Link</th>
       <th>Venta</th>
-      <th>Liquidación</th>
+      <th>Acreditación</th>
       <th>Estado</th>
     </tr>
   </thead>
@@ -54,7 +54,7 @@
       </td>
       <td>
         <span class="status-label"
-          [ngClass]="{ 'liquidado': income.status === 'Liquidado', 'por-liquidar': income.status === 'Por liquidar' }">
+          [ngClass]="{ 'liquidado': income.status === 'Acreditado', 'por-liquidar': income.status === 'Pendiente' }">
           {{ income.status }}
         </span>
       </td>
@@ -66,22 +66,22 @@
 <div class="income-mobile-container">
   <div class="income-mobile-header">
     <span>Venta</span>
-    <span>Liquidación</span>
+    <span>Acreditación</span>
     <span>Estado</span>
   </div>
 
   <div class="income-card" *ngFor="let income of filteredTransactions">
     <div class="income-column">
-      <span class="secondary-500">{{ income.created_at | date: 'dd/MM/yyyy' }}</span>
-      <span class="paragraph-600">{{ income.formattedTotalAmount }}</span>
+      <span class="income-date">{{ income.created_at | date: 'dd/MM/yy' }}</span>
+      <span class="income-amount">{{ income.formattedTotalAmount }}</span>
     </div>
     <div class="income-column">
-      <span class="secondary-500">{{ income.settlement_date | date: 'dd/MM/yyyy' }}</span>
-      <span class="paragraph-600">{{ income.formattedMerchantAmount }}</span>
+      <span class="income-date">{{ income.created_at | date: 'dd/MM/yy' }}</span>
+      <span class="income-amount">{{ income.formattedMerchantAmountMobile }}</span>
     </div>
     <div class="income-status">
-      <span class="status-label"
-        [ngClass]="{ 'liquidado': income.status === 'Liquidado', 'por-liquidar': income.status === 'Por liquidar' }">
+      <span class="status-label-mobile"
+        [ngClass]="{ 'liquidado': income.status === 'Acreditado', 'por-liquidar': income.status === 'Pendiente' }">
         {{ income.status }}
       </span>
     </div>

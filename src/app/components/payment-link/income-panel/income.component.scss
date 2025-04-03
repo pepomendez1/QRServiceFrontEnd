@@ -132,6 +132,17 @@
   flex: 1;
 }
 
+.income-amount{
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.income-date{
+  font-size: 12px;
+  text-align: right;
+}
+
 .status-label {
   padding: 4px 8px;
   border-radius: 4px;
@@ -145,8 +156,26 @@
   }
 
   &.por-liquidar {
-    background-color: #F2F2F2;
-    color: "black";
+    background-color: #fff3cd;
+    color: #856404;
+  }
+}
+
+.status-label-mobile {
+  padding: 4px 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  display: inline-block;
+  text-align: center;
+
+  &.liquidado {
+    background-color: #ECF9EC;
+    color: #267326;
+  }
+
+  &.por-liquidar {
+    background-color: #fff3cd;
+    color: #856404;
   }
 }
 
@@ -164,7 +193,7 @@
       margin-top: 20px;
       margin-bottom: 10px;
     }
-  
+
     .page-size-dropdown {
       border: none;
       border-radius: 8px;
@@ -172,16 +201,16 @@
       cursor: pointer;
       font-size: 14px;
     }
-  
+
     .rows-label {
       color: #666;
     }
-  
+
     .page-info {
       flex: 1;
       text-align: center;
     }
-  
+
     .nav-button {
       background: none;
       border: none;
@@ -189,7 +218,7 @@
       font-size: 16px;
       padding: 4px;
       color: #000;
-  
+
       &:disabled {
         color: #ccc;
         cursor: not-allowed;

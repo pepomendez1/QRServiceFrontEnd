@@ -51,7 +51,7 @@
 
               <div class="details">
                 <div class="paragraph-600">
-                  {{ activity.type ? activity.type : "Sin descripción" }}
+                  Nro. de cuenta {{ activity.agendaId ? activity.agendaId.split('#').pop() : "Sin descripción" }}
                 </div>
                 <div class="secondary-500-light">
                   {{ activity.companyName ? activity.companyName : "Comercio desconocido" }}
@@ -70,6 +70,7 @@
                   <mat-icon color="primary">notifications</mat-icon>
                 </div>
 
+                <span *ngIf="!isToday(activity.expirationDate)">Vencimiento: {{ activity.expirationDate }}</span>
                 <!-- <span *ngIf="!activity.vencido && activity.autodebito">Se autodebita el {{ activity.fechaAutodebito }}</span> -->
               </div>
             </div>

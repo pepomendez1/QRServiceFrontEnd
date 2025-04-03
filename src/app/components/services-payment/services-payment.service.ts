@@ -828,22 +828,28 @@ export class ServicesPaymentService {
   }
 
   private mapBackendToFrontend(backendData: BackendHistory[]): Histories {
-    return backendData.map(item => ({
-      description: `${item.company.category} - Nro de Cuenta ${item.external_id} `,
-      merchant_name: item.company.company_name || 'Desconocido',
+    return backendData.map(item => {
+        // Extraemos la parte después de ":"
+        const parts = item.additional_data.split(":");
+        const accountNumber = parts.length > 1 ? parts[1] : 'Desconocido';
 
-      companyCode: item.company.company_code || 'Desconocido',
-      companyName: item.company.company_name || 'Desconocido',
-      companyLogo: item.company.company_logo || 'Desconocido',
+        return {
+            description: `${item.company.category} - Nro de Cuenta ${accountNumber}`,
+            merchant_name: item.company.company_name || 'Desconocido',
 
-      operation_id: item.operation_id,
-      vencido: new Date(item.created_at) < new Date(),  // Si la fecha es pasada, está vencido
-      autodebito: false,  // No hay info en el backend, por defecto `false`
-      fechaAutodebito: '',  // No hay info, por defecto vacío
-      amount: item.amount,
-      date: item.created_at.split('T')[0]  // Tomamos solo la fecha sin la hora
-    }));
-  }
+            companyCode: item.company.company_code || 'Desconocido',
+            companyName: item.company.company_name || 'Desconocido',
+            companyLogo: item.company.company_logo || 'Desconocido',
+
+            operation_id: item.operation_id,
+            vencido: new Date(item.created_at) < new Date(),  // Si la fecha es pasada, está vencido
+            autodebito: false,  // No hay info en el backend, por defecto `false`
+            fechaAutodebito: '',  // No hay info, por defecto vacío
+            amount: item.amount,
+            date: item.created_at.split('T')[0]  // Tomamos solo la fecha sin la hora
+        };
+    });
+}
 
   public payments(requestBody: RequestPayments): Observable<any> {
     console.log('payment() body:', requestBody);
