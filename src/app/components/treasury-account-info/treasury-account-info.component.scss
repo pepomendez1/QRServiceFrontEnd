@@ -3,28 +3,43 @@
 $icon-button-size: 24px;
 
 .account-info-container {
-  height: 100%;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 1em;
+  overflow: hidden;
+  padding: 0; // Ensure no padding
+  margin: 0; // Ensure no margin
 
+  /* Ajustes para el preloader centrado */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh; /* Altura específica y más pequeña para el spinner */
+  width: 100%;
+  mat-spinner {
+    width: 50px !important; /* Ajustar el ancho del spinner */
+    height: 50px !important; /* Ajustar la altura del spinner */
+  }
+}
   .info-wrapper {
-    height: 100%;
+    flex-grow: 1; /* Allow the content to grow and fill the available space */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    flex-grow: 1; /* Allow the content to grow and fill the available space */
-    gap: 1em;
+    padding: 0; // Ensure no padding
+    margin: 0; // Ensure no margin
   }
 
   .account-info {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     justify-content: space-between;
+    padding: 0; // Ensure no padding
+    margin: 0; // Ensure no margin
     .info-box {
       width: 100%;
       display: flex;
@@ -101,44 +116,9 @@ $icon-button-size: 24px;
   }
 }
 
-.error-message {
-  margin-top: 10px;
-  color: red;
-}
-
-.copy-message {
-  margin-top: 10px;
-  color: green;
-}
 mat-form-field {
   width: 100%;
 }
 
-/* Ajustes para el preloader centrado */
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 80vh; /* Altura específica y más pequeña para el spinner */
-  width: 100%;
-  mat-spinner {
-    width: 50px !important; /* Ajustar el ancho del spinner */
-    height: 50px !important; /* Ajustar la altura del spinner */
-  }
-}
 
-.section-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1em;
-  text-align: center;
-  width: 100%;
-  //box-shadow: 0px 4px 24px 0px #16161629;
-  .btn {
-    height: 60px;
-    text-align: center;
-    justify-content: center;
-    width: 100%;
-  }
-}
+

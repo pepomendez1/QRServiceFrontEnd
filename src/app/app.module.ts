@@ -12,6 +12,7 @@ import { registerLocaleData } from '@angular/common';
 import { StoreDataService } from './services/store-data.service';
 import { SvgLibraryService } from './services/svg-library.service';
 import { DatePipe } from '@angular/common';
+import { MatProgressBar } from '@angular/material/progress-bar';
 import { FormatNamePipe } from './pipes/format-name.pipe';
 import { StatusPillPipe } from './pipes/status-pill.pipe';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
@@ -67,6 +68,10 @@ const SVG_NAMES = [
   'problem',
   'searching',
   'discount-cupons',
+  'slide-1',
+  'slide-2',
+  'slide-3',
+  'slide-4',
 ];
 
 // Preload SVGs with the primary color from the store
@@ -100,10 +105,10 @@ export function preloadSvgLibrary(
             store.init_config?.contrast_logo_url ||
             themeService.getDynamicLogo(true, primaryColor);
 
-          console.log('Primary color:', primaryColor);
-          console.log('Stroke color:', strokeColor);
-          console.log('Primary Logo URL:', logoUrl);
-          console.log('Contrast Logo URL:', contrastLogoUrl);
+          // console.log('Primary color:', primaryColor);
+          // console.log('Stroke color:', strokeColor);
+          // console.log('Primary Logo URL:', logoUrl);
+          // console.log('Contrast Logo URL:', contrastLogoUrl);
 
           const customUrls = Object.keys(store.init_config || {}).reduce(
             (acc, key) => {
@@ -151,7 +156,7 @@ export function preloadSvgLibrary(
     HttpClientModule,
     AuthModule,
     BrowserAnimationsModule,
-
+    MatProgressBar,
     // Core Modules
     AppRoutingModule,
 

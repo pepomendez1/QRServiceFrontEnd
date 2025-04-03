@@ -1,63 +1,86 @@
 app-welcome-slider {
-
   .welcome-container {
     background-color: $theme-background;
 
     swiper-container {
-      box-shadow: $theme-box-shadow;
+      // Remove shadow from swiper-container
+      box-shadow: none;
+
       .swiper-card-container {
         .swiper-card {
           background-color: $theme-card;
+
           .content {
             background-color: $theme-card;
+            padding-bottom: 2em; // Add padding to separate content from button
           }
         }
       }
-    }
-    swiper-container::part(bullet) {
-      background-color: $theme-swiper-bullet;
-    }
-    swiper-container::part(button-prev) {
-      padding-left: 1.5em;
-      height: 20px;
-      width: 20px;
-      color: $theme-swiper-button-prev;
-      transform: translateY(600%);
 
+      &::part(bullet) {
+        background-color: $theme-swiper-bullet !important;
+      }
+
+      &::part(button-prev),
+      &::part(button-next) {
+        padding-left: 1.5em;
+        padding-right: 1.5em;
+        height: 20px;
+        width: 20px;
+        color: $theme-swiper-button-prev !important;
+        top: 80%; // Center vertically
+        transform: translateY(-50%); // Adjust for exact centering
+      }
+
+      &::part(button-next) {
+        color: $theme-swiper-button-next !important;
+      }
+
+      &::part(bullet-active) {
+        background-color: $theme-swiper-bullet-active !important;
+      }
     }
-    swiper-container::part(button-next) {
-      padding-right: 1.5em;
-      height: 20px;
-      width: 20px;
-      color: $theme-swiper-button-next;
-      transform: translateY(600%);
-    }
-    swiper-container::part(bullet-active) {
-      background-color: $theme-swiper-bullet-active;
+
+    // Apply shadow to the pseudo-card container
+    .pseudo-card-container {
+      box-shadow: $theme-box-shadow; // Use the theme variable for shadow
     }
   }
 
   @media screen and (max-width: 840px) {
     .welcome-container {
       swiper-container::part(bullet) {
-        background-color: $theme-swiper-bullet;
-        transform: translateY(-1300%);
+        background-color: $theme-swiper-bullet !important;
+        opacity: 0.5; // Make active bullet fully visible
+        width: 8px; // Adjust bullet size
+        height: 8px; // Adjust bullet size
+        margin: 0 4px; // Add spacing between bullets
+        transform: translateY(-1000%); // Restore the large transform
+        bottom: auto; // Ensure bottom is not overriding the transform
       }
-      swiper-container::part(button-prev) {
-        height: 20px;
-        width: 20px;
-        color: $theme-swiper-bullet-active;
-        transform: translateY(0%);
+
+      swiper-container::part(bullet-active) {
+        background-color: $theme-swiper-bullet-active !important;
+        opacity: 1; // Make active bullet fully visible
+        width: 8px; // Adjust active bullet size
+        height: 8px; // Adjust active bullet size
+        transform: translateY(-1000%); // Match the transform of regular bullets
+        bottom: auto; // Ensure bottom is not overriding the transform
       }
+
+      swiper-container::part(button-prev),
       swiper-container::part(button-next) {
         height: 20px;
         width: 20px;
-        color: $theme-swiper-bullet-active;
-        transform: translateY(0%);
+        color: $theme-swiper-bullet-active !important;
+        top: 50%; // Center vertically
+        transform: translateY(-50%); // Adjust for exact centering
       }
-      swiper-container::part(bullet-active) {
-        background-color: $theme-swiper-bullet-active;
-        transform: translateY(-1300%);
+
+      // Adjust pseudo-card container for mobile
+      .pseudo-card-container {
+        box-shadow: none; // Ensure shadow is applied on mobile
+        border-radius: 0; // Remove border radius on mobile if needed
       }
     }
   }

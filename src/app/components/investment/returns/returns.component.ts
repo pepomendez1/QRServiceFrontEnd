@@ -97,7 +97,7 @@ export class ReturnsComponent implements OnInit, AfterViewInit, OnDestroy {
     { label: 'Sep', value: 910 },
   ];
   formatNumber = (value: number) => {
-    return `$${value.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+    return `$${value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
   };
 
   constructor(

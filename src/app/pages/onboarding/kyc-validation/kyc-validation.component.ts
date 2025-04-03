@@ -33,7 +33,7 @@ export class KycValidationComponent {
       if (data.init_config) {
         this.primaryColor = data.init_config.primary_color || '#507CDD';
         this.flowId =
-          data.init_config.metamap_flow_id || '6692be9aa8d43a001cdc9a74';
+          data.init_config.metamap_flow_id || '67b5c5fce1daf5001c0c783e';
       }
     });
     this.onboardingService.getOnboardingStatus().subscribe({
@@ -55,27 +55,10 @@ export class KycValidationComponent {
   goToParent() {
     this.stepCompleted.emit('metamap_completed'); // Call stepCompleted method
   }
-  onVerificationFinishe() {
+  onVerificationFinished() {
     // onboarding_status = address_pending
-    this.isProcessing = true;
-    const intervalId = setInterval(() => {
-      console.log('polling status...');
-      this.onboardingService.getOnboardingStatus().subscribe({
-        next: (response: any) => {
-          const metamap_status = response.metamap_status; // Adjust according to your API response format
-          console.log('status: ', metamap_status);
-          if (metamap_status === 'InProgress') {
-            // address_pending
-            clearInterval(intervalId); // Stop the interval
-            this.stepCompleted.emit('metamap_completed'); // Call stepCompleted method
-          }
-        },
-        error: (error: any) => {
-          console.error('Error obteniendo el estado:', error);
-          this.isProcessing = false;
-          clearInterval(intervalId);
-        },
-      });
-    }, 2000); // Poll every 2 seconds
+    this.isProcessing = false;
+    this.stepCompleted.emit('metamap_completed'); // Call stepCompleted method
+    this.onboardingService.checkOnboardingStatus(true); // Pass true to indicate metamap_completed
   }
 }

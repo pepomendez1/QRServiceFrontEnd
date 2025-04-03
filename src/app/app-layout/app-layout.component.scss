@@ -3,11 +3,16 @@
 .main-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Ensures it covers the full viewport height */
-  width: 100vw;
+  min-height: 100dvh; /* Ensures it covers the full viewport height */
+  width: 100dvw;
   overflow-x: hidden;
   box-sizing: border-box; /* Includes padding and border in size */
 }
+
+.mat-sidenav-container {
+  height: 100dvh; /* Ensure the container takes full viewport height */
+}
+
 .content-container {
   //background-color: white;
   display: flex;
@@ -23,7 +28,7 @@
     max-width: 100%;
     box-sizing: border-box; /* Include padding in height calculations */
     @media screen and (max-width: 599px) {
-      padding: 0.8em 1em 1em 1em;
+      padding: 5em 1em 1em 1em;
     }
   }
   .footer {
@@ -37,38 +42,35 @@
 /* Style the mat-sidenav */
 .side-panel-sidenav {
   width: $sidepanel-width;
-  height: 100vh; /* Full viewport height */
-  //background-color: white;
+  height: 100dvh; /* Full viewport height */
   padding: 2em;
   overflow: hidden;
   box-shadow: none;
+
   &.padding-zero {
     padding: 0;
   }
 
   @media (max-width: 599px) {
-    width: 100%;
+    width: 100dvw;
     padding: 1em;
-    .side-panel-container {
-      padding: 1em;
-      overflow-y: auto;
-      border-radius: 0;
-    }
+  }
+
+  .side-panel-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
   }
 }
 
-/* Apply border radius to the container div */
-.side-panel-container {
-  width: 100%;
- // background-color: white; /* Set desired background color */
-  border-radius: 0px;
-  padding-bottom: 1em;
-  overflow: hidden; /* Hide any overflow to respect border radius */
-}
-
 .nav-sidebar {
-  height: 100vh;
-  overflow: hidden;
+  height: 100dvh; /* Full viewport height */
+  overflow-y: hidden; /* Allow the sidenav to scroll if content overflows */
+  width: 280px; /* Default width for desktop */
+
+  @media (max-width: 599px) {
+    width: 80%; /* Adjust sidenav width for mobile */
+  }
   .sidenav-toolbar-mobile {
     margin-bottom: 1em;
   }
@@ -110,6 +112,8 @@
   .nav-list-wrapper {
     display: flex;
     flex-direction: column;
+    height: calc(100vh - 200px); /* Adjust height to account for toolbar and other elements */
+    overflow-y: auto; /* Allow the list to scroll if content overflows */
     mat-list-item {
       padding: 0;
     }
@@ -120,6 +124,30 @@
     margin-left: 2px;
     width: 208px;
     height: 1.5em;
+  }
+
+  .nav-item-wrapper-extra {
+    padding-left: 1em;
+    display: flex;
+    align-items: center; /* Vertically center all items */
+    justify-content: space-between; /* Space out items */
+    width: 100%; /* Ensure the container takes full width */
+  }
+
+  .material-symbols-outlined {
+    vertical-align: middle; // Align icon to middle
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+  }
+
+  .name {
+    padding: 0 0.5em; /* Add spacing between text and toggle */
+  }
+
+  .slide-toggle {
+    align-self: flex-start;
+    margin-left: auto; /* Push the toggle to the right */
   }
 
   .sidenav-menu-list {
@@ -156,5 +184,15 @@
       cursor: not-allowed;
       opacity: 0.6;
     }
+  }
+}
+
+@media (max-width: 599px) {
+  .nav-sidebar {
+    width: 80%; /* Adjust sidenav width for mobile */
+  }
+
+  .nav-list-wrapper {
+    height: calc(100dvh - 150px); /* Adjust height for mobile */
   }
 }

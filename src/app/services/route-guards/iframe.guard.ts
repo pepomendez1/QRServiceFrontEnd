@@ -19,12 +19,12 @@ export const iframeGuard: CanActivateFn = (route, state) => {
   const userService = inject(UserService);
   const onboardingService = inject(OnboardingService);
 
-  console.log('AASDASDASD Guard Triggered for Route:', state.url);
+  console.log('🛡️ iframeGuard triggered for:', state.url);
 
-  // Check if on /on-hold page; if so, redirect to login on refresh
-  if (state.url === '/i/on-hold') {
-    console.log('Page reloaded on /on-hold, redirecting to /auth/login');
-    return of(true); //
+  // Prevents refresh-loop issue on /on-hold
+  if (state.url === '/on-hold') {
+    console.log('Page reloaded on /on-hold, keeping user here.');
+    return of(true);
   }
 
   return authService.isAuthenticated().pipe(
@@ -32,8 +32,7 @@ export const iframeGuard: CanActivateFn = (route, state) => {
       console.log('User Authenticated:', isAuthenticated);
 
       if (!isAuthenticated) {
-        console.log('User not authenticated, redirecting to /auth/login');
-        //router.navigate(['/auth/login']);
+        console.log('User not authenticated');
         return of(false);
       }
 
@@ -47,60 +46,82 @@ export const iframeGuard: CanActivateFn = (route, state) => {
 
           const currentRoute = state.url;
 
-          // Handle specific status cases
+          // 🔹 Redirect user based on their status
           if (userStatus === USER_STATUS.PIN) {
-            if (currentRoute.startsWith('/i/pin-code')) {
+            if (currentRoute.startsWith('/pin-code')) {
               return true; // Allow access to '/pin-code'
             } else {
-              console.log('Redirecting to /i/pin-code for PIN setup');
-              router.navigate(['/i/onboarding']);
+              console.log('Redirecting to /pin-code for PIN setup');
+              router.navigate(['/pin-code']);
               return false;
             }
           }
 
           if (userStatus === USER_STATUS.ONBOARDING) {
-            if (currentRoute.startsWith('/i/onboarding')) {
+            if (currentRoute.startsWith('/onboarding')) {
               return true; // Allow access to '/onboarding'
             } else {
               console.log(
                 'Redirecting to /onboarding for ongoing onboarding process'
               );
-              router.navigate(['/i/onboarding']);
+              router.navigate(['/onboarding']);
               return false;
             }
           }
 
-          if (userStatus === USER_STATUS.COMPLETED) {
-            if (metamapStatus !== 'Completed') {
-              if (currentRoute.startsWith('/i/on-hold')) {
+          if (userStatus === USER_STATUS.TREASURY) {
+            if (metamapStatus == 'Pending') {
+              if (currentRoute.startsWith('/onboarding')) {
                 return true; // Allow access to '/on-hold'
               } else {
                 console.log('Metamap is InProgress, redirecting to /on-hold');
-                router.navigate(['/i/on-hold']);
+                router.navigate(['/onboarding']);
                 return false;
               }
             } else {
-              if (currentRoute.startsWith('/i/app')) {
-                return true; // Allow access to '/app'
+              if (currentRoute.startsWith('/on-hold')) {
+                return true; // Allow access to '/on-hold'
               } else {
-                console.log('Metamap Completed, redirecting to /i/app');
-                router.navigate(['/i/app']);
+                console.log('Metamap is InProgress, redirecting to /on-hold');
+                router.navigate(['/on-hold']);
                 return false;
               }
             }
           }
 
+          if (userStatus === USER_STATUS.COMPLETED) {
+            if (metamapStatus == 'Pending') {
+              if (currentRoute.startsWith('/onboarding')) {
+                return true; // Allow access to '/on-hold'
+              } else {
+                console.log('Metamap is InProgress, redirecting to /on-hold');
+                router.navigate(['/onboarding']);
+                return false;
+              }
+            } else if (metamapStatus !== 'Completed') {
+              if (currentRoute.startsWith('/on-hold')) {
+                return true; // Allow access to '/on-hold'
+              } else {
+                console.log('Metamap is InProgress, redirecting to /on-hold');
+                router.navigate(['/on-hold']);
+                return false;
+              }
+            } else {
+              if (currentRoute.startsWith('/app/')) {
+                return true;
+              } else {
+                console.log('Metamap Completed, redirecting to home');
+                router.navigate(['/app']);
+                return false;
+              }
+            }
+          }
           // Default fallback to login
-          console.log('Unexpected case, redirecting to /auth/login');
-          //router.navigate(['/auth/login']);
+          console.log('Unexpected case ...');
           return false;
         }),
         catchError((error) => {
-          console.error(
-            'Error obtaining user status or metamap status:',
-            error
-          );
-         // router.navigate(['/auth/login']);
+          console.error('Error obtaining user status:', error);
           return of(false);
         })
       );

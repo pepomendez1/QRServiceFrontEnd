@@ -3,10 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
+  production: true,
   region: 'us-east-2', // Cambia esto a tu región
   redirectUrl: 'http://localhost:4200/',
-  apiUrl: 'https://connect-api-nprod.wibond.co',
+  apiUrl: 'https://connect-api.wibond.co',
   debugMode: true,
   // apiUrl: 'https://xa9cbubdj2.execute-api.us-east-2.amazonaws.com/public',
 };

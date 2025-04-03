@@ -9,6 +9,8 @@ import {
 } from 'rxjs';
 import { debounceTime, mapTo, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { SnackbarService } from '@fe-treasury/shared/snack-bar/snackbar.service';
+import { TokenService } from './token.service';
+import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root',
 })
@@ -33,7 +35,15 @@ export class SessionManagementService {
   private warningSubscription?: Subscription;
   private logoutSubscription?: Subscription;
 
-  constructor(private snackbarService: SnackbarService) {}
+  private tokenExpirationTimer$ = new Subject<void>(); // Timer for token expiration
+  private tokenExpirationTime: number | null = null; // Stores the token expiration time
+  private isTokenMonitoringActive = false; // Flag to track if token monitoring is active
+
+  constructor(
+    private snackbarService: SnackbarService,
+    private tokenService: TokenService,
+    private router: Router
+  ) {}
 
   // Expose the logoutReason$ as an observable
   getLogoutReason() {
@@ -53,7 +63,7 @@ export class SessionManagementService {
   /**
    * Starts monitoring user activity and handles session timeout logic.
    */
-  startMonitoring(): void {
+  startInactivityMonitoring(): void {
     this.resetLogoutReason();
     if (this.sessionMonitorActive) {
       return; // Prevent multiple starts
@@ -81,8 +91,97 @@ export class SessionManagementService {
     this.logoutSubscription = this.onLogout.subscribe(() => {
       console.warn('Session expired. Closing snackbar.');
       this.snackbarService.close();
-      this.stopMonitoring();
+      this.stopInactivityMonitoring();
     });
+  }
+
+  /**
+   * Starts monitoring token expiration (for /auth/register, /pin-code, /onboarding routes).
+   */
+  startTokenExpirationMonitoring(): void {
+    console.log('running token monitor......');
+    const accessToken = this.tokenService.getToken('access_token');
+    console.log('access token monitoring: ', accessToken);
+    if (!accessToken) {
+      console.error('Access token not found.');
+      return;
+    }
+
+    // Decode the access token to get the expiration time
+    const decodedToken = this.tokenService.decodeToken(accessToken);
+    console.log('decoded token: ....... ', decodedToken);
+    if (!decodedToken || !decodedToken.exp) {
+      console.error('Invalid access token.');
+      return;
+    }
+
+    // Calculate exactly when token expires
+    const expirationTime = decodedToken.exp * 1000; // Convert to ms
+    const currentTime = Date.now();
+    const timeUntilExpiration = expirationTime - currentTime;
+
+    // Show warning exactly 30s before expiration
+    const warningTime = Math.max(timeUntilExpiration - 30000, 0);
+
+    console.log(`Token expires in: ${timeUntilExpiration / 1000}s`);
+
+    console.log('Token expiration time:', new Date(expirationTime));
+    console.log('Current time:', new Date(currentTime));
+    console.log('Time until expiration (ms):', timeUntilExpiration);
+
+    if (timeUntilExpiration <= 0) {
+      this.handleTokenExpired();
+      return;
+    }
+
+    // Set up the 30s warning
+    timer(warningTime)
+      .pipe(takeUntil(this.tokenExpirationTimer$))
+      .subscribe(() => {
+        this.showTokenExpirationWarning(
+          'la sesión cerrará en 30 segundos, para seguir tenés que volver a ingresar o solicitar un nuevo link',
+          30000
+        );
+      });
+
+    // Set up the expiration handler
+    timer(timeUntilExpiration)
+      .pipe(takeUntil(this.tokenExpirationTimer$))
+      .subscribe(() => {
+        this.handleTokenExpired();
+      });
+  }
+  private handleTokenExpired(): void {
+    console.warn('Token expired - logging out');
+    this.onLogout.next();
+
+    const route = this.router.url;
+    if (route === '/onboarding') {
+      this.setLogoutReason('token_expired_onb');
+    } else if (route === '/auth/register' || route === '/pin-code') {
+      this.setLogoutReason('token_expired_credentials');
+    } else {
+      this.setLogoutReason('token_expired');
+    }
+  }
+  /**
+   * Stops token expiration monitoring.
+   */
+  stopTokenExpirationMonitoring(): void {
+    console.log('Token expiration monitoring stopped.');
+    this.tokenExpirationTimer$.next(); // Stop the token expiration timer
+    this.tokenExpirationTimer$.complete();
+  }
+
+  /**
+   * Shows a warning snackbar for token expiration.
+   */
+  private showTokenExpirationWarning(message: string, duration: number): void {
+    this.snackbarService.openWarning(
+      message,
+      false, // Show close button
+      duration // Duration for the warning
+    );
   }
 
   /**
@@ -102,7 +201,7 @@ export class SessionManagementService {
   /**
    * Stops monitoring user activity.
    */
-  stopMonitoring(): void {
+  stopInactivityMonitoring(): void {
     if (this.sessionMonitorActive) {
       console.log('Session monitoring stopped.');
 

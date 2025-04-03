@@ -2,14 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 //import { PaymentCardsService } from '../payment-cards.service';
-import {  ServicesPaymentService } from '../services-payment.service';
+import { ServicesPaymentService } from '../services-payment.service';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { SidePanelService } from '@fe-treasury/shared/side-panel/side-panel.service';
 import { SecondsToTimeStringPipe } from 'src/app/pipes/seconds-to-time-string.pipe';
 import { SidePanelHeaderComponent } from '@fe-treasury/shared/side-panel/side-panel-header/side-panel-header.component';
-import { OtpFormModule } from '@fe-treasury/shared/otp-form/otp-form.module';
+import { OtpInputModule } from '@fe-treasury/shared/otp-input/otp-input.module';
 import { OTPService } from 'src/app/services/otp.service';
 import { MessagesModule } from '@fe-treasury/shared/messages/messages.module';
 import { MessageService } from '@fe-treasury/shared/messages/messages.service';
@@ -27,7 +27,7 @@ import { SidePanelFooterComponent } from '@fe-treasury/shared/side-panel/side-pa
     MessagesModule,
     SidePanelHeaderComponent,
     SidePanelFooterComponent,
-    OtpFormModule,
+    OtpInputModule,
   ],
   templateUrl: './view-card.component.html',
   styleUrl: './view-card.component.scss',
@@ -178,7 +178,7 @@ export class ViewCardComponent implements OnInit {
       }
     }, 1000);
 
-    this.cardService.getCardIframeUrl(cardId).subscribe({
+    /*this.cardService.getCardIframeUrl(cardId).subscribe({
       next: (url: string) => {
         this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
         this.loading = false;
@@ -188,7 +188,7 @@ export class ViewCardComponent implements OnInit {
         this.handleError(error);
         this.errors.push(error.message);
       },
-    });
+    });*/
   }
   ngOnDestroy(): void {
     this.clearTimer(); // Clear the timer when the component is destroyed

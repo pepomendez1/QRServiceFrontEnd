@@ -1,0 +1,19 @@
+<div class="invalid-token">
+  <div class="text-content">
+    <div
+      class="image-container"
+      *ngIf="problemImg"
+      [innerHTML]="problemImg"
+      alt="General Failure"
+    ></div>
+    <h2 class="heading-4-700">
+      Los permisos de acceso a la cuenta, han vencido
+    </h2>
+    <p class="paragraph-500">Lo sentimos. Volvé a intentar en unos minutos.</p>
+  </div>
+  <div class="button-container">
+    <button class="btn-cta-filled w-100 btn-md" (click)="retryLoad()">
+      Reintentar
+    </button>
+  </div>
+</div>

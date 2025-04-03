@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { SvgLibraryService } from 'src/app/services/svg-library.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { SessionManagementService } from 'src/app/services/session.service';
 
 export enum RegisterSteps {
   START_AUTH = 'startAuth',
@@ -25,22 +26,25 @@ export class RegisterComponent {
   public RegisterSteps = RegisterSteps;
   isMobile: boolean = false;
   problemImg: SafeHtml | null = null;
+  isLoading: boolean = true; // Loading flag
+  private isMagicLinkProcessed: boolean = false; // Track if magic link is processed
 
   constructor(
     private svgLibrary: SvgLibraryService,
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private sessionManagementService: SessionManagementService
   ) {}
 
   ngOnInit(): void {
     this.svgLibrary.getSvg('problem').subscribe((svgContent) => {
       this.problemImg = svgContent; // SafeHtml type to display SVG dynamically
     });
+
     // Observe breakpoints for responsiveness
     this.logoUrl = this.svgLibrary.getLogo();
-    //console.log('logo Url', this.logoUrl);
     this.breakpointObserver
       .observe(['(max-width: 840px)'])
       .subscribe((result) => {
@@ -50,7 +54,6 @@ export class RegisterComponent {
     console.log('register -- ');
 
     const magicLinkParam = 'code';
-    let processingLink = false; // Track if processing the link
 
     // Handle navigation state for SET_PASSWORD
     const navigationState = history.state;
@@ -61,6 +64,7 @@ export class RegisterComponent {
     ) {
       console.log('Navigating to SET_PASSWORD step');
       this.currentStep = RegisterSteps.SET_PASSWORD; // Directly set the step
+      this.isLoading = false; // Stop loader
       return; // Skip further processing
     }
 
@@ -69,11 +73,11 @@ export class RegisterComponent {
       const hashedData = params[magicLinkParam];
       if (hashedData) {
         console.log('dato: ', hashedData);
-        processingLink = true; // Start processing
+        this.isMagicLinkProcessed = true; // Mark magic link as processed
         if (this.debugMode) {
           console.log('set password --- debug mode');
           this.currentStep = RegisterSteps.START_AUTH; // Welcome slider
-          processingLink = false;
+          this.isLoading = false;
         } else {
           this.authService
             .getTokenFromLink({
@@ -84,7 +88,10 @@ export class RegisterComponent {
                 console.log('token---> ', response);
                 console.log('Step: START AUTH-----');
                 this.currentStep = RegisterSteps.START_AUTH; // Welcome slider
-                processingLink = false;
+                this.isLoading = false; // Stop loader
+
+                // Start token expiration monitoring
+                this.sessionManagementService.startTokenExpirationMonitoring();
               },
               error: (error: any) => {
                 console.error(
@@ -93,20 +100,36 @@ export class RegisterComponent {
                 );
                 this.errorMessage = error;
                 this.currentStep = RegisterSteps.EXPIRED_LINK; // Link expired
-                processingLink = false;
+                this.isLoading = false; // Stop loader
               },
             });
         }
+      } else if (!this.isMagicLinkProcessed) {
+        // Only redirect to login if no magic link was processed
+        console.log('No magic link, redirecting to /auth/login');
+        this.isLoading = false; // Stop loader
+        this.router.navigate(['/auth/login']);
       }
     });
   }
+
   goToLogin(): void {
     this.router.navigate(['/auth/login']);
   }
+
   goToSetPassword(): void {
-    this.currentStep = RegisterSteps.SET_PASSWORD;
+    this.isLoading = true; // Start loader
+    setTimeout(() => {
+      this.currentStep = RegisterSteps.SET_PASSWORD;
+      this.isLoading = false; // Stop loader
+    }, 1000); // Simulate loading delay
   }
+
   gotToWelcomeSwiper(): void {
-    this.currentStep = RegisterSteps.START_AUTH;
+    this.isLoading = true; // Start loader
+    setTimeout(() => {
+      this.currentStep = RegisterSteps.START_AUTH;
+      this.isLoading = false; // Stop loader
+    }, 1000); // Simulate loading delay
   }
 }

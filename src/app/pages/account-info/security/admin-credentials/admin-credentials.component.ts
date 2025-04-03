@@ -8,7 +8,7 @@ import { SidePanelHeaderComponent } from '@fe-treasury/shared/side-panel/side-pa
 import { SidePanelFooterComponent } from '@fe-treasury/shared/side-panel/side-panel-footer/side-panel-footer.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { ChangePinComponent } from './change-pin/change-pin.component';
-
+import { StoreDataService } from 'src/app/services/store-data.service';
 @Component({
   selector: 'app-admin-credentials',
   standalone: true,
@@ -29,7 +29,11 @@ import { ChangePinComponent } from './change-pin/change-pin.component';
 export class AdminCredentialsComponent {
   @Output() backToOptions = new EventEmitter<void>();
   credentialOpt: string = 'start';
-
+  isIframe: boolean = false;
+  constructor(private storeDataService: StoreDataService) {}
+  ngOnInit(): void {
+    this.isIframe = this.storeDataService.checkIframe();
+  }
   handleArrowBack() {
     this.backToOptions.emit();
   }

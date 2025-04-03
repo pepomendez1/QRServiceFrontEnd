@@ -1,3 +1,9 @@
+<div *ngIf="isLoading">
+  <div class="progress">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+</div>
+
 <div *ngIf="!isLoading" class="auth-container">
   <router-outlet></router-outlet>
 </div>

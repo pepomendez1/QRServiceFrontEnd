@@ -130,7 +130,7 @@
               mat-button
               class="text-button-type"
               type="button"
-              (click)="openTermDialog()"
+              (click)="openDialog('terms')"
             >
               T&C de uso
             </button>
@@ -143,7 +143,7 @@
               mat-button
               class="text-button-type"
               type="button"
-              (click)="openAccountTerms()"
+              (click)="openDialog('terms_balance_investment')"
             >
               T&C cuenta remunerada
             </button>
@@ -157,7 +157,7 @@
               color="#EA044E"
               class="text-button-type"
               type="button"
-              (click)="openAffidavitDialog()"
+              (click)="openDialog('disclaimer')"
             >
               Declaración Jurada
             </button>

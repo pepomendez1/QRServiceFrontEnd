@@ -166,7 +166,7 @@ export class PaymentCardsService {
     }
   }
 
-  getCardToken(): Observable<string> {
+  getCardToken(useOtpToken: boolean): Observable<string> {
     // console.log(`getCardToken(${cardId})`);
     if (this.useMockData) {
       // MOCK DATA
@@ -179,7 +179,11 @@ export class PaymentCardsService {
         }, 1000);
       });
     } else {
-      return this.apiService.get<string>(this.cardsEndpoint + '/tokens');
+      return this.apiService.get<string>(
+        this.cardsEndpoint + '/tokens',
+        false,
+        useOtpToken
+      );
     }
   }
 
@@ -188,25 +192,95 @@ export class PaymentCardsService {
 
     return this.storeService.getStore().pipe(
       switchMap((store) => {
-        const styles =
-          store.init_config?.card_iframe_styles ||
-          window.location.origin + '/assets/styles/iframe-card.css'; // Absolute URL// Local fallback
+        // Use the CSS file from the store if available, otherwise fall back to custom styles
+        const storeStyles = store.init_config?.card_iframe_styles;
 
-        return this.getCardToken().pipe(
+        // Define custom styles as a fallback
+        const textColor = '#ffffff';
+        const primaryColor = getComputedStyle(document.documentElement)
+          .getPropertyValue('--primary-color-200')
+          .trim();
+
+        const customStyles = encodeURIComponent(`
+          * {
+            margin: 0;
+            font-family: "Courier Prime", monospace;
+            font-weight: 400;
+            font-style: normal;
+            color: ${textColor};
+          }
+
+          .card {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-start;
+            gap: 1em;
+            background: ${primaryColor};
+            background-size: cover;
+            border-radius: 1em;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3), inset 1px 1px 2px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(0, 0, 0, 0.5);
+            padding: 2em;
+
+            * {
+              text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7), 1px 1px 0px rgba(0, 0, 0, 0.2);
+            }
+          }
+
+          .card .name {
+            color: ${textColor};
+            margin: 0;
+          }
+
+          .card .pan {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: ${textColor};
+          }
+
+          .card .pan .copy-icon {
+            opacity: 0.7;
+            width: 20px;
+            height: 20px;
+            margin-bottom: 2px;
+          }
+
+          .card .exp-code-container {
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+            gap: 3em;
+            align-items: center;
+          }
+
+          .card .security-code {
+            color: ${textColor};
+          }
+
+          .card .expiration-date {
+            color: ${textColor};
+          }
+        `);
+
+        return this.getCardToken(true).pipe(
           switchMap((response: any) => {
             console.log(response);
             const POMELO_BASE_CARD_TOKEN_URL =
-              'https://secure-data-web-stage.pomelo.la/v1/';
+              'https://secure-data-web.pomelo.la/v1/';
 
+            // Append the token, styles, and custom styles to the iframe URL
             const webViewUrl =
               POMELO_BASE_CARD_TOKEN_URL +
               cardId +
               '?auth=' +
               response.access_token +
-              '&styles=' +
-              encodeURIComponent(styles) + // Ensure proper encoding
               '&field_list=pan%2Ccode%2Cname%2Cexpiration' +
-              '&locale=es';
+              '&locale=es' +
+              (storeStyles
+                ? '&styles=' + encodeURIComponent(storeStyles) // Use the store-provided CSS file
+                : '&styles_string=' + customStyles); // Fall back to custom styles
 
             return new Observable<string>((subscriber) => {
               console.log(webViewUrl);
@@ -617,9 +691,6 @@ export class PaymentCardsService {
       }),
       switchMap((theme) => {
         // ✅ Dynamically select the correct CSS file based on the theme
-        const styles =
-          window.location.origin +
-          `/assets/styles/iframe-activation-${theme}.css`;
         const textColor = theme === 'light' ? '#161616' : '#ffffff';
         const buttonTextColor = theme === 'light' ? '#ffffff' : '#1a1a1a';
         const formBorder = theme === 'light' ? '#DBDBDB' : '#c5c5c5';
@@ -635,7 +706,7 @@ export class PaymentCardsService {
           .getPropertyValue('--primary-color-600')
           .trim();
 
-        return this.getCardToken().pipe(
+        return this.getCardToken(true).pipe(
           switchMap((response: any) => {
             console.log(' response: -- token pomelo ', response);
             const POMELO_ACTIVATION_CARD_URL =
@@ -644,7 +715,7 @@ export class PaymentCardsService {
             const customStyles = encodeURIComponent(`
 
              html, body, .activation-form {
-                height: 92vh !important;
+                height: 100vh !important;
                 width: 100%;
   margin: 0;
   padding: 0;
@@ -714,7 +785,7 @@ export class PaymentCardsService {
 
             // append the token as a query param
             const webViewUrl =
-              `${POMELO_ACTIVATION_CARD_URL}?token=${encodeURIComponent(
+              `${POMELO_ACTIVATION_CARD_URL}?auth=${encodeURIComponent(
                 response.access_token
               )}` +
               `&locale=es` +

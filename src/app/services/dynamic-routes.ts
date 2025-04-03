@@ -10,6 +10,8 @@ import { firstValueFrom } from 'rxjs';
 import { InvoiceComponent } from '../components/invoice/invoice.component';
 import { InternationalOperationsComponent } from '../components/international-operations/international-operations.component';
 import { FeatureFlagsService } from './modules.service';
+import { PaymentLinkComponent } from '../components/payment-link/payment-link.component';
+import { CostsComponent } from '../components/costs/costs.component';
 
 @Injectable({
   providedIn: 'root',
@@ -102,6 +104,15 @@ export class DynamicRoutesService {
             '../pages/insurance-dashboard/insurance-dashboard.module'
           ).then((m) => m.InsuranceDashboardModule),
         pathMatch: 'full',
+      });
+    }
+    if (featureFlags.payment_link_module) {
+      routes.push({
+        path: 'payment-link',
+        component: PaymentLinkComponent,
+      }, {
+        path:'costs',
+        component: CostsComponent,
       });
     }
 

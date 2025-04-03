@@ -95,7 +95,7 @@ export class InternationalBalanceComponent implements OnInit {
   startTransfer(): void {
     this.sidePanelService.open(
       InternationalTransferComponent,
-      'Transferir',
+      'Enviar dinero',
       {},
       true
     );

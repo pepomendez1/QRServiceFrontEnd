@@ -7,28 +7,22 @@
 <div class="transfer-contacts-container">
   <div class="input-search">
     <span class="contact-title heading-5-600"> Nuevo contacto</span>
-    <div
-      class="cbu-input-container"
-      [ngClass]="{ 'error-border': notFoundOwner }"
-    >
-      <div class="input-data">
-        <input
-          class="input-alias paragraph-500"
-          placeholder="CVU, CBU, Alias"
-          [(ngModel)]="cbuInput"
-          (input)="validateInput()"
-          (keyup.enter)="searchAccountOwner()"
-        />
-      </div>
-      <div class="actions-button">
+
+    <div class="add-input-container" (click)="searchAccountOwner()">
+      <div class="add-contact-button">
+        <mat-icon class="material-symbols-outlined">add_circle</mat-icon>
         <button
           mat-icon-button
-          (click)="searchAccountOwner()"
           class="outline-button"
           [disabled]="!isValid"
+        ></button>
+        <div class="contact-info">
+          <span class="paragraph-600"> Añadir un nuevo contacto </span>
+        </div>
+
+        <mat-icon class="material-symbols-outlined"
+          >keyboard_arrow_right</mat-icon
         >
-          <mat-icon class="material-symbols-outlined">search</mat-icon>
-        </button>
       </div>
     </div>
     <mat-error *ngIf="notFoundOwner" class="form-error">
@@ -86,9 +80,10 @@
                   <span class="paragraph-600">{{
                     contact.name | formatName
                   }}</span>
-                  <span class="secondary-500-light">{{
-                    contact.bank_name
-                  }}</span>
+                  <span class="secondary-500-light"
+                    >Cuenta en {{ contact.currency }} acabada en
+                    {{ contact.accountNumber | slice : -4 }}</span
+                  >
                 </div>
                 <div
                   *ngIf="contact.isFavMode"
@@ -178,12 +173,4 @@
     </div>
   </div>
 </div>
-<!-- <app-side-panel-footer
-    class="w-100"
-    [buttonText]="'Continuar'"
-    buttonStyle="filled"
-    [buttonDisabled]="!accountOwner"
-    (buttonClicked)="onSubmitContact()"
-  ></app-side-panel-footer> -->
-
 }
