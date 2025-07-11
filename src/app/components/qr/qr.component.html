@@ -30,7 +30,7 @@
     <div class="qr-list">
       <div class="qr-item" *ngFor="let qr of qrs">
         <span>{{ qr.description }} — {{ qr.amount }} {{ qr.currency }}</span>
-        <button mat-icon-button color="warn" (click)="deleteQr(qr.qr_id)">
+        <button mat-icon-button color="warn" (click)="deleteQr(qr.id!)">
           <mat-icon>delete</mat-icon>
         </button>
       </div>

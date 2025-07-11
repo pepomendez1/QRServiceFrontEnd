@@ -1,5 +1,13 @@
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { NgModule, LOCALE_ID, APP_INITIALIZER } from '@angular/core';
 import { MatFormFieldDefaultOptions } from '@angular/material/form-field';
 import { PendingInterceptorModule } from '@fe-treasury/shared/loading-indicator/pending-interceptor.module';
@@ -154,38 +162,35 @@ export function preloadSvgLibrary(
   declarations: [
     AppComponent,
     QrComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
   ],
   imports: [
-    // Angular Core Module
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     AuthModule,
-    BrowserAnimationsModule,
-    MatProgressBar,
-    // Core Modules
-    AppRoutingModule,
-
-    // Layout Module (Sidenav, Header, Content)
     AppLayoutModule,
-    // Main routing module with onboarding
     MainModule,
-
-    // Displays Loading Bar when a Route Request or HTTP Request is pending
+    BrowserAnimationsModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormatNamePipe,
+    MatButtonModule,
+    MatCardModule,
+    MatProgressBarModule,
+    MatDialogModule,
+    MatIconModule,
     PendingInterceptorModule,
-
-    //Third party modules
-    CurrencyMaskModule,
+    CurrencyMaskModule
   ],
   providers: [
     DatePipe,
-    FormatNamePipe,
-    ThemeService, // Register ThemeService
-    SvgLibraryService, // Register SvgLibraryService
-    StoreDataService, // Register StoreDataService
+    ThemeService,
+    SvgLibraryService,
+    StoreDataService,
     { provide: CURRENCY_MASK_CONFIG, useValue: CustomCurrencyMaskConfig },
-    { provide: LOCALE_ID, useValue: 'es-AR' }, // Configuración de localización
+    { provide: LOCALE_ID, useValue: 'es-AR' },
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: {
@@ -195,10 +200,9 @@ export function preloadSvgLibrary(
     {
       provide: APP_INITIALIZER,
       useFactory: preloadSvgLibrary,
-      deps: [SvgLibraryService, StoreDataService, ThemeService], // Add StoreDataService here
+      deps: [SvgLibraryService, StoreDataService, ThemeService],
       multi: true,
     },
-
     {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
       useValue: {
@@ -211,6 +215,4 @@ export function preloadSvgLibrary(
   bootstrap: [AppComponent],
 })
 export class AppModule {}
-function reject(arg0: Error) {
-  throw new Error('Function not implemented.');
-}
+

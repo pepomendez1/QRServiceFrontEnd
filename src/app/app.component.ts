@@ -303,7 +303,7 @@ export class AppComponent implements OnInit, OnDestroy {
               name: 'C\u00f3digos QR',
               routeOrFunction: '/app/qr',
               icon: 'qr_code',
-              position: 6,
+              position: 7,
               navigation: true,
               enabled: true,
             },

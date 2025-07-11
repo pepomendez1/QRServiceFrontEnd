@@ -45,6 +45,13 @@ export class SidenavComponent implements OnInit, OnDestroy {
       position: 5,
       enabled: false,
     },
+    {
+      name: 'QR',
+      routeOrFunction: '/app/qr',
+      icon: 'qr_code', 
+      position: 7,     
+      enabled: true
+    }
   ];
 
   constructor(
