@@ -1,61 +1,84 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { QrService, QrCode } from './qr.service';
+import { QrService, QrCode } from '../../services/qr.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from './confirm-dialog.component'; 
 
 @Component({
   selector: 'app-qr',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, MatInputModule],
   templateUrl: './qr.component.html',
-  styleUrl: './qr.component.scss'
+  styleUrls: ['./qr.component.scss']
 })
 export class QrComponent implements OnInit {
   qrs: QrCode[] = [];
-  newQr: Partial<QrCode> = {};
   loading = false;
 
-  constructor(private qrService: QrService) {}
+  // Estado del formulario
+  newQr: QrCode = {
+    amount: 0,
+    currency: 'ARS',
+    description: ''
+  };
+
+    constructor(
+    private qrService: QrService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
+    ) {}
 
   ngOnInit(): void {
-    this.loadQrs();
+    this.fetchQrs();
   }
 
-  loadQrs(): void {
+  fetchQrs(): void {
     this.loading = true;
-    this.qrService.getAllQrs().subscribe({
-      next: res => {
-        this.qrs = res.qrs;
-        this.loading = false;
-      },
-      error: err => {
-        console.error('Error fetching QR codes', err);
-        this.loading = false;
-      }
+    this.qrService.getAllQrs().subscribe(response => {
+      this.qrs = response.qrs;
+      this.loading = false;
     });
   }
 
   generateQr(): void {
-    if (!this.newQr.amount || !this.newQr.currency) {
-      return;
-    }
-    const payload = { ...this.newQr } as QrCode;
-    this.qrService.createQr(payload).subscribe({
-      next: () => {
-        this.newQr = {};
-        this.loadQrs();
-      },
-      error: err => console.error('Error creating QR', err)
+    const payload: QrCode = {
+        ...this.newQr,
+        amount: this.newQr.amount.toString() as any
+    };
+
+    this.qrService.createQr(payload).subscribe((newQr: QrCode) => {
+        this.qrs.unshift(newQr);
+        this.resetForm();
+        this.snackBar.open('✅ QR generado con éxito', 'Cerrar', { duration: 3000 });
     });
-  }
+    }
 
   deleteQr(id: string): void {
-    this.qrService.deleteQr(id).subscribe({
-      next: () => this.loadQrs(),
-      error: err => console.error('Error deleting QR', err)
+    this.qrService.deleteQr(id).subscribe(() => {
+        this.qrs = this.qrs.filter(qr => qr.id !== id);
+        this.snackBar.open('🗑️ QR eliminado correctamente', 'Cerrar', { duration: 3000 });
     });
+    }
+
+  confirmDelete(id: string): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        width: '300px',
+        data: {
+        message: '¿Estás seguro que querés eliminar este QR?'
+        }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+        if (result === true) {
+        this.deleteQr(id);
+        }
+    });
+    }
+    
+
+  private resetForm(): void {
+    this.newQr = {
+      amount: 0,
+      currency: 'ARS',
+      description: ''
+    };
   }
 }
