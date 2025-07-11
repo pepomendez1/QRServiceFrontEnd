@@ -1,29 +1,17 @@
-.qr-card {
-  margin-bottom: 24px;
-}
-
 .qr-form {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .qr-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .qr-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #ddd;
-}
-
-.qr-empty {
-  padding: 16px;
-  font-style: italic;
-  color: #666;
 }

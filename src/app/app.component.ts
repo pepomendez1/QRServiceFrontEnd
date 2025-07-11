@@ -38,7 +38,6 @@ export class AppComponent implements OnInit, OnDestroy {
     insurance_module: false,
     payment_link_module: false,
     qr_module: false,
-
   };
 
   private isAppRoute: boolean = false; // Track if the current route starts with /app

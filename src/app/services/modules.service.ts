@@ -15,7 +15,6 @@ export class FeatureFlagsService {
     insurance_module: false,
     payment_link_module: false,
     qr_module: false,
-
   });
   private originalFeatureFlags = this.featureFlags.value; // Store original flags
   featureFlags$ = this.featureFlags.asObservable(); // Expose as observable
@@ -65,7 +64,6 @@ export class FeatureFlagsService {
         insurance_module: false,
         payment_link_module: false,
         qr_module: false,
-
       });
     }
   }

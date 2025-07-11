@@ -14,7 +14,6 @@ import { PaymentLinkComponent } from '../components/payment-link/payment-link.co
 import { CostsComponent } from '../components/costs/costs.component';
 import { QrComponent } from '../components/qr/qr.component';
 
-
 @Injectable({
   providedIn: 'root',
 })
