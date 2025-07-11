@@ -1,17 +1,20 @@
 .qr-form {
   display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .qr-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .qr-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
 }

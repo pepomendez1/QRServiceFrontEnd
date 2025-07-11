@@ -1,18 +1,39 @@
-<div class="qr-form">
-  <input matInput placeholder="Monto" type="number" [(ngModel)]="newQr.amount" name="amount">
-  <input matInput placeholder="Moneda" [(ngModel)]="newQr.currency" name="currency">
-  <input matInput placeholder="Descripción" [(ngModel)]="newQr.description" name="description">
-  <button mat-raised-button color="primary" (click)="generateQr()">Generar QR</button>
-</div>
+<mat-card class="qr-card">
+  <mat-card-title>Generar nuevo QR</mat-card-title>
+  <mat-card-content>
+    <div class="qr-form">
+      <mat-form-field appearance="fill">
+        <mat-label>Monto</mat-label>
+        <input matInput type="number" [(ngModel)]="newQr.amount" name="amount" />
+      </mat-form-field>
 
-<div class="qr-list" *ngIf="qrs.length">
-  <div class="qr-item" *ngFor="let qr of qrs">
-    <span>{{ qr.description || qr.id }}</span>
-    <button mat-icon-button color="warn" (click)="deleteQr(qr.id!)">
-      <mat-icon>delete</mat-icon>
-    </button>
-  </div>
-</div>
+      <mat-form-field appearance="fill">
+        <mat-label>Divisa</mat-label>
+        <input matInput type="text" [(ngModel)]="newQr.currency" name="currency" />
+      </mat-form-field>
 
-<div *ngIf="!qrs.length && !loading">No hay códigos QR.</div>
-<div *ngIf="loading">Cargando...</div>
+      <mat-form-field appearance="fill">
+        <mat-label>Descripción</mat-label>
+        <input matInput type="text" [(ngModel)]="newQr.description" name="description" />
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="generateQr()">Generar QR</button>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-progress-bar *ngIf="loading" mode="indeterminate" color="accent"></mat-progress-bar>
+
+<mat-card class="qr-card" *ngIf="qrs.length">
+  <mat-card-title>Listado de QRs generados</mat-card-title>
+  <mat-card-content>
+    <div class="qr-list">
+      <div class="qr-item" *ngFor="let qr of qrs">
+        <span>{{ qr.description }} — {{ qr.amount }} {{ qr.currency }}</span>
+        <button mat-icon-button color="warn" (click)="deleteQr(qr.qr_id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
