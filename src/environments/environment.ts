@@ -6,7 +6,7 @@ export const environment = {
   production: true,
   region: 'us-east-2', // Cambia esto a tu región
   redirectUrl: 'http://localhost:4200/',
-  apiUrl: 'https://connect-api.wibond.co',
+  apiUrl: 'https://qnji4j5blg.execute-api.us-east-2.amazonaws.com/Prod',
   debugMode: true,
   // apiUrl: 'https://xa9cbubdj2.execute-api.us-east-2.amazonaws.com/public',
 };
