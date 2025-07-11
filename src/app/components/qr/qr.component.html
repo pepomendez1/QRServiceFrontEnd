@@ -1,0 +1,44 @@
+<!-- FORMULARIO DENTRO DE UNA CARD -->
+<mat-card class="qr-card">
+  <mat-card-title>Generar nuevo QR</mat-card-title>
+  <mat-card-content>
+    <div class="qr-form">
+      <mat-form-field appearance="fill">
+        <mat-label>Monto</mat-label>
+        <input matInput type="number" [(ngModel)]="newQr.amount" name="amount" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Divisa</mat-label>
+        <input matInput type="text" [(ngModel)]="newQr.currency" name="currency" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Descripción</mat-label>
+        <input matInput type="text" [(ngModel)]="newQr.description" name="description">
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="generateQr()">Generar QR</button>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<!-- LOADING BAR -->
+<mat-progress-bar *ngIf="loading" mode="indeterminate" color="accent"></mat-progress-bar>
+
+<!-- LISTADO DENTRO DE OTRA CARD -->
+<mat-card class="qr-card" *ngIf="qrs.length">
+  <mat-card-title>Listado de QRs generados</mat-card-title>
+  <mat-card-content>
+    <div class="qr-list">
+      <div class="qr-item" *ngFor="let qr of qrs">
+        <span>{{ qr.description || qr.id }}</span>
+        <button mat-icon-button color="warn" (click)="confirmDelete(qr.id!)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<div *ngIf="!qrs.length && !loading" class="qr-empty">No hay códigos QR.</div>

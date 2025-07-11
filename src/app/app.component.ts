@@ -37,6 +37,8 @@ export class AppComponent implements OnInit, OnDestroy {
     services_payment: false,
     insurance_module: false,
     payment_link_module: false,
+    qr_module: false,
+
   };
 
   private isAppRoute: boolean = false; // Track if the current route starts with /app
@@ -290,6 +292,18 @@ export class AppComponent implements OnInit, OnDestroy {
               name: 'Configurar cobros',
               routeOrFunction: '/app/costs',
               icon: 'settings',
+              position: 6,
+              navigation: true,
+              enabled: true,
+            },
+          ]
+        : []),
+              ...(featureFlags.qr_module
+        ? [
+            {
+              name: 'C\u00f3digos QR',
+              routeOrFunction: '/app/qr',
+              icon: 'qr_code',
               position: 6,
               navigation: true,
               enabled: true,

@@ -20,6 +20,9 @@ import {
   MAT_SNACK_BAR_DEFAULT_OPTIONS,
   MatSnackBarConfig,
 } from '@angular/material/snack-bar';
+import { QrComponent } from './components/qr/qr.component';
+import { ConfirmDialogComponent } from './components/qr/confirm-dialog.component';
+
 
 // Registrar la localización para 'es-ES'
 // import localeEs from '@angular/common/locales/es';
@@ -148,7 +151,11 @@ export function preloadSvgLibrary(
 }
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [
+    AppComponent,
+    QrComponent,
+    ConfirmDialogComponent
+  ],
   imports: [
     // Angular Core Module
     BrowserModule,

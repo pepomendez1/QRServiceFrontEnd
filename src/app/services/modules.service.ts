@@ -14,6 +14,8 @@ export class FeatureFlagsService {
     services_payment: false,
     insurance_module: false,
     payment_link_module: false,
+    qr_module: false,
+
   });
   private originalFeatureFlags = this.featureFlags.value; // Store original flags
   featureFlags$ = this.featureFlags.asObservable(); // Expose as observable
@@ -44,6 +46,8 @@ export class FeatureFlagsService {
           storeData?.init_config?.['insurance_module'] === 'true',
         payment_link_module:
           storeData?.init_config?.['payment_link_module'] === 'true',
+        qr_module:
+        storeData?.init_config?.['qr_module'] === 'true',
       };
 
       console.log('✅ Feature Flags Loaded:', newFeatureFlags);
@@ -60,6 +64,8 @@ export class FeatureFlagsService {
         services_payment: false,
         insurance_module: false,
         payment_link_module: false,
+        qr_module: false,
+
       });
     }
   }
@@ -74,6 +80,7 @@ export class FeatureFlagsService {
       flags.services_payment = false;
       flags.insurance_module = false;
       flags.payment_link_module = false;
+      flags.qr_module = false;
     } else if (flags.basic_modules === true) {
       flags.international_account = false; // Ensure international_account is false
 
@@ -83,6 +90,7 @@ export class FeatureFlagsService {
       flags.services_payment = this.originalFeatureFlags.services_payment;
       flags.insurance_module = this.originalFeatureFlags.insurance_module;
       flags.payment_link_module = this.originalFeatureFlags.payment_link_module;
+      flags.qr_module = this.originalFeatureFlags.qr_module;
     }
 
     const newFlags = { ...currentFlags, ...flags }; // Merge changes
