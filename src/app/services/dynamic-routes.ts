@@ -12,6 +12,7 @@ import { InternationalOperationsComponent } from '../components/international-op
 import { FeatureFlagsService } from './modules.service';
 import { PaymentLinkComponent } from '../components/payment-link/payment-link.component';
 import { CostsComponent } from '../components/costs/costs.component';
+import { QrComponent } from '../components/qr/qr.component';
 
 @Injectable({
   providedIn: 'root',
@@ -113,6 +114,13 @@ export class DynamicRoutesService {
       }, {
         path:'costs',
         component: CostsComponent,
+      });
+    }
+
+    if (featureFlags.qr_module) {
+      routes.push({
+        path: 'qr',
+        component: QrComponent,
       });
     }
 

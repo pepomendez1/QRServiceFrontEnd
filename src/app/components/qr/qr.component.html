@@ -1,0 +1,18 @@
+<div class="qr-form">
+  <input matInput placeholder="Monto" type="number" [(ngModel)]="newQr.amount" name="amount">
+  <input matInput placeholder="Moneda" [(ngModel)]="newQr.currency" name="currency">
+  <input matInput placeholder="Descripción" [(ngModel)]="newQr.description" name="description">
+  <button mat-raised-button color="primary" (click)="generateQr()">Generar QR</button>
+</div>
+
+<div class="qr-list" *ngIf="qrs.length">
+  <div class="qr-item" *ngFor="let qr of qrs">
+    <span>{{ qr.description || qr.id }}</span>
+    <button mat-icon-button color="warn" (click)="deleteQr(qr.id!)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</div>
+
+<div *ngIf="!qrs.length && !loading">No hay códigos QR.</div>
+<div *ngIf="loading">Cargando...</div>
